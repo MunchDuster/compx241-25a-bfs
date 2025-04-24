@@ -17,7 +17,7 @@ httpServer.listen(PORT, () => { // start http server listening
     console.log('httpServer running at http://localhost:' + PORT);
 });
 
-const usersFinding = ['test1','test2','test3']; //TODO: dictionary of usernames to sockets for "PtP" comms
+const usersFinding = [];
 io.on('connection', (socket) => { // start socket server listening
     console.log('connection made!');
     let username = null;
