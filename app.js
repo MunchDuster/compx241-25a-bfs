@@ -17,11 +17,11 @@ httpServer.listen(PORT, () => { // start http server listening
     console.log('httpServer running at http://localhost:' + PORT);
 });
 
-const usersFinding = ['test1','test2','test3'];
+const usersFinding = ['test1','test2','test3']; //TODO: dictionary of usernames to sockets for "PtP" comms
 io.on('connection', (socket) => { // start socket server listening
     console.log('connection made!');
     let username = null;
-    socket.on('find', (newUsername) => {
+    socket.on('find', (newUsername, callback) => {
         console.log('finding for user: ' + newUsername)
         if (!isValidUsername(newUsername)) {
             socket.emit('error', 'invalid username, 3-16 letters with no whitespaces only');
@@ -33,10 +33,18 @@ io.on('connection', (socket) => { // start socket server listening
         }
         username = newUsername;
         usersFinding.push(username);
-        socket.emit('find-results', usersFinding);
+        socket.join(username); // put the user in a room by their username
+        socket.join('finding'); // join the finding room
+        io.to('finding').emit('find-results', usersFinding);
     });
-    socket.on('find-again', () => {
-        socket.emit('find-results', usersFinding);
+    socket.on('request-game', (requesteeUsername) => {
+        console.log(username + ' is requesting game with ' + requesteeUsername);
+        if (!usersFinding.includes(requesteeUsername)) {
+            socket.error('user \'' + requesteeUsername + '\' does not exist or is not finding a game');
+            return;
+        }
+        // broadcast to the other user that this user is requesting a game
+        socket.to(requesteeUsername).emit('requested-game', username);
     });
 
     socket.on('disconnect', function() {
@@ -45,8 +53,7 @@ io.on('connection', (socket) => { // start socket server listening
             if (usersFinding.includes(username)) {
                 console.log(username + ' is removed from usersFinding')
                 usersFinding.splice(usersFinding.indexOf(username), 1);
-                // TODO: update currently finding players
-                // LATER: put all users finding into a room
+                socket.to('finding').emit('find-results', usersFinding);
             }
         }
     });
