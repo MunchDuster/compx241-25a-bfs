@@ -88,7 +88,7 @@ function onJoined(otherUsername, joinedGameRoom) {
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
-    console.log('joing game ' + gameRoom + ' against ' + oppUsername);
+    console.log('joining game ' + gameRoom + ' against ' + oppUsername);
 }
 
 

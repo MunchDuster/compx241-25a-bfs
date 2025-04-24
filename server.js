@@ -18,11 +18,15 @@ httpServer.listen(PORT, () => { // start http server listening
 });
 
 const usersFinding = [];
+const usersInGame = [];
 let gameCount = 0;
 io.on('connection', (socket) => { // start socket server listening
     console.log('connection made!');
     let username = null;
     let gameRoom = null;
+    let isFindingGame = false;
+    let isInGame = false;
+
     socket.on('find', (newUsername, callback) => {
         console.log('finding for user: ' + newUsername)
         if (!isValidUsername(newUsername)) {
@@ -38,6 +42,7 @@ io.on('connection', (socket) => { // start socket server listening
         callback({success: true});
         username = newUsername;
         usersFinding.push(username);
+        isFindingGame = true;
         socket.join(username); // put the user in a room by their username
         socket.join('finding'); // join the finding room
         io.to('finding').emit('find-results', usersFinding);
@@ -58,25 +63,31 @@ io.on('connection', (socket) => { // start socket server listening
             callback({success: false});
             return;
         }
+        const gameRoomName = 'game-' + gameCount++;
+        callback({success: true, gameRoom: gameRoomName});
+
         socket.leave('finding');
         console.log('starting game between ' + username + ' and ' + requesterUsername);
 
-        gameRoom = 'game-' + gameCount++;
-        socket.join(gameRoom);
-        callback({success: true, gameRoom: gameRoom});
-
-        io.to(requesterUsername).emit('joined', username, gameRoom);
+        joinGameRoom(gameRoomName)
+        io.to(requesterUsername).emit('joined', username, gameRoomName);
         // TODO: create a 'Game' instance to hold game state and whose turn, etc        
     });
-    socket.on('joined-ping', (joinedGameRoom) => { // for other player to join the game room
+    socket.on('joined-ping', joinGameRoom);
+    
+    function joinGameRoom(joinedGameRoom) {
         gameRoom = joinedGameRoom;
-    });
+        isFindingGame = false;
+        isInGame = true;
+        usersFinding.splice(usersFinding.indexOf(username), 1);
+        socket.join(gameRoom);
+    }
 
     socket.on('disconnect', function() {
         console.log('disconnect');
         if (username != null) {
             socket.leave(username);
-            if (usersFinding.includes(username)) {
+            if (isFindingGame) {
                 console.log(username + ' is removed from usersFinding')
                 usersFinding.splice(usersFinding.indexOf(username), 1);
                 socket.leave('finding')
