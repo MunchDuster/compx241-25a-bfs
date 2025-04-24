@@ -14,3 +14,13 @@ body {
 .hidden {
     display: none;
 }
+.find-result {
+    width: 400px;
+    background-color: #ddd;
+    margin: 4px;
+    text-align: left;
+    padding: 2px 12px;
+}
+.request-game-button {
+    float: right;
+}

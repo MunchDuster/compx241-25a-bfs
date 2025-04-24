@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div id="startmenu">
+        <div id="start-menu">
             <h1>Battle fleet sweep</h1>
                 <button id="find" class="menu-button" onclick="find()">Find Game</button>
                 <br>
@@ -13,6 +13,10 @@
                 <br>
                 <button id="credits" class="menu-button" onclick="credits()">Credits</button>
             </div>
+        </div>
+        <div id="find-menu" class="hidden">
+            <div>Your username is <div id="username-display"></div></div>
+            <div id="find-list"></div>
         </div>
         <script src="socket.io/socket.io.js"></script>
         <script src="script.js"></script>
