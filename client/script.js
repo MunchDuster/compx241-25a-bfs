@@ -1,9 +1,14 @@
 const socket = io();
 const startmenu = document.getElementById('start-menu');
 const findmenu = document.getElementById('find-menu');
+const gameMenu = document.getElementById('game-menu');
 const findListContainer = document.getElementById('find-list');
-const usernameDisplay = document.getElementById('username-display');
+const usernameDisplays = document.querySelectorAll('.username-display:not([id="opp"])');
+const oppUsernameDisplay = document.getElementById('opp');
+
 let username = null;
+let oppUsername = null;
+let gameRoom = null;
 
 socket.on('connect', function() {
     console.log('connected');
@@ -15,7 +20,8 @@ function find() {
         if (!response.success) return;
         startmenu.classList.add('hidden');
         findmenu.classList.remove('hidden');
-        usernameDisplay.innerText = username;
+        console.log(usernameDisplays)
+        usernameDisplays.forEach(div => div.innerText = username);
     });
 }
 socket.on('error', (message) => {
@@ -63,10 +69,28 @@ socket.on('requested-game', (requesterUsername) => {
     joinButton.innerText = 'Join';
     joinButton.classList.add('join-button');
     joinButton.addEventListener('click', () => {
-        socket.emit('join', requesterUsername);
+        socket.emit('join', requesterUsername, (response) => {
+            if (!response.success) return;
+            onJoined(requesterUsername, response.gameRoom);
+        });
     });
     listItem.appendChild(joinButton);
 });
+
+socket.on('joined', (otherUsername, gameRoom) => {
+    socket.emit('joined-ping', gameRoom);
+    onJoined(otherUsername, gameRoom);
+})
+
+function onJoined(otherUsername, joinedGameRoom) {
+    findmenu.classList.add('hidden');
+    gameMenu.classList.remove('hidden');
+    oppUsernameDisplay.innerText = otherUsername;
+    oppUsername = otherUsername;
+    gameRoom = joinedGameRoom;
+    console.log('joing game ' + gameRoom + ' against ' + oppUsername);
+}
+
 
 socket.on('disconnect', function() {
 	console.log('disconnected');

@@ -18,9 +18,11 @@ httpServer.listen(PORT, () => { // start http server listening
 });
 
 const usersFinding = [];
+let gameCount = 0;
 io.on('connection', (socket) => { // start socket server listening
     console.log('connection made!');
     let username = null;
+    let gameRoom = null;
     socket.on('find', (newUsername, callback) => {
         console.log('finding for user: ' + newUsername)
         if (!isValidUsername(newUsername)) {
@@ -43,11 +45,31 @@ io.on('connection', (socket) => { // start socket server listening
     socket.on('request-game', (requesteeUsername) => {
         console.log(username + ' is requesting game with ' + requesteeUsername);
         if (!usersFinding.includes(requesteeUsername)) {
-            socket.error('user \'' + requesteeUsername + '\' does not exist or is not finding a game');
+            socket.emit('error', 'user \'' + requesteeUsername + '\' does not exist or is not finding a game');
             return;
         }
         // broadcast to the other user that this user is requesting a game
         socket.to(requesteeUsername).emit('requested-game', username);
+    });
+    
+    socket.on('join', (requesterUsername,callback) => {
+        if (!usersFinding.includes(requesterUsername)) {
+            socket.emit('error', 'user \'' + requesteeUsername + '\' does not exist or is not finding a game');
+            callback({success: false});
+            return;
+        }
+        socket.leave('finding');
+        console.log('starting game between ' + username + ' and ' + requesterUsername);
+
+        gameRoom = 'game-' + gameCount++;
+        socket.join(gameRoom);
+        callback({success: true, gameRoom: gameRoom});
+
+        io.to(requesterUsername).emit('joined', username, gameRoom);
+        // TODO: create a 'Game' instance to hold game state and whose turn, etc        
+    });
+    socket.on('joined-ping', (joinedGameRoom) => { // for other player to join the game room
+        gameRoom = joinedGameRoom;
     });
 
     socket.on('disconnect', function() {

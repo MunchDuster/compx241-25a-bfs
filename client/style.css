@@ -31,7 +31,11 @@ body {
     width: 400px;
     margin: auto;
 }
-#username-display {
+.username-display {
     background-color: #bdddf9;
+    display: inline-block;
+}
+#opp {
+    background-color: #f9c3bd;
     display: inline-block;
 }
