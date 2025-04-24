@@ -99,6 +99,7 @@ function onJoined(otherUsername, joinedGameRoom) {
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
+    startDrawing();
 }
 socket.on('game-ended', (message) => {
     alert(message);
@@ -106,6 +107,7 @@ socket.on('game-ended', (message) => {
     gameRoom = null;
     socket.emit('game-ended-ping');
     showMenu('start');
+    stopDrawing();
 });
 
 socket.on('disconnect', function() {

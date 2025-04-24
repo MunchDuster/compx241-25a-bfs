@@ -19,9 +19,11 @@
         </div>
         <div id="game-menu" class="hidden">
             <div><div class="username-display"></div> vs <div id="opp" class="username-display"></div></div>
-            <canvas id="canvas"></canvas>
+            <!--IMPORTANT canvas width and height here must match css settings else will look bad-->
+            <canvas id="canvas" width="500px" height="1000px"></canvas>
         </div>
         <script src="socket.io/socket.io.js"></script>
+        <script src="drawer.js"></script>
         <script src="script.js"></script>
     </body>
 </html>
