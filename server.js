@@ -62,5 +62,5 @@ io.on('connection', (socket) => { // start socket server listening
 });
 
 function isValidUsername(username) {
-    return typeof(username) == 'string' && username.match('^[a-zA-Z]+') && 2 < username.length < 16;
+    return typeof(username) == 'string' && new RegExp('^[a-zA-Z]+$').test(username) && username.length > 2 && username.length < 17;
 }
