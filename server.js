@@ -17,47 +17,53 @@ httpServer.listen(PORT, () => { // start http server listening
     console.log('httpServer running at http://localhost:' + PORT);
 });
 
-const usersFinding = [];
+const users = [];
 let gameCount = 0;
 io.on('connection', (socket) => { // start socket server listening
     console.log('connection made!');
-    let username = null;
-    let gameRoom = null;
-    let isFindingGame = false;
-    let isInGame = false;
+    const user = {
+        name: null,
+        game: null,
+        isFinding: false,
+        isGaming: false,
+    }
 
     socket.on('find', (newUsername, callback) => {
-        console.log('finding for user: ' + newUsername)
         if (!isValidUsername(newUsername)) {
-            socket.emit('error', 'invalid username, 3-16 letters with no whitespaces only');
+            socket.emit('error', 'invalid user.name, 3-16 letters with no whitespaces only');
             callback({success: false});
             return;
         }
-        if (usersFinding.includes(newUsername)) {
+        if (users.includes(newUsername)) {
             socket.emit('error', 'there is already a user called that, try another name.');
             callback({success: false});
             return;
         }
+        console.log(newUsername + ' is finding');
         callback({success: true});
-        username = newUsername;
-        usersFinding.push(username);
-        isFindingGame = true;
-        socket.join(username); // put the user in a room by their username
+        user.name = newUsername;
+        user.isFinding = true;
+        users.push(user);
+        socket.join(newUsername); // put the user in a room by their user.name
         socket.join('finding'); // join the finding room
-        io.to('finding').emit('find-results', usersFinding);
+        io.to('finding').emit('find-results', getFindingUsers());
     });
+    function getFindingUsers() {
+        return users.filter(user => user.isFinding).map(user => user.name);
+    }
     socket.on('request-game', (requesteeUsername) => {
-        console.log(username + ' is requesting game with ' + requesteeUsername);
-        if (!usersFinding.includes(requesteeUsername)) {
+        console.log(user.name + ' is requesting game with ' + requesteeUsername);
+        const requestee = users.find(user => user.name == requesteeUsername);
+        if (requestee === undefined || !requestee.isFinding) {
             socket.emit('error', 'user \'' + requesteeUsername + '\' does not exist or is not finding a game');
             return;
         }
         // broadcast to the other user that this user is requesting a game
-        socket.to(requesteeUsername).emit('requested-game', username);
+        socket.to(requesteeUsername).emit('requested-game', user.name);
     });
     
     socket.on('join', (requesterUsername,callback) => {
-        if (!usersFinding.includes(requesterUsername)) {
+        if (users.every(user => user.name != requesterUsername)) {
             socket.emit('error', 'user \'' + requesteeUsername + '\' does not exist or is not finding a game');
             callback({success: false});
             return;
@@ -66,42 +72,44 @@ io.on('connection', (socket) => { // start socket server listening
         callback({success: true, gameRoom: gameRoomName});
 
         socket.leave('finding');
-        console.log('starting game between ' + username + ' and ' + requesterUsername);
+        console.log('starting game between ' + user.name + ' and ' + requesterUsername);
 
-        joinGameRoom(gameRoomName)
-        io.to(requesterUsername).emit('joined', username, gameRoomName);
+        joinGameRoom(gameRoomName);
+        io.to(requesterUsername).emit('joined', user.name, gameRoomName);
         // TODO: create a 'Game' instance to hold game state and whose turn, etc        
     });
     socket.on('joined-ping', joinGameRoom);
     
     function joinGameRoom(joinedGameRoom) {
         gameRoom = joinedGameRoom;
-        isFindingGame = false;
-        isInGame = true;
-        usersFinding.splice(usersFinding.indexOf(username), 1);
+        user.isFinding = false;
+        user.isGaming = true;
         socket.join(gameRoom);
     }
     socket.on('game-ended-ping', () => {
-        isInGame = false;
+        user.isGaming = false;
         socket.leave(gameRoom);
         gameRoom = null;
     });
 
     socket.on('disconnect', function() {
-        console.log('disconnect');
-        if (username == null) return;
-        socket.leave(username);
-        if (isFindingGame) {
-            console.log(username + ' is removed from usersFinding')
-            socket.leave('finding')
-            usersFinding.splice(usersFinding.indexOf(username), 1);
-            socket.to('finding').emit('find-results', usersFinding);
+        if (user.name == null) {
+            console.log('disconnect');
             return;
         }
-        if (isInGame) {
-            console.log(username + ' was in game, closing game ' + gameRoom);
+        console.log('disconnecting ' + user.name);
+
+        users.splice(users.indexOf(user.name), 1);
+        socket.leave(user.name);
+        if (user.isFinding) {
+            socket.leave('finding');
+            socket.to('finding').emit('find-results', getFindingUsers());
+            return;
+        }
+        if (user.isGaming) {
+            console.log(user.name + ' was in ' + gameRoom +', closing game');
             socket.leave(gameRoom);
-            io.to(gameRoom).emit('game-ended', username + ' disconnected');
+            io.to(gameRoom).emit('game-ended', user.name + ' disconnected');
         }
     });
 });
