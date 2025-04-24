@@ -18,7 +18,6 @@ httpServer.listen(PORT, () => { // start http server listening
 });
 
 const usersFinding = [];
-const usersInGame = [];
 let gameCount = 0;
 io.on('connection', (socket) => { // start socket server listening
     console.log('connection made!');
