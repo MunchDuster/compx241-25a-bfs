@@ -1,7 +1,19 @@
 const socket = io();
-const startmenu = document.getElementById('start-menu');
-const findmenu = document.getElementById('find-menu');
-const gameMenu = document.getElementById('game-menu');
+const menus = [
+    {
+        name: 'start',
+        element: document.getElementById('start-menu'),
+        shown: true,
+    }, {
+        name: 'find',
+        element: document.getElementById('find-menu'),
+        shown: false,
+    }, {
+        name: 'game',
+        element: document.getElementById('game-menu'),
+        shown: false,
+    },
+];
 const findListContainer = document.getElementById('find-list');
 const usernameDisplays = document.querySelectorAll('.username-display:not([id="opp"])');
 const oppUsernameDisplay = document.getElementById('opp');
@@ -18,8 +30,7 @@ function find() {
     username = prompt('enter user name:');
     socket.emit('find', username, (response) => {
         if (!response.success) return;
-        startmenu.classList.add('hidden');
-        findmenu.classList.remove('hidden');
+        showMenu('find');
         console.log(usernameDisplays)
         usernameDisplays.forEach(div => div.innerText = username);
     });
@@ -83,8 +94,7 @@ socket.on('joined', (otherUsername, gameRoom) => {
 })
 
 function onJoined(otherUsername, joinedGameRoom) {
-    findmenu.classList.add('hidden');
-    gameMenu.classList.remove('hidden');
+    showMenu('game');
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
@@ -95,8 +105,7 @@ socket.on('game-ended', (message) => {
     oppUsername = null;
     gameRoom = null;
     socket.emit('game-ended-ping');
-    gameMenu.classList.add('hidden');
-    startmenu.classList.remove('hidden');
+    showMenu('start');
 });
 
 socket.on('disconnect', function() {
@@ -105,3 +114,18 @@ socket.on('disconnect', function() {
     oppUsername = null;
     gameRoom = null;
 });
+
+function showMenu(name) {
+    for(let menu of menus) {
+        if (menu.name == name) {
+            if (menu.shown) continue;
+            menu.shown = true;
+            menu.element.classList.remove('hidden');
+            continue;
+        }
+
+        if (!menu.shown) continue;
+        menu.shown = false;
+        menu.element.classList.add('hidden');
+    }
+}
