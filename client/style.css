@@ -1,0 +1,16 @@
+body {
+    width: 60%;
+    margin: auto;
+    text-align: center;
+}
+
+.menu-button {
+    width: 200px;
+    height: 40px;
+    font-size: unset;
+    margin: 4px;
+}
+
+.hidden {
+    display: none;
+}
