@@ -50,9 +50,11 @@ io.on('connection', (socket) => { // start socket server listening
     socket.on('disconnect', function() {
         console.log('disconnect');
         if (username != null) {
+            socket.leave(username);
             if (usersFinding.includes(username)) {
                 console.log(username + ' is removed from usersFinding')
                 usersFinding.splice(usersFinding.indexOf(username), 1);
+                socket.leave('finding')
                 socket.to('finding').emit('find-results', usersFinding);
             }
         }
