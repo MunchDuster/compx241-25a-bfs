@@ -39,3 +39,9 @@ body {
     background-color: #f9c3bd;
     display: inline-block;
 }
+canvas {
+    width: 50%;
+    height: 50%;
+    border: 1px solid black;
+  background-color: #4279aa;
+}
