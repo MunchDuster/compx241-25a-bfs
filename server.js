@@ -82,17 +82,27 @@ io.on('connection', (socket) => { // start socket server listening
         usersFinding.splice(usersFinding.indexOf(username), 1);
         socket.join(gameRoom);
     }
+    socket.on('game-ended-ping', () => {
+        isInGame = false;
+        socket.leave(gameRoom);
+        gameRoom = null;
+    });
 
     socket.on('disconnect', function() {
         console.log('disconnect');
-        if (username != null) {
-            socket.leave(username);
-            if (isFindingGame) {
-                console.log(username + ' is removed from usersFinding')
-                usersFinding.splice(usersFinding.indexOf(username), 1);
-                socket.leave('finding')
-                socket.to('finding').emit('find-results', usersFinding);
-            }
+        if (username == null) return;
+        socket.leave(username);
+        if (isFindingGame) {
+            console.log(username + ' is removed from usersFinding')
+            socket.leave('finding')
+            usersFinding.splice(usersFinding.indexOf(username), 1);
+            socket.to('finding').emit('find-results', usersFinding);
+            return;
+        }
+        if (isInGame) {
+            console.log(username + ' was in game, closing game ' + gameRoom);
+            socket.leave(gameRoom);
+            io.to(gameRoom).emit('game-ended', username + ' disconnected');
         }
     });
 });

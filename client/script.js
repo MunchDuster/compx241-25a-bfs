@@ -90,7 +90,12 @@ function onJoined(otherUsername, joinedGameRoom) {
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
 }
-
+socket.on('game-ended', (message) => {
+    alert(message);
+    socket.emit('game-ended-ping');
+    gameMenu.classList.add('hidden');
+    startmenu.classList.remove('hidden');
+});
 
 socket.on('disconnect', function() {
 	console.log('disconnected');
