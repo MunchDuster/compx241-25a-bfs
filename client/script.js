@@ -92,6 +92,8 @@ function onJoined(otherUsername, joinedGameRoom) {
 }
 socket.on('game-ended', (message) => {
     alert(message);
+    oppUsername = null;
+    gameRoom = null;
     socket.emit('game-ended-ping');
     gameMenu.classList.add('hidden');
     startmenu.classList.remove('hidden');
@@ -99,4 +101,7 @@ socket.on('game-ended', (message) => {
 
 socket.on('disconnect', function() {
 	console.log('disconnected');
+    username = null;
+    oppUsername = null;
+    gameRoom = null;
 });
