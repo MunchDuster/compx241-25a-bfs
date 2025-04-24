@@ -15,7 +15,6 @@ body {
     display: none;
 }
 .find-result {
-    width: 400px;
     background-color: #ddd;
     margin: 4px;
     text-align: left;
@@ -27,4 +26,8 @@ body {
 .join-button {
     float: right;
     margin-right: 4px;
+}
+#find-menu {
+    width: 400px;
+    margin: auto;
 }
