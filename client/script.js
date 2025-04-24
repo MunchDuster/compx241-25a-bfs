@@ -2,6 +2,7 @@ const socket = io();
 const startmenu = document.getElementById('start-menu');
 const findmenu = document.getElementById('find-menu');
 const findListContainer = document.getElementById('find-list');
+const usernameDisplay = document.getElementById('username-display');
 let username = null;
 
 socket.on('connect', function() {
@@ -14,6 +15,7 @@ function find() {
         if (!response.success) return;
         startmenu.classList.add('hidden');
         findmenu.classList.remove('hidden');
+        usernameDisplay.innerText = username;
     });
 }
 socket.on('error', (message) => {

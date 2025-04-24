@@ -31,3 +31,7 @@ body {
     width: 400px;
     margin: auto;
 }
+#username-display {
+    background-color: #bdddf9;
+    display: inline-block;
+}
