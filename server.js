@@ -25,12 +25,15 @@ io.on('connection', (socket) => { // start socket server listening
         console.log('finding for user: ' + newUsername)
         if (!isValidUsername(newUsername)) {
             socket.emit('error', 'invalid username, 3-16 letters with no whitespaces only');
+            callback({success: false});
             return;
         }
         if (usersFinding.includes(newUsername)) {
             socket.emit('error', 'there is already a user called that, try another name.');
+            callback({success: false});
             return;
         }
+        callback({success: true});
         username = newUsername;
         usersFinding.push(username);
         socket.join(username); // put the user in a room by their username

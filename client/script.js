@@ -10,9 +10,11 @@ socket.on('connect', function() {
 
 function find() {
     username = prompt('enter user name:');
-    socket.emit('find', username);
-    startmenu.classList.add('hidden');
-    findmenu.classList.remove('hidden');
+    socket.emit('find', username, (response) => {
+        if (!response.success) return;
+        startmenu.classList.add('hidden');
+        findmenu.classList.remove('hidden');
+    });
 }
 socket.on('error', (message) => {
     alert(message);
