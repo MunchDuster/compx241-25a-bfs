@@ -34,7 +34,7 @@ io.on('connection', (socket) => { // start socket server listening
             callback({success: false});
             return;
         }
-        if (users.includes(newUsername)) {
+        if (users.some(user => user.name == newUsername)) {
             socket.emit('error', 'there is already a user called that, try another name.');
             callback({success: false});
             return;
