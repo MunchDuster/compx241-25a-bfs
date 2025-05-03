@@ -11,8 +11,8 @@ const height = canvas.height;
 console.log(width + ' ' + height);
 const gridSize = 10; // same as normal battleships
 
-const deltaXPos = width / (gridSize + 1); // + 1 for gap-to-edge, + 1 for side gaps
-const deltaYPos = Math.min(height / (gridSize + 1), deltaXPos);
+const deltaYPos = height / (gridSize + 1); // + 1 for gap-to-edge, + 1 for side gaps
+const deltaXPos = Math.min(height / (gridSize + 1), deltaYPos); 
 
 console.log(deltaXPos + ' ' + deltaYPos);
 
@@ -32,7 +32,7 @@ function stopDrawing() {
 function draw() {
     clear();
     drawLines(0);
-    drawLines(height/2);
+    drawLines(width/2);
 
     if (isDrawing) {
         requestAnimationFrame(draw);
@@ -41,25 +41,25 @@ function draw() {
 function clear() {
     ctx.clearRect(0, 0, width, height);
 }
-function drawLines(offsetY) {
+function drawLines(offsetX) {
     ctx.lineWidth = 1;
     ctx.strokeStyle = colors.line;
     
     ctx.beginPath();
     { // draw vertical lines
-        const yStart = getGridStartYPos(0) + offsetY;
-        const yEnd = getGridStartYPos(gridSize) + offsetY;
+        const yStart = getGridStartYPos(0);
+        const yEnd = getGridStartYPos(gridSize);
         for (let x = 0; x < gridSize + 1; x++) {
-            const xPos = getGridStartXPos(x);
+            const xPos = getGridStartXPos(x) + offsetX;
             ctx.moveTo(xPos, yStart);
             ctx.lineTo(xPos, yEnd);
         }
     }
     { // draw horizontal lines
-        const xStart = getGridStartYPos(0);
-        const xEnd = getGridStartYPos(gridSize);
+        const xStart = getGridStartYPos(0) + offsetX;
+        const xEnd = getGridStartYPos(gridSize) + offsetX;
         for (let y = 0; y < gridSize + 1; y++) {
-            const yPos = getGridStartYPos(y) + offsetY;
+            const yPos = getGridStartYPos(y);
             ctx.moveTo(xStart, yPos);
             ctx.lineTo(xEnd, yPos);
         }
