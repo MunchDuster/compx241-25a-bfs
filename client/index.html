@@ -7,6 +7,7 @@
     </head>
     <body>
         <h1>Battle fleet sweep</h1>
+
         <div id="start-menu">
             <button id="find" class="menu-button" onclick="find()" autofocus>Find Game</button>
             <br>
@@ -14,10 +15,12 @@
             <br>
             <button id="credits" class="menu-button" onclick="credits()">Credits</button>
         </div>
+
         <div id="find-menu" class="hidden">
             <div>Your username is <div class="username-display"></div></div>
             <div id="find-list"></div>
         </div>
+        
         <div id="game-menu" class="hidden">
             <div><div class="username-display"></div> vs <div id="opp" class="username-display"></div></div>
             <!--IMPORTANT canvas width and height here must match css settings else will look bad-->
