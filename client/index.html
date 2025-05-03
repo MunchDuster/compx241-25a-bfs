@@ -8,6 +8,7 @@
     <body>
         <h1>Battle fleet sweep</h1>
 
+        <!-- Start Menu View -->
         <div id="start-menu">
             <button id="find" class="menu-button" onclick="find()" autofocus>Find Game</button>
             <br>
@@ -16,18 +17,25 @@
             <button id="credits" class="menu-button" onclick="credits()">Credits</button>
         </div>
 
+        <!-- Find Game Menu: Displays when searching for opponents -->
         <div id="find-menu" class="hidden">
             <div>Your username is <div class="username-display"></div></div>
             <div id="find-list"></div>
         </div>
-        
+
+        <!-- Game Menu: Active game view -->
         <div id="game-menu" class="hidden">
             <div><div class="username-display"></div> vs <div id="opp" class="username-display"></div></div>
             <!--IMPORTANT canvas width and height here must match css settings else will look bad-->
             <canvas id="canvas" width="1000px" height="500px"></canvas>
         </div>
+        
+        <!-- Required JavaScript dependencies -->
+        <!-- Socket.IO client library for real-time communication -->
         <script src="socket.io/socket.io.js"></script>
+        <!-- Custom game board drawing functionality -->
         <script src="drawer.js"></script>
+        <!-- Main game logic and event handlers -->
         <script src="script.js"></script>
     </body>
 </html>
