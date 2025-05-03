@@ -12,21 +12,32 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
+// -- Express Setup --
 // Setup static files from client directory
 app.use(express.static(join(__dirname,'/client')));
-
-// Start HTTP server
-httpServer.listen(PORT, () => {
-    console.log('httpServer running at http://localhost:' + PORT);
-});
 
 // Track connected users and number of game instances
 const users = [];
 let gameCount = 0;
 
-// Handle new socket connections
+// -- Utility Functions --
+// Username validation function
+function isValidUsername(username) {
+    return typeof(username) == 'string' &&              // Ensure input is string type
+           new RegExp('^[a-zA-Z]+$').test(username) &&  // Only letters allowed
+           username.length > 2 &&                       // Minimum 3 characters
+           username.length < 17;                        // Maximum 16 characters
+}
+
+// Function to get list of users searching for games
+function getFindingUsers() {
+    // Filter users array for those with isFinding flag and map to names only
+    return users.filter(user => user.isFinding).map(user => user.name);
+}
+
+// -- Socket.IO Connection Handling --
 io.on('connection', (socket) => {
-    console.log('New connection established');
+    console.log(`Connection made: ${socket.id}`);
 
     // Initialize user state
     const user = {
@@ -67,12 +78,6 @@ io.on('connection', (socket) => {
         // Broadcast updated user list to all searching players
         io.to('finding').emit('find-results', getFindingUsers());
     });
-
-    // Function to get list of users searching for games
-    function getFindingUsers() {
-        // Filter users array for those with isFinding flag and map to names only
-        return users.filter(user => user.isFinding).map(user => user.name);
-    }
 
     // Handle game request from one user to another
     socket.on('request-game', (requesteeUsername) => {
@@ -161,10 +166,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// Username validation function
-function isValidUsername(username) {
-    return typeof(username) == 'string' &&              // Ensure input is string type
-           new RegExp('^[a-zA-Z]+$').test(username) &&  // Only letters allowed
-           username.length > 2 &&                       // Minimum 3 characters
-           username.length < 17;                        // Maximum 16 characters
-}
+// -- Start Server --
+httpServer.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
