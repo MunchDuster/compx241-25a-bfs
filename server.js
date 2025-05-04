@@ -142,9 +142,6 @@ io.on('connection', (socket) => {
         io.to(requesterSocketId).emit('joined', user.name, gameRoomName);
 
         callback({success: true, gameRoom: gameRoomName});
-
-        // Update finding list for everyone else
-        io.to('finding').emit('find-results', getFindingUsers());
     });
     
     socket.on('joined-ping', joinGameRoom);
@@ -157,6 +154,8 @@ io.on('connection', (socket) => {
         user.currentGame = gameRoom;
         socket.leave('finding');
         socket.join(gameRoom); // Add user to the game room
+        // Update finding list for everyone else
+        io.to('finding').emit('find-results', getFindingUsers());
     }
 
     // Handle game clean up when a game ends
