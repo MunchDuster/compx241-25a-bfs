@@ -88,7 +88,7 @@ function SocketHandler(socket, io) {
 
     // Handle placements
     socket.on('placements-complete', (placements) => {
-        if (!isValidPlacements(placements, logError)) {
+        if (!Game.isValidPlacements(placements, logError)) {
             return;
         }
         // TODO: set player's placement in game instance to these
