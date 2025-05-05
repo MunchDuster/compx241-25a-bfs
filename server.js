@@ -6,6 +6,7 @@ const express = require('express');
 const { Server } = require('socket.io');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
+const gameLogic = require('./gameLogic.js');
 
 // Initialize express and socket.io
 const app = express();
@@ -17,7 +18,8 @@ const io = new Server(httpServer);
 app.use(express.static(join(__dirname,'/client')));
 
 // Track connected users and number of game instances
-const users = [];
+const users = new Map();
+const activeGames = new Map();
 let gameCount = 0;
 
 // -- Utility Functions --
@@ -31,21 +33,26 @@ function isValidUsername(username) {
 
 // Function to get list of users searching for games
 function getFindingUsers() {
-    // Filter users array for those with isFinding flag and map to names only
-    return users.filter(user => user.isFinding).map(user => user.name);
+    const findingUsers = [];
+    for (const user of users.values()) {
+        if (user.isFinding) {
+            findingUsers.push(user.name);
+        }
+    }
+    return findingUsers;
 }
 
 // -- Socket.IO Connection Handling --
 io.on('connection', (socket) => {
     console.log(`Connection made: ${socket.id}`);
 
-    // Initialize user state
-    const user = {
+    // Initialize new user state
+    users.set(socket.id, { 
         name: null,
-        game: null,
-        isFinding: false,
-        isGaming: false,
-    }
+        currentGame: null, 
+        isFinding: false 
+    });
+    const user = users.get(socket.id);
 
     // Handle user searching for a game
     socket.on('find', (newUsername, callback) => {
@@ -57,24 +64,22 @@ io.on('connection', (socket) => {
         }
 
         // Check for duplicate usernames
-        if (users.some(user => user.name == newUsername)) {
-            socket.emit('error', 'there is already a user called that, try another name.');
-            callback({success: false});
-            return;
+        for (const existingUser of users.values()) {
+            if (existingUser.name == newUsername) {
+                socket.emit('error', 'Username already taken. Please choose another.');
+                callback({success: false});
+                return;
+            }
         }
-
-        console.log(`${newUsername} is searching for a game`);
-        callback({success: true});
 
         // Update user state to indicate they are searching for a game
         user.name = newUsername;
         user.isFinding = true;
-        users.push(user);
+        console.log(`${newUsername} (${socket.id}) is finding.`);
+        callback({success: true});
 
         // Add user to relevant rooms
-        socket.join(newUsername); // Individual room for the user
         socket.join('finding');   // Room for users searching for games
-
         // Broadcast updated user list to all searching players
         io.to('finding').emit('find-results', getFindingUsers());
     });
@@ -83,39 +88,60 @@ io.on('connection', (socket) => {
     socket.on('request-game', (requesteeUsername) => {
         console.log(`${user.name} requesting game with ${requesteeUsername}`);
 
-        // Find the target user fro.m users array
-        const requestee = users.find(user => user.name === requesteeUsername);
-        
+        let requesteeSocketId = null;
+        for (const [id, userEntry] of users.entries()) {
+            // Find the target user
+            if (userEntry.name === requesteeUsername && userEntry.isFinding) {
+                requesteeSocketId = id;
+                break;
+            }
+        }
+
         // Check if the requestee is valid and available for a game
-        if (!requestee?.isFinding) {
-            socket.emit('error', `User '${requesteeUsername}' is not available for a game`);
+        if (!requesteeSocketId) {
+            socket.emit('error', `User '${requesteeUsername}' not found or is not available.`);
             return;
         }
         
-        socket.to(requesteeUsername).emit('requested-game', user.name);
+        socket.to(requesteeSocketId).emit('requested-game', user.name);
     });
     
     // Handle game join acceptance
-    socket.on('join', (requesterUsername,callback) => {
-        // Check if the requester is still valid and available for a game
-        if (users.every(user => user.name != requesterUsername)) {
-            socket.emit('error', 'user \'' + requesteeUsername + '\' does not exist or is not finding a game');
-            callback({success: false});
+    socket.on('join', (requesterUsername, callback) => {
+        // Get the user who reqeusted the game
+        let requesterSocketId = null;
+        let requesterUser = null;
+        for (const [id, userEntry] of users.entries()) {
+            if (userEntry.name === requesterUsername) {
+                requesterSocketId = id;
+                requesterUser = userEntry;
+                break;
+            }
+        }
+
+        // Validate both players are still available and finding
+        if (!user?.isFinding || !requesterSocketId || !requesterUser?.isFinding) {
+            socket.emit('error', `User '${requesteeUsername}' does not exist or is not finding a game.`);
+            callback({success: false}); 
             return;
         }
 
         // Create unique game room name
-        const gameRoomName = 'game-' + gameCount++;
-        callback({success: true, gameRoom: gameRoomName});
+        const gameRoomName = `game-${gameCount++}`;
 
-        // Remove user from searching pool
-        socket.leave('finding');
-        console.log(`Starting game between ${user.name} and ${requesterUsername}`);
+        // TODO: create a 'Game' instance to hold game state and whose turn, etc
+
+        // TODO: check if game was successfully created and send false callback if not
+
+        console.log(`Starting game ${gameRoomName} between ${user.name} and ${requesterUsername}`);
 
         // Set up game room and notify other player
         joinGameRoom(gameRoomName);
-        io.to(requesterUsername).emit('joined', user.name, gameRoomName);
-        // TODO: create a 'Game' instance to hold game state and whose turn, etc        
+        user.currentGame = gameRoomName;
+
+        io.to(requesterSocketId).emit('joined', user.name, gameRoomName);
+
+        callback({success: true, gameRoom: gameRoomName});
     });
     
     socket.on('joined-ping', joinGameRoom);
@@ -125,8 +151,11 @@ io.on('connection', (socket) => {
         // Update game state variables
         gameRoom = joinedGameRoom;
         user.isFinding = false;
-        user.isGaming = true;
+        user.currentGame = gameRoom;
+        socket.leave('finding');
         socket.join(gameRoom); // Add user to the game room
+        // Update finding list for everyone else
+        io.to('finding').emit('find-results', getFindingUsers());
     }
 
     // Handle placements
@@ -149,36 +178,36 @@ io.on('connection', (socket) => {
     // Handle game clean up when a game ends
     socket.on('game-ended-ping', () => {
         // Reset user's game state
-        user.isGaming = false;
         socket.leave(gameRoom);
+        console.log(`${user.name} leaving game ${gameRoom}.`);
+        user.currentGame = null;
         gameRoom = null;
     });
 
     // Handle user disconnection
     socket.on('disconnect', function() {
-        if (user.name == null) {
-            console.log('Disconnect');
-            return;
-        }
+        const user = users.get(socket.id);
+        console.log(`Disconnecting: ${user ? user.name : socket.id}`);
+        if (user.name == null) return;
 
-        console.log(`User ${user.name} disconnecting`);
-
-        // Remove user from the users array
-        users.splice(users.indexOf(user.name), 1);
-        socket.leave(user.name);
-        
-        // Clean up based on user state
-        if (user.isFinding) {
-            // Remove from seraching pool and notify others
-            socket.leave('finding');
-            socket.to('finding').emit('find-results', getFindingUsers());
-            return;
-        }
-        if (user.isGaming) {
-            // Notify other player of game end due to disconnection
-            console.log(user.name + ' was in ' + gameRoom +', closing game');
+        const gameRoom = user.currentGame;
+        if (gameRoom) {
+            //const game = activeGames.get(gameRoom);
+            console.log(`${user.name} disconnecting from game ${gameRoom}.`);
             socket.leave(gameRoom);
-            io.to(gameRoom).emit('game-ended', user.name + ' disconnected');
+            socket.to(gameRoom).emit('game-ended', `${user.name} disconnected.`);
+
+            // Delete game from active games
+        }
+        else if (user.isFinding) {
+            socket.leave('finding');
+        }
+
+        // Remove user from the users map
+        users.delete(socket.id);
+
+        if(user.isFinding) {
+            io.to('finding').emit('find-results', getFindingUsers());
         }
     });
 });
