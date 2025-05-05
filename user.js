@@ -17,6 +17,7 @@ function User(socketId) {
         isFinding = false;
     };
     this.leaveGame = function() {
+        console.log(`${this.name} leaving game ${this.gameId}.`);
         if (this.gameId == null) {
             console.log('error: trying to remove user ' + user.name + ':' + user.socketId + ' from game, user is not in game.');
             return;

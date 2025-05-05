@@ -102,30 +102,19 @@ socket.on('requested-game', (requesterUsername) => {
     const joinButton = document.createElement('button');
     joinButton.innerText = 'Join';
     joinButton.classList.add('join-button');
-    joinButton.addEventListener('click', () => {
-        socket.emit('join', requesterUsername, (response) => {
-            if (!response.success) return;
-            onJoined(requesterUsername, response.gameRoom);
-        });
-    });
+    joinButton.addEventListener('click', () => socket.emit('join', requesterUsername));
     listItem.appendChild(joinButton);
 });
 
-// Handle successful game join from other player
-socket.on('joined', (otherUsername, gameRoom) => {
-    socket.emit('joined-ping', gameRoom);
-    onJoined(otherUsername, gameRoom);
-})
-
 // Set up game state when joining a game
-function onJoined(otherUsername, joinedGameRoom) {
+socket.on('joined', (otherUsername, joinedGameRoom) => {
     showMenu('game'); // Switch to game menu
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
     startDrawing(); // Initialize drawing state
-}
+});
 
 // Handle game ending 
 socket.on('game-ended', (message) => {
@@ -133,7 +122,6 @@ socket.on('game-ended', (message) => {
     // Reset game state and show start menu
     oppUsername = null;
     gameRoom = null;
-    socket.emit('game-ended-ping');
     showMenu('start');
     stopDrawing();
 });
