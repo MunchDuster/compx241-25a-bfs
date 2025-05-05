@@ -23,7 +23,10 @@ function User(socketId) {
             return;
         }
         this.gameId = null;
-    }
+    };
+    this.toString = function() {
+        return (this.name ?? '[no_username]') + '@' + this.socketId;
+    };
 
     users.set(socketId, this);
 }

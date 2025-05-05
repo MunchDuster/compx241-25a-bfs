@@ -1,6 +1,6 @@
-const { Socket } = require("socket.io");
 const Game = require('./game.js');
 const User = require('./user.js');
+const LobbyHandler = require('./lobbyHandler.js');
 
 const socketHandlers = new Map();
 
@@ -9,82 +9,38 @@ function SocketHandler(socket, io) {
 
     // Initialize new user state
     const user = new User(socket.id);
-
-    // Handle user searching for a game
-    socket.on('find', (newUsername, callback) => {
-        // Check if username is valid and not already taken
-        if (!User.isValidName(newUsername)) {
-            socket.emit('error', 'Invalid username. Must be 3-16 letters with no spaces.');
-            callback({success: false});
-            return;
-        }
-
-        // Check for duplicate usernames
-        if (User.getIdByName(newUsername) != null) {
-            socket.emit('error', 'Username already taken. Please choose another.');
-            callback({success: false});
-            return;
-        }
-
-        // Update user state to indicate they are searching for a game
-        user.name = newUsername;
-        user.isFinding = true;
-        console.log(`${newUsername} (${socket.id}) is finding.`);
-        callback({success: true});
-
-        // Add user to relevant rooms
+    function onJoinedLobby() {
         socket.join('finding');   // Room for users searching for games
         // Broadcast updated user list to all searching players
         io.to('finding').emit('find-results', User.getAllFinding());
-    });
+    }
+    function onGameRequested(requesteeSocketId) {
+        socket.to(requesteeSocketId).emit('requested-game', user.name);
+    }
+    this.onJoinGame = (otherUser, game, isLastPlayerToJoin) => {
+        socket.leave('finding'); // its time to stop
+        socket.join(game.id); // Add user to the game room
+        socket.emit('joined', otherUser.name, game.id); // tell the client
+
+        // Update finding list for everyone else
+        if (isLastPlayerToJoin) { // prevent multiple updates for one game starting
+            io.to('finding').emit('find-results', User.getAllFinding());
+        }
+        else {
+            socketHandlers.get(otherUser.socketId).onJoinGame(user, game, true);
+        }
+    };
+
+    const lobby = new LobbyHandler(user, logError, onJoinedLobby, onGameRequested, this.onJoinGame);
+
+    // Handle user searching for a game
+    socket.on('find', lobby.joinLobby);
 
     // Handle game request from one user to another
-    socket.on('request-game', (requesteeUsername) => {
-        console.log(`${user.name} requesting game with ${requesteeUsername}`);
-
-        let requesteeSocketId = User.getIdByName(requesteeUsername);
-
-        // Check if the requestee is valid and available for a game
-        if (!requesteeSocketId) {
-            socket.emit('error', `User '${requesteeUsername}' not found or is not available.`);
-            return;
-        }
-
-        socket.to(requesteeSocketId).emit('requested-game', user.name);
-    });
+    socket.on('request-game', lobby.requestGame);
 
     // Handle game join acceptance
-    socket.on('join', (requesterUsername) => {
-        // Get the user who reqeusted the game
-        let requesterUser = User.getByName(requesterUsername);
-
-        // Validate both players are still available and finding
-        if (!user.isFinding || !requesterUser?.isFinding) {
-            socket.emit('error', `User '${requesteeUsername}' does not exist or is not finding a game.`);
-            return;
-        }
-
-        // Create game
-        const game = new Game(user, requesterUser);
-
-        // Set up game room and notify other player
-        this.joinGameRoom(game);
-        socketHandlers.get(requesterUser.socketId).joinGameRoom(game);
-
-        socket.emit('joined', requesterUser.name, game.id);
-        io.to(requesterUser.socketId).emit('joined', user.name, game.id);
-    });
-
-    // Handle game room setup
-    this.joinGameRoom = function(game) {
-        user.joinGame(game.id);
-
-        // Update game state variables
-        socket.leave('finding');
-        socket.join(game.id); // Add user to the game room
-        // Update finding list for everyone else
-        io.to('finding').emit('find-results', User.getAllFinding());
-    }
+    socket.on('join', lobby.joinGame);
 
     // Handle placements
     socket.on('placements-complete', (placements) => {
@@ -107,7 +63,7 @@ function SocketHandler(socket, io) {
     this.gameEnded = () => {
         // Reset user's game state
         if (user.gameId == null) {
-            console.log('error: users\'s game ended but no gameId set! user: ' + user.name);
+            console.log('error: users\'s game ended but no gameId set! user: ' + user);
             return;
         }
         socket.leave(user.gameId);
