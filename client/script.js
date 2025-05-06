@@ -107,7 +107,7 @@ socket.on('game-ended', (message) => {
     gameRoom = null;
     socket.emit('game-ended-ping');
     showMenu('start');
-    stopDrawing();
+    Clear();
 });
 
 socket.on('disconnect', function() {
