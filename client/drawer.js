@@ -10,10 +10,10 @@ const width = canvas.width;
 const height = canvas.height;
 console.log(width + ' ' + height);
 const gridSize = 10; // same as normal battleships
-const offset = 4; //offset for squares to get grid lines inbetween squares for aesthetics
-const squares = [];
+const offset = 4; //offset for tiles to get grid lines inbetween tiles for aesthetics
+const tiles = [];
 
-class Rectangle {
+class tile {
     constructor(x, y, id, color) {
         this.x = x;
         this.y = y;
@@ -35,7 +35,6 @@ const deltaXPos = Math.min(height / (gridSize + 1), deltaYPos);
 
 console.log(deltaXPos + ' ' + deltaYPos);
 
-let isDrawing = false;
 ctx.imageSmoothingEnabled = false;
 
 
@@ -47,9 +46,9 @@ function startDrawing() {
 
 function draw() {
     clear();
-    makeSquares(0, 1);
-    makeSquares(width/2, 2);
-    squares.forEach(Rectangle => Rectangle.draw(ctx));
+    makeTiles(0, 1);
+    makeTiles(width/2, 2);
+    tiles.forEach(Tile => Tile.draw(ctx));
 }
 
 
@@ -57,7 +56,7 @@ function clear() {
     ctx.clearRect(0, 0, width, height);
 }
 
-function makeSquares(offsetX, gridNum) { 
+function makeTiles(offsetX, gridNum) { 
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
             const xPos = getGridStartYPos(x) + offsetX + offset;
@@ -90,10 +89,10 @@ canvas.addEventListener('click', (e) => {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
     };
-    squares.forEach(Rectangle => {
-      if (isIntersect(pos, Rectangle)) {
-        Rectangle.color = "green";
-        Rectangle.draw(ctx);
+    tiles.forEach(Tile => {
+      if (isIntersect(pos, Tile)) {
+        Tile.color = "green";
+        Tiles.draw(ctx);
       }
     });
   });
