@@ -74,7 +74,7 @@ function getGridStartYPos(y) {
     return Math.round((deltaYPos / 2.0) + y * deltaYPos);
 }
 function getGridPos({x, y}) {
-    return {x: getGridStartXPos(x), y: getGridStartYPos(y)}
+    return {x: getGridStartXPos(x), y: getGridStartYPos(y)};
 }
 
 // startDrawing(); // for debugging
