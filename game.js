@@ -136,7 +136,7 @@ class Game {
     }
 
     userDisconnected(username, socketId) {
-        console.log(`${username} disconnecting from game ${this.id}.`);
+        console.log(`${username} disconnecting from ${this.id}.`);
 
         // LATER: give 5-30s for user to reconnect incase accidental disconnect
         this.delete();

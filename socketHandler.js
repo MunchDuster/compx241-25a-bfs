@@ -9,14 +9,17 @@ function SocketHandler(socket, io) {
 
     // Initialize new user state
     const user = new User(socket.id);
+
     function onJoinedLobby() {
         socket.join('finding');   // Room for users searching for games
         // Broadcast updated user list to all searching players
         io.to('finding').emit('find-results', User.getAllFinding());
     }
+
     function onGameRequested(requesteeSocketId) {
         socket.to(requesteeSocketId).emit('requested-game', user.name);
     }
+
     this.onJoinGame = (otherUser, game, isLastPlayerToJoin) => {
         socket.leave('finding'); // its time to stop
         user.isFinding = false; // user is no longer finding a game
@@ -77,31 +80,31 @@ function SocketHandler(socket, io) {
         socketHandlers.delete(socket.id);
 
         const user = User.getById(socket.id);
-        console.log(`Disconnecting: ${user ? user.name : socket.id}`);
-        if (user.name == null) return;
+        console.log(`Disconnecting: ${user ? user.toString() : socket.id}`);
+        if (!user || !user.name) return;
 
-        console.log('user game id is ', user.gameId);
-        if (user.gameId != null) {
+        if (user.gameId) {
+            const game = Game.getById(user.gameId);
+            if (!game) {
+                console.log('Disconnect could not find game by id! ' + user.gameId);
+                return;
+            }
+
+            const otherSocketId = game.getOtherSocketId(user.socketId);
+
             socket.leave(user.gameId);
             io.to(user.gameId).emit('game-ended', `${user.name} disconnected.`);
 
-            const game = Game.getById(user.gameId);
-            if (game == null) {
-                console.log('disconnect could not find game by id! ' + user.gameId);
-                return;
+            if (otherSocketId) {
+                socketHandlers.get(otherSocketId).gameEnded();
             }
+
             game.userDisconnected(user.name, socket.id);
-            const otherSocketId = game.getOtherSocketId(user);
-            if (otherSocketId == null) {
-                console.error('other socket id in  game is null! id is ' + user.socketId + ' game is ' + user.gameId);
-                return;
-            }
-            socketHandlers.get(otherSocketId).gameEnded();
         }
         else if (user.isFinding) {
             socket.leave('finding');
         }
-
+        
         user.delete();
 
         if(user.isFinding) {
