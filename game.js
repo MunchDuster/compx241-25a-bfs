@@ -1,152 +1,155 @@
-const games = new Map();
+const Ship = require('./ship.js');
 
-function Game(user1, user2) {
-    // keep track of game by usernames
-    // to allow for later quick-connect feature
-    this.id = `game:${user1.name}-${user2.name}`;
-    this.user1SocketId = user1.socketId;
-    this.user2SocketId = user2.socketId;
-    this.user1Board = {
-        boats: []
-    };
-    this.delete = function() {
+const games = new Map();
+const BOARD_SIZE = 10;
+
+class Game { 
+    static getById(id) {
+        return games.get(id);
+    }
+
+    static isValidPlacements(boats, logError) {
+        function tileStr(tile) {
+            return `(${tile.x},${tile.y})`;
+        }
+
+        // check that placements is an array
+        if (!Array.isArray(boats)) {
+            logError('Boats is not an array!');
+            return false;
+        }
+
+        // check that there are the correct number of boats
+        const expectedBoatsCount = 5;
+        if (boats.length !== expectedBoatsCount) {
+            logError(`There should be ${expectedBoatsCount} boats! Given ${boats.length}`);
+            return false;
+        }
+
+        // check that all boats valid: sizes of 5,4,3,3,2
+        const expectedSizes = [5, 4, 3, 3, 2].sort((a,b) => b-a); 
+        const actualSizes = boats.map(p => p.tiles.length).sort((a,b) => b-a); // Sort in descending order
+
+        if (JSON.stringify(expectedSizes) !== JSON.stringify(actualSizes)) {
+            logError(`Boat sizes are incorrect. Expected: ${expectedSizes.join(',')}. Got: ${actualSizes.join(',')}`);
+            return false;
+        }
+
+        // Check that all boat tiles are within bounds (0-9 for a 10x10 board)
+        for (let i = 0; i < boats.length; i++) {
+            const boatPlacement = boats[i];
+            for (let t = 0; t < boatPlacement.tileArray.length; t++) {
+                const tile = boatPlacement.tileArray[t];
+                const isWithinBounds = tile.x < BOARD_SIZE && tile.y < BOARD_SIZE && tile.x >= 0 && tile.y >= 0;
+                if (!isWithinBounds) {
+                    logError(`Boat tile out-of-bounds! Boat: ${boatPlacement.name || `Boat ${i}`}, Tile: ${tileStr(tile)}`);
+                    return false;
+                }
+            }
+        }
+
+        // Check that boat tiles are consecutive (boat is not disjoint)
+        // This also implicitly checks if a boat is straight (horizontal or vertical)
+        for (let i = 0; i < placements.length; i++) {
+            const boatPlacement = placements[i];
+            const tiles = boatPlacement.tiles;
+
+            if (tiles.length < 2) {
+                logError(`Boat is less than two tiles big! Boat: ${boatPlacement.name || `Boat ${i}`}`);
+                return false;
+            }
+
+            const isHorizontal = tiles[0].y === tiles[1].y;
+            const isVertical = tiles[0].x === tiles[1].x;
+
+            for (let t = 1; t < tiles.length; t++) {
+                const prevTile = tiles[t-1];
+                const currentTile = tiles[t];
+                let expectedX = prevTile.x;
+                let expectedY = prevTile.y;
+
+                if (isHorizontal) {
+                    expectedX = prevTile.x + (currentTile.x > prevTile.x ? 1 : -1);
+                } else { // isVertical
+                    expectedY = prevTile.y + (currentTile.y > prevTile.y ? 1 : -1);
+                }
+
+                const diffX = Math.abs(currentTile.x - prevTile.x);
+                const diffY = Math.abs(currentTile.y - prevTile.y);
+
+                if (!((isHorizontal && diffX === 1 && diffY === 0) || (isVertical && diffX === 0 && diffY === 1))) {
+                     logError(`Boat contains non-consecutive tiles! Boat: ${boatPlacement.name || `Boat ${i}`}, between ${tileStr(prevTile)} and ${tileStr(currentTile)}`);
+                     return false;
+                }
+            }
+
+            // Check that no boats intersect (no tile is the same position as any other tile)
+            const allOccupiedTiles = new Set();
+            for (let i = 0; i < placements.length; i++) {
+                const boatPlacement = placements[i];
+                for (let t = 0; t < boatPlacement.tiles.length; t++) {
+                    const tile = boatPlacement.tiles[t];
+                    const tileString = tileStr(tile);
+                    if (allOccupiedTiles.has(tileString)) {
+                        logError(`Boat tiles overlap! Boat: ${boatPlacement.name || `Boat ${i}`}, overlapping tile: ${tileString}`);
+                        return false;
+                    }
+                    allOccupiedTiles.add(tileString);
+                }
+            }
+
+            return true;
+        }
+    }   
+
+    constructor(user1, user2) {
+        // keep track of game by usernames
+        // to allow for later quick-connect feature
+        this.id = `game:${user1.name}-${user2.name}`;
+        this.user1 = { 
+            name: user1.name, 
+            socketId: user1.socketId,
+            board: {
+                ships: [],
+            }
+        };
+        this.user2 = { 
+            name: user2.name, 
+            socketId: user2.socketId,
+            board: {
+                ships: [],
+            }
+        }
+        
+        this.currentPlayerSocketId = user1.socketId; 
+        this.gameState = "placing";
+        this.winner = null;
+
+        console.log(`Starting game ${this.id} between ${user1.name} and ${user2.name}`);
+        games.set(this.id, this);
+
+    }
+
+    delete() {
+        console.log(`Deleting game ${this.id}`);
         games.delete(this.id);
-    };
-    this.userDisconnected = function(username, socketId) {
+    }
+
+    userDisconnected(username, socketId) {
         console.log(`${username} disconnecting from game ${this.id}.`);
 
         // LATER: give 5-30s for user to reconnect incase accidental disconnect
         this.delete();
-    };
-    this.getOtherSocketId = function (user) {
-        if (user.socketId == this.user1SocketId) return this.user2SocketId;
-        if (user.socketId == this.user2SocketId) return this.user1SocketId;
-        console.log('error: socket not in game!');
+    }
+
+    getOtherSocketId(currentUserSocketId) {
+        if (currentUserSocketId === this.user1.socketId) return this.user2.socketId;
+        if (currentUserSocketId === this.user2.socketId) return this.user1.socketId;
+
+        console.error(`Error: Socket ID ${currentUserSocketId} not in game ${this.id}!`);
         console.trace();
         return null;
-    };
-    this.onPlacementSet
-
-    console.log(`Starting game ${this.id} between ${user1.name} and ${user2.name}`);
-    games.set(this.id, this);
-}
-
-Game.getById = function(id) {
-    return games.get(id);
-}
-
-// TODO: move to gameLogic later
-// for quick and easy test
-// const TEST_PLACEMENTS = [
-//     {
-//         name: 'carrier', // size 5
-//         tiles: [{x: 0, y: 0}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 0, y: 3}, {x: 0, y: 4}]
-//     }, {
-//         name: 'battleship', // size 4
-//         tiles: [{x: 3, y: 6}, {x: 4, y: 6}, {x: 5, y: 6}, {x: 6, y: 6}]
-//     }, {
-//         name: 'cruiser', //size 3
-//         tiles: [{x: 9, y: 7}, {x: 9, y: 8}, {x: 9, y: 9}] // bottom-right corner
-//     }, {
-//         name: 'submarine', //size 3
-//         tiles: [{x: 5, y: 7}, {x: 5, y: 8}, {x: 5, y: 9}] // bottom-center corner
-//     }, {
-//         name: 'destroyer', //size 2
-//         tiles: [{x: 8, y: 2}, {x: 8, y: 3}] // bottom-center corner
-//     }
-// ]
-// console.log(isValidPlacements(TEST_PLACEMENTS, console.error));
-Game.isValidPlacements = function(placements, logError) {
-    function tileStr(tile) {
-        return '(' + tile.x + ',' + tile.y + ')';
     }
-    // check that placements is an array
-    if (typeof (placements) != 'object' || typeof (placements.length) != 'number') {
-        logError('placements is not an array!');
-        return false;
-    }
-
-    // check that there are the correct number of boats
-    const expectedBoatsCount = 5;
-    const boatsCount = placements.length;
-    if (boatsCount != expectedBoatsCount) {
-        logError('there should be ' + expectedBoatsCount + ' boats! given ' + boatsCount);
-        return false;
-    }
-
-    // check that all boats valid: sizes of 5,4,3,3,2
-    const expectedSizes = [5, 4, 3, 3, 2]; // MAKE SURE THAT LENGTH MATCHES expectedBoatsCount
-    for (let i = 0; i < expectedSizes.length; i++) {
-        const expectedSize = expectedSizes[i];
-        const size = placements[i].tiles.length
-        if (size != expectedSize) {
-            logError('a boat size is unexpected! boat index ' + i + ', expected ' + expectedSize + ', given ' + size);
-            return false;
-        }
-    }
-
-    // check that all boat tiles are within bounds
-    for (let i = 0; i < placements.length; i++) {
-        const tiles = placements[i].tiles;
-        for (let t = 1; t < tiles.length; t++) {
-            const tile = placements[i].tiles[t];
-            const isWithinBounds = tile.x < 10 && tile.y < 10 && tile.x >= 0 && tile.y >= 0;
-            if (!isWithinBounds) {
-                logError('boat tile is out-of-bounds! boat index ' + i + ', tile index ' + t + ', from ' + tileStr(lastTile) + ' to ' + tileStr(tile));
-                return false;
-            }
-        }
-    }
-
-    // check that boat tiles are consecutive (boat is not disjoint)
-    for (let i = 0; i < placements.length; i++) {
-        const tiles = placements[i].tiles;
-
-        // check that there are at least two tiles used -- REMOVE CHECK IF ONE TILE BOATS EXIST
-        if (tiles.length < 2) {
-            logError('boat is less than two tiles big! boat index ' + i);
-            return false;
-        }
-
-        let lastTile = tiles[0];
-        for (let t = 1; t < tiles.length; t++) {
-            const tile = tiles[t];
-            const isAdjacentToLast =
-                tile.x == lastTile.x && tile.y == (lastTile.y + 1) || // up
-            tile.x == lastTile.x && tile.y == (lastTile.y - 1) || // down
-            tile.x == (lastTile.x + 1) && tile.y == lastTile.y || // right
-            tile.x == (lastTile.x - 1) && tile.y == lastTile.y    // left
-            if (!isAdjacentToLast) {
-                logError('boat contains non-adjacent tiles! boat index ' + i + ', tile index ' + t + ', between ' + tileStr(tile) + ' and ' + tileStr(lastTile));
-                return false;
-            }
-            lastTile = tile;
-        }
-    }
-
-    // check that no boats intersect
-    // AKA that no tile is the same position as any other tile
-    // probably unnecessarily inefficient, but hey thats life ¯\_(ツ)_/¯
-    for (let i = 0; i < placements.length; i++) {
-        const tiles = placements[i].tiles;
-        for (let t = 1; t < tiles.length; t++) {
-            const tile = placements[i].tiles[t];
-            for (let i2 = 0; i2 < placements.length; i2++) {
-                const tiles2 = placements[i2].tiles;
-                for (let t2 = 1; t2 < tiles2.length; t2++) {
-                    const tile2 = placements[i2].tiles[t2];
-                    if (i == i2 && t == t2) // comparing self
-                        continue;
-                    if (tile.x == tile2.x && tile.y == tile2.y) {
-                        logError('boat tiles overlap! boat1 index ' + i + ', tile1 index ' + t + ',boat2 index ' + i2 + ',tile2 index ' + t2 + ' at ' + tileStr(tile));
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-
-    return true;
 }
 
 module.exports = Game;
