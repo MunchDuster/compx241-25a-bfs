@@ -36,7 +36,8 @@ socket.on('connect', function() {
 // Handle user clicking "Find Game" button
 function find() {
     // Prompt user to input username
-    username = prompt('enter user name:');
+    // username = prompt('enter user name: ');
+    username = document.getElementById("uname").value;
 
     //Emit find event to server with username
     socket.emit('find', username, (response) => {

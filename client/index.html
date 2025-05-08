@@ -11,7 +11,10 @@
 
         <!-- Start Menu View -->
         <div id="start-menu">
-            <button id="find" class="menu-button" onclick="find()" autofocus>Find Game</button>
+            <label for="uname">Username:</label>
+            <input type="text" id="uname" name="uname">
+            <br>
+            <button id="find" class="menu-button" onclick="find()" autofocus>Find Game</button> 
             <br>
             <button id="settings" class="menu-button" onclick="settings()">Settings</button>
             <br>
@@ -21,6 +24,9 @@
         <!-- Find Game Menu: Displays when searching for opponents -->
         <div id="find-menu" class="hidden">
             <div>Your username is <div class="username-display"></div></div>
+            <br>
+            Players list: 
+            <br>
             <div id="find-list"></div>
         </div>
 
