@@ -13,7 +13,7 @@ const gridSize = 10; // same as normal battleships
 const offset = 4; //offset for tiles to get grid lines inbetween tiles for aesthetics
 const tiles = [];
 
-class tile {
+class Tile {
     constructor(x, y, id, color) {
         this.x = x;
         this.y = y;
@@ -24,8 +24,8 @@ class tile {
     }
 
     draw(ctx) {
-         ctx.fillStyle = this.color;
-         ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 }
 
@@ -41,14 +41,17 @@ ctx.imageSmoothingEnabled = false;
 // (x,y) is a grid point
 // (xPos, yPos) is a canvas pixel
 function startDrawing() {
+    console.log('Starting to draw game board...');
     draw();
 }
 
 function draw() {
+    console.log('Drawing tiles...');
     clear();
     makeTiles(0, 1);
     makeTiles(width/2, 2);
-    tiles.forEach(Tile => Tile.draw(ctx));
+    console.log(`Created ${tiles.length} tiles`);
+    tiles.forEach(tile => tile.draw(ctx));
 }
 
 
@@ -61,7 +64,7 @@ function makeTiles(offsetX, gridNum) {
         for (let x = 0; x < gridSize; x++) {
             const xPos = getGridStartYPos(x) + offsetX + offset;
             const yPos = getGridStartYPos(y) + offset;
-            tiles.push(new Rectangle(xPos, yPos, x.toString() + y.toString() + gridNum.toString(), "#5F85B5"));
+            tiles.push(new Tile(xPos, yPos, x.toString() + y.toString() + gridNum.toString(), "#5F85B5"));
         }     
     }
 }
@@ -81,7 +84,7 @@ function getGridPos({x, y}) {
 
 function isIntersect(p, r) {
     return (p.x >= r.x && p.x < (r.x + r.width) && p.y >= r.y && p.y < (r.y + r.height));
-  }
+}
 
 canvas.addEventListener('click', (e) => {
     var rect = canvas.getBoundingClientRect();
@@ -92,7 +95,11 @@ canvas.addEventListener('click', (e) => {
     tiles.forEach(Tile => {
       if (isIntersect(pos, Tile)) {
         Tile.color = "green";
-        Tiles.draw(ctx);
+        Tile.draw(ctx);
       }
     });
-  });
+  }
+);
+
+window.startDrawing = startDrawing;
+window.clear = clear;
