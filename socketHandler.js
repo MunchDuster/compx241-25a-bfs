@@ -19,9 +19,11 @@ function SocketHandler(socket, io) {
     }
     this.onJoinGame = (otherUser, game, isLastPlayerToJoin) => {
         socket.leave('finding'); // its time to stop
+        user.isFinding = false; // user is no longer finding a game
+
         socket.join(game.id); // Add user to the game room
         socket.emit('joined', otherUser.name, game.id); // tell the client
-
+        
         // Update finding list for everyone else
         if (isLastPlayerToJoin) { // prevent multiple updates for one game starting
             io.to('finding').emit('find-results', User.getAllFinding());
