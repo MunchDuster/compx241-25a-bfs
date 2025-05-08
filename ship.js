@@ -5,6 +5,7 @@ const SHIP_TYPES = {
     DESTROYER: 'destroyer',
     SUBMARINE: 'submarine'
 };
+const MOVEMENT_RADIUS = 3; // The maximum distance a ship can move in one turn
 
 class Ship {
     constructor(id, type, centreTile) {
@@ -57,11 +58,6 @@ class Ship {
         return this.hitArray.every(hit => hit === 1);
     }
 
-    move(newCentreTile) {
-        this.centreTile = newCentreTile;
-        this.updateTilePositions();
-    }
-
     updateTilePositions() {
         const {x: centreX, y: centreY} = this.centreTile;
         
@@ -90,12 +86,86 @@ class Ship {
     }
 
     rotate() {
-        this.rotation = (this.rotation + 1) % 4;
-        this.updateTilePositions();
+        const oldRotation = this.rotation;
+        if (this.isValidMove(this.centreTile)) {
+            this.rotation = (this.rotation + 1) % 4;
+            this.updateTilePositions();
+        }
+        else {
+            console.error(`Invalid rotation: Rotation moves out of bounds, ${this.rotation} -> ${oldRotation}`);
+        }
     }
 
     toString() {
-        return `${this.type}@${this.centreTile.x}${this.centreTile.y}`;
+        return `${this.type}@${this.centreTile.x}, ${this.centreTile.y}`;
+    }
+
+    move(newCentreTile, gridSize = 10) {
+        const moveCheck = this.isValidMove(newCentreTile, gridSize);
+        if (!moveCheck.valid) {
+            console.error(`Invalid move: ${moveCheck.reason}`);
+            return;
+        }
+
+        this.centreTile = newCentreTile;
+        this.updateTilePositions();
+    }
+
+    canMove() {
+        return this.hitArray.every(hit => hit === 0);
+    }
+
+    isValidMove(newCentreTile, gridSize = 10) {
+        if(!this.canMove()) {
+            return { valid: false, reason: 'Ship is damaged and cannot move' };
+        }
+
+        const deltaX = Math.abs(newCentreTile.x - this.centreTile.x);
+        const deltaY = Math.abs(newCentreTile.y - this.centreTile.y);
+        if (deltaX > MOVEMENT_RADIUS || deltaY > MOVEMENT_RADIUS) {
+            return { valid: false, reason: 'Move exceeds maximum movement radius' };
+        }
+
+        const newTiles = this.getNewTilePositions(newCentreTile);
+        if (this.isOutOfBounds(newTiles, gridSize)) {
+            return { valid: false, reason: 'Move is out of bounds' };
+        }
+
+        return { valid: true};
+    }
+
+    getNewTilePositions(newCentreTile) {
+        const halfLength = Math.floor(this.length / 2);
+        let newTiles = [];
+
+        switch(this.rotation % 4) {
+            case 0: // Rightwards
+                for (let i = 0; i < this.length; i++) {
+                    newTiles.push({ x: newCentreTile.x + (i - halfLength), y: newCentreTile.y });
+                }
+                break;
+            case 1: // Downwards
+                for (let i = 0; i < this.length; i++) {
+                    newTiles.push({ x: newCentreTile.x, y: newCentreTile.y + (i - halfLength) });
+                }
+                break;
+            case 2: // Leftwards
+                for (let i = 0; i < this.length; i++) {
+                    newTiles.push({ x: newCentreTile.x - (i - halfLength), y: newCentreTile.y });
+                }
+                break;
+            case 3: // Upwards
+                for (let i = 0; i < this.length; i++) {
+                    newTiles.push({ x: newCentreTile.x, y: newCentreTile.y - (i - halfLength) });
+                }
+                break;
+        }
+
+        return newTiles;
+    }
+
+    isOutOfBounds(newTiles, gridSize = 10) {
+        return newTiles.some(tile => tile.x < 0 || tile.x >= gridSize || tile.y < 0 || tile.y >= gridSize);
     }
 }
 
