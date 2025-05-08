@@ -61,7 +61,7 @@ function makeTiles(offsetX, gridNum) {
         for (let x = 0; x < gridSize; x++) {
             const xPos = getGridStartYPos(x) + offsetX + offset;
             const yPos = getGridStartYPos(y) + offset;
-            squares.push(new Rectangle(xPos, yPos, x.toString() + y.toString() + gridNum.toString(), "#5F85B5"));
+            tiles.push(new Rectangle(xPos, yPos, x.toString() + y.toString() + gridNum.toString(), "#5F85B5"));
         }     
     }
 }
