@@ -1,232 +1,97 @@
-/**
- *  this script handles all scripts/data of Ships ingame.
- *  I believe this will be bounded to one user. Meaning for each user gets one ship.js
- *  But I have no idea.
- * */ 
-const userShips = new Map();
-const shipTypesArray = ['battleship','cruiser','carrier','destroyer','submarine'];
-
-function Ship(id,type,centreTile) {
+const SHIP_TYPES = {
+    BATTLESHIP: 'battleship',
+    CRUISER: 'cruiser',
+    CARRIER: 'carrier',
+    DESTROYER: 'destroyer',
+    SUBMARINE: 'submarine'
+};
+function Ship(id, type, centreTile) {
     this.id = id; //Unique Identifier for Map(). I imagine along the lines of "username_shiptype_num".
     this.type = type; //Is Ship a battleship,cruiser,carrier,destroyer, or submarine.
-
     this.centreTile = centreTile; //Middle position of Ship (Anchored Mouse Position). E.g. centreTile = {x : 0, y: 0}.
-    this.numOfTiles = null; //Total amount of tiles it will occupy.
+    this.length = null; // The length of the ship
     this.tileArray = null; //All detailed positions of Tiles it occupies.
     this.rotation = 0; //Tracks number of rotations on ship, See rotate function for how its used.
+    this.hitArray = [] // Array of 0s and 1s indicating if a segment of the ship has been hit or not.
 
-    this.toString = function() {
-        return (this.type ?? '[no_shipType]') + '@' + this.centreTile.x + this.centreTile.y;
-    };
-
-    for([this.id, Ship] of userShips) {
-        if(id == this.id) {
-            console.error('A Ship ID matches another Ships ID: \"' + this + '\" and \"' + Ship + '\"')
-            return;
-        }
-    }    
-
-    this.numOfTiles = function() {
-        switch(this.type) {
-            case carrier:
-                this.numOfTiles = 5;
-                break;
-            case battleship:
-                this.numOfTiles = 4;
-                break;
-            case cruiser:
-                this.numOfTiles = 3;
-                break;
-            case submarine:
-                this.numOfTiles = 3;
-                break;
-            case destroyer:
-                this.numOfTiles = 2;
-                break;
-            default:
-                console.error('Different Case found for this.numOfTiles in ship.js');
-                
-        }
-        this.tileArray = new Array(this.numOfTiles);
-    };
-
-    this.tileArray = function() {
-        centreX = centreTile.x;
-        centreY = centreTile.y;
-        switch(this.numOfTiles) {
-            case 5:
-                this.tileArray = 
-                [{x : centreX-2, y : centreY},{x : centreX-1, y : centreY},
-                {x : centreX, y : centreY},
-                {x : centreX+1, y : centreY},{x : centreX+2, y : centreY}];
-                break;
-            case 4:
-                this.tileArray = 
-                [{x : centreX-1, y : centreY},
-                {x : centreX, y : centreY},
-                {x : centreX+1, y : centreY},{x : centreX+2, y : centreY}];
-                break;
-            case 3:
-                this.tileArray = 
-                [{x : centreX-1, y : centreY},
-                {x : centreX, y : centreY},
-                {x : centreX+1, y : centreY}];
-            case 2:
-                this.tileArray = 
-                [{x : centreX, y : centreY},{x : centreX+1, y : centreY}];
-                break;
-            default:
-                console.error('Different Case found for this.tileArray in ship.js');
-        }
+    switch(this.type) {
+        case SHIP_TYPES.CARRIER:
+            this.length = 5;
+            this.hitArray = new Array(5).fill(0);
+            break;
+        case SHIP_TYPES.BATTLESHIP:
+            this.length = 4;
+            this.hitArray = new Array(4).fill(0);
+            break;
+        case SHIP_TYPES.CRUISER:
+        case SHIP_TYPES.SUBMARINE:
+            this.length = 3;
+            this.hitArray = new Array(3).fill(0);
+            break;
+        case SHIP_TYPES.DESTROYER:
+            this.length = 2;
+            this.hitArray = new Array(2).fill(0);
+            break;
+        default:
+            throw new Error(`Invalid ship type: ${this.type}`);
     }
-
-    userShips.set(this.id, this);
 }
 
-Ship.getTilePositions = function(id) {
-    for(const [id, shipEntry] of userShips) {
-        if(id == this.id) {
-            return this.tileArray;
-        }
+Ship.prototype.receiveHit = function(x, y) {
+    // Find which tile position was hit
+    const hitIndex = this.tileArray.findIndex(tile => tile.x === x && tile.y === y
+    );
+    
+    if (hitIndex !== -1) {
+        this.hitArray[hitIndex] = 1;
+        return true;
     }
-    return null; //Not found.
-}
+    return false;
+};
 
-Ship.getCentreTile = function(id) {
-    for(const [id, shipEntry] of userShips) {
-        if(id == this.id) {
-            switch(this.numOfTiles){
-                case 5:
-                    return tileArray[2];
-                case 4:
-                case 3:
-                    return tileArray[1]
-                case 2:
-                    return tileArray[0]
-                default:
-                    console.error('Different Case found for Ship.getCentreTile in ship.js');
-            }
-        }
-    }
-    return null; //Not found.
-}
+Ship.prototype.isHitAt = function(index) {
+    return this.hitArray[index] === 1;
+};
 
-Ship.rotate = function(id) {
-    for(const [id, shipEntry] of userShips) {
-        if(id == this.id) {
-            this.rotate++;
-            centreX = this.centreTile.x;
-            centreY = this.centreTile.y;
-            
-            switch(this.rotate % 4) {
-                case 0:
-                    switch(this.numOfTiles) {
-                        case 5:
-                            this.tileArray = 
-                            [{x : centreX-2, y : centreY},{x : centreX-1, y : centreY},
-                            {x : centreX, y : centreY},
-                            {x : centreX+1, y : centreY},{x : centreX+2, y : centreY}];
-                            break;
-                        case 4:
-                            this.tileArray = 
-                            [{x : centreX-1, y : centreY},
-                            {x : centreX, y : centreY},
-                            {x : centreX+1, y : centreY},{x : centreX+2, y : centreY}];
-                            break;
-                        case 3:
-                            this.tileArray = 
-                            [{x : centreX-1, y : centreY},
-                            {x : centreX, y : centreY},
-                            {x : centreX+1, y : centreY}];
-                        case 2:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY},{x : centreX+1, y : centreY}];
-                            break;
-                        default:
-                            console.error('Different Case found for Ship.rotate in ship.js');
-                    }
-                case 1:
-                    switch(this.numOfTiles) {
-                        case 5:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY+2},{x : centreX, y : centreY+1},
-                            {x : centreX, y : centreY},
-                            {x : centreX, y : centreY-1},{x : centreX, y : centreY-2}];
-                            break;
-                        case 4:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY+1},
-                            {x : centreX, y : centreY},
-                            {x : centreX, y : centreY-1},{x : centreX, y : centreY-2}];
-                            break;
-                        case 3:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY+1},
-                            {x : centreX, y : centreY},
-                            {x : centreX, y : centreY-1}];
-                        case 2:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY},{x : centreX, y : centreY+1}];
-                            break;
-                        default:
-                            console.error('Different Case found for Ship.rotate in ship.js');
-                    }
-                case 2:
-                    switch(this.numOfTiles) {
-                        case 5:
-                            this.tileArray = 
-                            [{x : centreX+2, y : centreY},{x : centreX+1, y : centreY},
-                            {x : centreX, y : centreY},
-                            {x : centreX-1, y : centreY},{x : centreX-2, y : centreY}];
-                            break;
-                        case 4:
-                            this.tileArray = 
-                            [{x : centreX+1, y : centreY},
-                            {x : centreX, y : centreY},
-                            {x : centreX-1, y : centreY},{x : centreX-2, y : centreY}];
-                            break;
-                        case 3:
-                            this.tileArray = 
-                            [{x : centreX+1, y : centreY},
-                            {x : centreX, y : centreY},
-                            {x : centreX-1, y : centreY}];
-                        case 2:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY},{x : centreX-1, y : centreY}];
-                            break;
-                        default:
-                            console.error('Different Case found for Ship.rotate in ship.js');
-                    }
-                case 3:
-                    switch(this.numOfTiles) {
-                        case 5:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY-2},{x : centreX, y : centreY-1},
-                            {x : centreX, y : centreY},
-                            {x : centreX, y : centreY+1},{x : centreX, y : centreY+2}];
-                            break;
-                        case 4:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY-1},
-                            {x : centreX, y : centreY},
-                            {x : centreX, y : centreY+1},{x : centreX, y : centreY+2}];
-                            break;
-                        case 3:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY-1},
-                            {x : centreX, y : centreY},
-                            {x : centreX, y : centreY+1}];
-                        case 2:
-                            this.tileArray = 
-                            [{x : centreX, y : centreY},{x : centreX, y : centreY+1}];
-                            break;
-                        default:
-                            console.error('Different Case found for Ship.rotate in ship.js');
-                    }
-            }
-        }
+Ship.prototype.isSunk = function() {
+    return this.hitArray.every(hit => hit === 1);
+};
+
+Ship.prototype.move = function(newCentreTile) {
+    this.centreTile = newCentreTile;
+    this.updateTilePositions();
+};
+
+Ship.prototype.updateTilePositions = function() {
+    const {x: centreX, y: centreY} = this.centreTile;
+    
+    switch(this.rotation % 4) {
+        case 0:
+            this.tileArray = Array.from({length: this.numOfTiles}, 
+                (_, i) => ({x: centreX + (i - Math.floor(this.numOfTiles/2)), y: centreY}));
+            break;
+        case 1:
+            this.tileArray = Array.from({length: this.numOfTiles}, 
+                (_, i) => ({x: centreX, y: centreY + (i - Math.floor(this.numOfTiles/2))}));
+            break;
+        case 2:
+            this.tileArray = Array.from({length: this.numOfTiles}, 
+                (_, i) => ({x: centreX - (i - Math.floor(this.numOfTiles/2)), y: centreY}));
+            break;
+        case 3:
+            this.tileArray = Array.from({length: this.numOfTiles}, 
+                (_, i) => ({x: centreX, y: centreY - (i - Math.floor(this.numOfTiles/2))}));
+            break;
     }
-    return null; //Ship not found.
-}
+};
+
+Ship.prototype.rotate = function() {
+    this.rotation = (this.rotation + 1) % 4;
+    this.updateTilePositions();
+};
+
+Ship.prototype.toString = function() {
+    return this.type + '@' + this.centreTile.x + this.centreTile.y;
+};
 
 module.exports = Ship;
