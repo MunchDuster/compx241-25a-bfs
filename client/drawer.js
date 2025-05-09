@@ -1,8 +1,9 @@
-let stage;
-let layer;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
-const width = 1000;
-const height = 500;
+
+const width = canvas.width;
+const height = canvas.height;
 console.log(width + ' ' + height);
 const gridSize = 10; // same as normal battleships
 const offset = 4; //offset for tiles to get grid lines inbetween tiles for aesthetics.
@@ -31,17 +32,13 @@ const deltaXPos = Math.min(height / (gridSize + 1), deltaYPos);
 
 console.log(deltaXPos + ' ' + deltaYPos);
 
+ctx.imageSmoothingEnabled = false;
+
+
 // (x,y) is a grid point
 // (xPos, yPos) is a canvas pixel
 function startDrawing() {
     console.log('Starting to draw game board...');
-    stage = new Konva.Stage({
-		container: 'game-board',
-		width: 1000,
-		height: 500
-	});
-	layer = new Konva.Layer();
-	stage.add(layer);
     draw();
 }
 
@@ -51,55 +48,31 @@ function draw() {
     makeTiles(0, 1);
     makeTiles(width/2, 2);
     console.log(`Created ${tiles.length} tiles`);
-	layer.draw();
+
+    const stage = new Konva.Stage({
+      container: 'canvas', width: width, height: height
+    });
+    const layer = new Konva.Layer();
+
+    tiles.forEach(tile => layer.add(tile));
+    stage.add(layer);
 }
 
 
 function clear() {
-	tiles.length = 0;
-    layer.destroyChildren();
+    ctx.clearRect(0, 0, width, height);
 }
 
 function makeTiles(offsetX, gridNum) { 
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
-            const xPos = getGridStartXPos(x) + offsetX + offset;
+            const xPos = getGridStartYPos(x) + offsetX + offset;
             const yPos = getGridStartYPos(y) + offset;
            // tiles.push(new Tile(xPos, yPos, x.toString() + y.toString() + gridNum.toString(), "#5F85B5"));
-            
-		   	const rect = new Konva.Rect({
-                x: xPos,
-                y: yPos,
-                width: size,
-                height: size,
-                fill: '#5F85B5',
-                stroke: '#234668',
-                strokeWidth: 1,
-                id: `${x}-${y}-${gridNum}`,
-                listening: true,
-                perfectDrawEnabled: false
+             const rect1 = new Konva.Rect({
+             x: xPos, y: yPos, width: size, height: size, fill: 'red'
             });
-
-			rect.on('mouseover', function() {
-                document.body.style.cursor = 'pointer';
-                this.stroke('#4CAF50');
-                layer.draw();
-            });
-
-			rect.on('mouseout', function() {
-                document.body.style.cursor = 'default';
-                this.stroke('#234668');
-                layer.draw();
-            });
-
-            rect.on('click', function(e) {
-                e.cancelBubble = true;
-                this.fill(this.fill() === '#5F85B5' ? '#4CAF50' : '#5F85B5');
-                layer.draw();
-            });
-
-            tiles.push(rect);
-            layer.add(rect);
+            tiles.push(rect1);
         }     
     }
 }
@@ -116,6 +89,25 @@ function getGridPos({x, y}) {
 }
 
 // startDrawing(); // for debugging
+
+function isIntersect(p, r) {
+    return (p.x >= r.x && p.x < (r.x + r.width) && p.y >= r.y && p.y < (r.y + r.height));
+}
+
+canvas.addEventListener('click', (e) => {
+    var rect = canvas.getBoundingClientRect();
+    const pos = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+    tiles.forEach(Tile => {
+      if (isIntersect(pos, Tile)) {
+        Tile.color = "green";
+        Tile.draw(ctx);
+      }
+    });
+  }
+);
 
 window.startDrawing = startDrawing;
 window.clear = clear;
