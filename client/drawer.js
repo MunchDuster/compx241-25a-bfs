@@ -1,9 +1,8 @@
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+let stage;
+let layer;
 
-
-const width = canvas.width;
-const height = canvas.height;
+const width = 1000;
+const height = 500;
 console.log(width + ' ' + height);
 const gridSize = 10; // same as normal battleships
 const offset = 4; //offset for tiles to get grid lines inbetween tiles for aesthetics.
@@ -32,13 +31,18 @@ const deltaXPos = Math.min(height / (gridSize + 1), deltaYPos);
 
 console.log(deltaXPos + ' ' + deltaYPos);
 
-ctx.imageSmoothingEnabled = false;
-
 
 // (x,y) is a grid point
 // (xPos, yPos) is a canvas pixel
 function startDrawing() {
     console.log('Starting to draw game board...');
+	stage = new Konva.Stage({
+		container: 'game-board',
+		width: 1000,
+		height: 500
+	});
+	layer = new Konva.Layer();
+	stage.add(layer);
     draw();
 }
 
@@ -52,13 +56,14 @@ function draw() {
 
 
 function clear() {
-    ctx.clearRect(0, 0, width, height);
+    tiles.length = 0;
+    layer.destroyChildren();
 }
 
 function makeTiles(offsetX, gridNum) { 
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
-            const xPos = getGridStartYPos(x) + offsetX + offset;
+            const xPos = getGridStartXPos(x) + offsetX + offset;
             const yPos = getGridStartYPos(y) + offset;
 
             // Log positions to check for overlaps
@@ -108,25 +113,6 @@ function getGridPos({x, y}) {
 }
 
 // startDrawing(); // for debugging
-
-function isIntersect(p, r) {
-    return (p.x >= r.x && p.x < (r.x + r.width) && p.y >= r.y && p.y < (r.y + r.height));
-}
-
-canvas.addEventListener('click', (e) => {
-    var rect = canvas.getBoundingClientRect();
-    const pos = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
-    tiles.forEach(Tile => {
-      if (isIntersect(pos, Tile)) {
-        Tile.color = "green";
-        Tile.draw(ctx);
-      }
-    });
-  }
-);
 
 window.startDrawing = startDrawing;
 window.clear = clear;
