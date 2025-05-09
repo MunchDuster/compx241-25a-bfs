@@ -1,7 +1,6 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-import Konva from 'konva';
 
 const width = canvas.width;
 const height = canvas.height;
@@ -73,7 +72,7 @@ function makeTiles(offsetX, gridNum) {
              const rect1 = new Konva.Rect({
              x: xPos, y: yPos, width: size, height: size, fill: 'red'
             });
-            shapes.push(rect1);
+            tiles.push(rect1);
         }     
     }
 }
