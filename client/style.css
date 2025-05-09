@@ -39,9 +39,9 @@ body {
     background-color: #f9c3bd;
     display: inline-block;
 }
-canvas {
+#game-board {
     width: 1000px;
     height: 500px;
-    border: 1px solid black;
+    margin: auto;
     background-color: #4279aa;
 }
