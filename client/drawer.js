@@ -40,12 +40,10 @@ ctx.imageSmoothingEnabled = false;
 // (xPos, yPos) is a canvas pixel
 function startDrawing() {
     console.log('Starting to draw game board...');
-    console.log('Starting to draw game board...');
     draw();
 }
 
 function draw() {
-    console.log('Drawing tiles...');
     console.log('Drawing tiles...');
     clear();
     makeTiles(0, 1);
@@ -66,7 +64,6 @@ function clear() {
     ctx.clearRect(0, 0, width, height);
 }
 
-function makeTiles(offsetX, gridNum) { 
 function makeTiles(offsetX, gridNum) { 
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
@@ -90,14 +87,12 @@ function getGridStartYPos(y) {
 }
 function getGridPos({x, y}) {
     return {x: getGridStartXPos(x), y: getGridStartYPos(y)};
-    return {x: getGridStartXPos(x), y: getGridStartYPos(y)};
 }
 
 // startDrawing(); // for debugging
 
 function isIntersect(p, r) {
     return (p.x >= r.x && p.x < (r.x + r.width) && p.y >= r.y && p.y < (r.y + r.height));
-}
 }
 
 canvas.addEventListener('click', (e) => {
@@ -110,18 +105,8 @@ canvas.addEventListener('click', (e) => {
       if (isIntersect(pos, Tile)) {
         Tile.color = "green";
         Tile.draw(ctx);
-    tiles.forEach(Tile => {
-      if (isIntersect(pos, Tile)) {
-        Tile.color = "green";
-        Tile.draw(ctx);
       }
     });
-  }
-);
-
-window.startDrawing = startDrawing;
-window.clear = clear;
-
   }
 );
 
