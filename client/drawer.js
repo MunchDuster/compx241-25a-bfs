@@ -9,31 +9,11 @@ const offset = 4; //offset for tiles to get grid lines inbetween tiles for aesth
 const size = Math.round(height / gridSize) - offset * 2;
 const tiles = [];
 
-// class Tile {
-//     constructor(x, y, id, color) {
-//         this.x = x;
-//         this.y = y;
-//         this.width = 
-//         this.height = Math.round(height / gridSize) - offset * 2;
-//         this.color = color;
-//         this.id = id; //id is x-row, y-row, grid e.g a square in the first row, second column in the grid on the right is 122
-//     }
-
-//     draw(ctx) {
-//         ctx.fillStyle = this.color;
-//         ctx.fillRect(this.x, this.y, this.width, this.height);
-//     }
-// }
-
-
 const deltaYPos = height / (gridSize + 1); // + 1 for gap-to-edge, + 1 for side gaps
 const deltaXPos = Math.min(height / (gridSize + 1), deltaYPos); 
 
 console.log(deltaXPos + ' ' + deltaYPos);
 
-
-// (x,y) is a grid point
-// (xPos, yPos) is a canvas pixel
 function startDrawing() {
     console.log('Starting to draw game board...');
 	stage = new Konva.Stage({
@@ -61,15 +41,17 @@ function clear() {
 }
 
 function makeTiles(offsetX, gridNum) { 
+	// (x,y) is a tile on the grid
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
+			// (xPos, yPos) is the position on the game board
             const xPos = getGridStartXPos(x) + offsetX + offset;
             const yPos = getGridStartYPos(y) + offset;
 
             // Log positions to check for overlaps
             console.log(`Tile (${x}, ${y}, ${gridNum}) at position (${xPos}, ${yPos})`);
 
-            const rect = new Konva.Rect({
+            const tile = new Konva.Rect({
                 x: xPos,
                 y: yPos,
                 width: size,
@@ -80,39 +62,38 @@ function makeTiles(offsetX, gridNum) {
                 id: `${x}-${y}-${gridNum}`,
             });
 
-            rect.on('mouseover', function() {
+            tile.on('mouseover', function() {
                 document.body.style.cursor = 'pointer';
                 this.stroke('#4CAF50');
             });
 
-            rect.on('mouseout', function() {
+            tile.on('mouseout', function() {
                 document.body.style.cursor = 'default';
                 this.stroke('#234668');
             });
 
-            rect.on('click', function(e) {
+            tile.on('click', function(e) {
                 e.cancelBubble = true;
                 this.fill(this.fill() === '#5F85B5' ? '#4CAF50' : '#5F85B5');
             });
 
-            tiles.push(rect);
-            layer.add(rect);
+            tiles.push(tile);
+            layer.add(tile);
         }     
     }
 }
 
-// rounding and add 0.51 makes lines crisper, because yes
 function getGridStartXPos(x) {
     return Math.round((deltaXPos / 2.0) + x * deltaXPos);
 }
+
 function getGridStartYPos(y) {
     return Math.round((deltaYPos / 2.0) + y * deltaYPos);
 }
+
 function getGridPos({x, y}) {
     return {x: getGridStartXPos(x), y: getGridStartYPos(y)};
 }
-
-// startDrawing(); // for debugging
 
 window.startDrawing = startDrawing;
 window.clear = clear;
