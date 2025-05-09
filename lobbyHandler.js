@@ -51,7 +51,7 @@ function LobbyHandler(user, logError, onJoinedLobby, onGameRequested, onJoinGame
             return;
         }
 
-        const game = new Game(user, requesterUser);
+        const game = new Game(user, requesterUser, logError);
 
         // tell the users
         user.joinGame(game.id);

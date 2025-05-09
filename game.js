@@ -109,6 +109,10 @@ class Game {
         this.user1 = { 
             name: user1.name, 
             socketId: user1.socketId,
+            callbacks: {
+                turnBegin: null,
+                waitBegin: null,
+            },
             board: {
                 ships: [],
             }
@@ -116,6 +120,10 @@ class Game {
         this.user2 = { 
             name: user2.name, 
             socketId: user2.socketId,
+            callbacks: {
+                turnBegin: null,
+                waitBegin: null,
+            },
             board: {
                 ships: [],
             }
@@ -165,6 +173,24 @@ class Game {
             this.gameState = "over";
             this.winner = this.user1.name;
         }
+
+        return user1ShipsSunk || user2ShipsSunk;
+    }
+
+    setTurnCallbacks(user, onTurnBegin, onWaitBegin) {
+        
+    }
+
+    playTurn(user, turn) {
+
+    }
+
+    placeMines() {
+
+    }
+
+    nextTurn() {
+
     }
 }
 
