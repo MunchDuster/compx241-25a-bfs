@@ -124,7 +124,6 @@ socket.on('game-ended', (message) => {
     oppUsername = null;
     gameRoom = null;
     showMenu('start');
-    clear();
 });
 
 // Handle disconnection from server

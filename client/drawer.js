@@ -51,7 +51,6 @@ function draw() {
     makeTiles(0, 1);
     makeTiles(width/2, 2);
     console.log(`Created ${tiles.length} tiles`);
-	layer.draw();
 }
 
 
@@ -65,9 +64,11 @@ function makeTiles(offsetX, gridNum) {
         for (let x = 0; x < gridSize; x++) {
             const xPos = getGridStartXPos(x) + offsetX + offset;
             const yPos = getGridStartYPos(y) + offset;
-           // tiles.push(new Tile(xPos, yPos, x.toString() + y.toString() + gridNum.toString(), "#5F85B5"));
-            
-		   	const rect = new Konva.Rect({
+
+            // Log positions to check for overlaps
+            console.log(`Tile (${x}, ${y}, ${gridNum}) at position (${xPos}, ${yPos})`);
+
+            const rect = new Konva.Rect({
                 x: xPos,
                 y: yPos,
                 width: size,
@@ -76,26 +77,21 @@ function makeTiles(offsetX, gridNum) {
                 stroke: '#234668',
                 strokeWidth: 1,
                 id: `${x}-${y}-${gridNum}`,
-                listening: true,
-                perfectDrawEnabled: false
             });
 
-			rect.on('mouseover', function() {
+            rect.on('mouseover', function() {
                 document.body.style.cursor = 'pointer';
                 this.stroke('#4CAF50');
-                layer.draw();
             });
 
-			rect.on('mouseout', function() {
+            rect.on('mouseout', function() {
                 document.body.style.cursor = 'default';
                 this.stroke('#234668');
-                layer.draw();
             });
 
             rect.on('click', function(e) {
                 e.cancelBubble = true;
                 this.fill(this.fill() === '#5F85B5' ? '#4CAF50' : '#5F85B5');
-                layer.draw();
             });
 
             tiles.push(rect);
