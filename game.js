@@ -1,4 +1,5 @@
 const Ship = require('./ship.js');
+const Minefield = require('./minefield.js');
 
 const games = new Map();
 const BOARD_SIZE = 10;
@@ -184,6 +185,7 @@ class Game {
         if(this.user1.ready == true && this.user2.ready == true){
             this.placeMines();
             // then move onto main game loop.
+            this.gameState = "mainGame";
         }
         return;
     }
@@ -197,7 +199,7 @@ class Game {
     }
 
     placeMines() {
-
+    
     }
 
     nextTurn() {
