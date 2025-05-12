@@ -115,7 +115,8 @@ class Game {
             },
             board: {
                 ships: [],
-            }
+            },
+            ready:false
         };
         this.user2 = { 
             name: user2.name, 
@@ -126,7 +127,8 @@ class Game {
             },
             board: {
                 ships: [],
-            }
+            },
+            ready:false
         }
         
         this.currentPlayerSocketId = user1.socketId; 
@@ -175,6 +177,15 @@ class Game {
         }
 
         return user1ShipsSunk || user2ShipsSunk;
+    }
+
+    setupPhase(){
+        //Called when a player clicks ready (Clickable after the player places all boats)
+        if(this.user1.ready == true && this.user2.ready == true){
+            this.placeMines();
+            // then move onto main game loop.
+        }
+        return;
     }
 
     setTurnCallbacks(user, onTurnBegin, onWaitBegin) {

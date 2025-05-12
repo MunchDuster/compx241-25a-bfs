@@ -8,6 +8,7 @@ function User(socketId) {
     this.name = null;
     this.gameId = null;
     this.isFinding = false;
+    this.isReady = false;
 
     this.delete = function() {
         users.delete(socketId);
@@ -27,6 +28,10 @@ function User(socketId) {
     this.toString = function() {
         return (this.name ?? '[no_username]') + '@' + this.socketId;
     };
+
+    this.readyFlip = function(){
+        this.isReady = !this.isReady;
+    }
 
     users.set(socketId, this);
 }
@@ -64,6 +69,14 @@ User.getAllFinding = function() {
         }
     }
     return findingUsers;
+}
+
+User.getReadyStateByName = function(name) {
+    for (const [id, userEntry] of users.entries()) {
+        if (userEntry.name === name) {
+            return this.isReady;
+        }
+    }
 }
 
 module.exports = User;
