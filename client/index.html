@@ -4,7 +4,6 @@
         <title>Battle Fleet Sweep</title>
         <link rel="stylesheet" href="style.css">
         <link rel="icon" type="image/x-icon" href="favicon.ico">
-        
     </head>
     <body>
         <h1>Battle fleet sweep</h1>
@@ -33,15 +32,14 @@
         <!-- Game Menu: Active game view -->
         <div id="game-menu" class="hidden">
             <div><div class="username-display"></div> vs <div id="opp" class="username-display"></div></div>
-            <!--IMPORTANT canvas width and height here must match css settings else will look bad-->
-            <canvas id="canvas" width="1000px" height="500px"></canvas>
+            <div id="game-board"></div>
         </div>
         
         <!-- Required JavaScript dependencies -->
         <!-- Socket.IO client library for real-time communication -->
         <script src="socket.io/socket.io.js"></script>
         <!-- Konva Library -->
-        <script src="https://unpkg.com/konva@9/konva.min.js"></script>
+        <script src="https://unpkg.com/konva@9.3.20/konva.min.js"></script>
         <!-- Custom game board drawing functionality -->
         <script src="drawer.js"></script>
         <!-- Main game logic and event handlers -->
