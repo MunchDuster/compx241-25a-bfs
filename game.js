@@ -3,6 +3,7 @@ const Minefield = require('./minefield.js');
 
 const games = new Map();
 const BOARD_SIZE = 10;
+const NUM_OF_MINES = 10; //Per User.
 
 class Game { 
     static getById(id) {
@@ -116,6 +117,7 @@ class Game {
             },
             board: {
                 ships: [],
+                mines: [],
             },
             ready:false
         };
@@ -128,6 +130,7 @@ class Game {
             },
             board: {
                 ships: [],
+                mines: [],
             },
             ready:false
         }
@@ -183,8 +186,8 @@ class Game {
     setupPhase(){
         //Called when a player clicks ready (Clickable after the player places all boats)
         if(this.user1.ready == true && this.user2.ready == true){
-            this.placeMines();
-            // then move onto main game loop.
+            this.placeMines(this.user1,this.user1.board.mines);
+            this.placeMines(this.user2,this.user2.board.mines);
             this.gameState = "mainGame";
         }
         return;
@@ -198,8 +201,18 @@ class Game {
 
     }
 
-    placeMines() {
-    
+    placeMines(user,mines) {
+        mines = new Minefield(user.name+'_mines')
+
+        mineplaced = 0;
+        while(mineplaced != NUM_OF_MINES){
+            x = Math.floor(Math.random(100));
+            y = Math.floor(Math.random(100));
+
+            //IF the tile at x,y isnt a Ship Tile
+            mines.placeMine(x,y);
+            mineplaced++;
+        }
     }
 
     nextTurn() {
