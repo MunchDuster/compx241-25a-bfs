@@ -10,27 +10,25 @@ class Minefield {
     }
 
     initilizeMineField() {
-        for(i = 0; i < BOARD_HEIGHT*BOARD_WIDTH; i++){
-            x = i % 10;
-            y = i-x;
-            this.mineArray[i] = ({x: x, y: y, isMine: false});
-        }
+        //for(i = 0; i < BOARD_HEIGHT*BOARD_WIDTH; i++){
+            //x = i % 10;
+            //y = i-x;
+            //this.mineArray[i] = false;
+        //}
+        this.mineArray.fill(false);
     }
 
     placeMine(x,y){
         index = (y*10)+x;
-        this.mineArray[index] = ({x: x, y: y, isMine: true});
+        this.mineArray[index] = true;
     }
     
-    receiveHit(x, y) {    
-        //If it was hit for first time.
-        this.mineArray[y*10+x] = { x: x, y: y, isMine: false};
-        return true;
-        //return false;
-    }
-
-    isOutOfBounds(newTiles, gridSize = 10) {
-        return newTiles.some(tile => tile.x < 0 || tile.x >= gridSize || tile.y < 0 || tile.y >= gridSize);
+    receiveMissileHit(x, y) {    
+        if(this.mineArray[y*10+x] == true){
+            this.mineArray[y*10+x] = false;
+            return true;
+        }
+        return false;
     }
 }
 
