@@ -4,7 +4,7 @@ const BOARD_HEIGHT = 10;
 
 class Minefield {
     constructor(NUM_OF_MINES) {
-        const NUM_OF_MINES= NUM_OF_MINES;
+        this.NUM_OF_MINES= NUM_OF_MINES;
         this.mineArray = [BOARD_HEIGHT*BOARD_WIDTH];
 
         this.initilizeMineField();
