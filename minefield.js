@@ -1,9 +1,10 @@
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 10;
 
+
 class Minefield {
-    constructor(id) {
-        this.id = id;
+    constructor(NUM_OF_MINES) {
+        const NUM_OF_MINES= NUM_OF_MINES;
         this.mineArray = [BOARD_HEIGHT*BOARD_WIDTH];
 
         this.initilizeMineField();
@@ -16,6 +17,38 @@ class Minefield {
             //this.mineArray[i] = false;
         //}
         this.mineArray.fill(false);
+    }
+
+    initilizeMines(user1Ships, user2Ships) {
+        occupiedTiles = [];
+
+        forEach(user1Ships, ship => {
+            forEach(ship.tileArray, tile => {
+                if(!occupiedTiles.includes(`${tile.x},${tile.y}`)){
+                    occupiedTiles.push(`${tile.x},${tile.y}`);
+                }
+            })
+        })
+
+        forEach(user2Ships, ship => {
+            forEach(ship.tileArray, tile => {
+                if(!occupiedTiles.includes(`${tile.x},${tile.y}`)){
+                    occupiedTiles.push(`${tile.x},${tile.y}`);
+                }
+            })
+        })
+
+        mineplaced = 0;
+        
+        while(mineplaced != NUM_OF_MINES){
+            const x = Math.floor(Math.random() * BOARD_SIZE);
+            const y = Math.floor(Math.random() * BOARD_SIZE);
+            const tileKey = `${x},${y}`;
+            if(!occupiedTiles.includes(tileKey)){
+                this.placeMine(tile.x, tile.y);
+                mineplaced++;
+            }
+        }
     }
 
     placeMine(x,y){

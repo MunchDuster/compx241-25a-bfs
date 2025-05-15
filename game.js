@@ -117,7 +117,6 @@ class Game {
             },
             board: {
                 ships: [],
-                mines: [],
             },
             ready:false
         };
@@ -130,7 +129,6 @@ class Game {
             },
             board: {
                 ships: [],
-                mines: [],
             },
             ready:false
         }
@@ -138,6 +136,7 @@ class Game {
         this.currentPlayerSocketId = user1.socketId; 
         this.gameState = "placing";
         this.winner = null;
+        this.minefield = new Minefield(NUM_OF_MINES);
 
         console.log(`Starting game ${this.id} between ${user1.name} and ${user2.name}`);
         games.set(this.id, this);
@@ -186,8 +185,7 @@ class Game {
     setupPhase(){
         //Called when a player clicks ready (Clickable after the player places all boats)
         if(this.user1.ready == true && this.user2.ready == true){
-            this.placeMines(this.user1,this.user1.board.mines,this.user1.board.ships);
-            this.placeMines(this.user2,this.user2.board.mines,this.user2.board.ships);
+            this.minefield.initilizeMines(this.user1.board.ships, this.user2.board.ships);
             this.gameState = "mainGame";
         }
         return;
@@ -199,35 +197,6 @@ class Game {
 
     playTurn(user, turn) {
 
-    }
-
-    placeMines(user,mines,ships) {
-        mines = new Minefield(user.name+'_mines')
-
-        //Store tiles where ships are.
-        occupiedTiles = [];
-
-        mineplaced = 0;
-        dontplace = false;
-        
-        while(mineplaced != NUM_OF_MINES){
-            x = Math.floor(Math.random(100));
-            y = Math.floor(Math.random(100));
-
-            tile = {x: x, y: y};
-
-            occupiedTiles.forEach(occupied => {
-                if(occupied.x == tile.x && occupied.y == tile.y){
-                    dontplace = true;
-                }
-            });
-
-            if(dontplace == false){
-                mines.placeMine(x,y);
-                mineplaced++;
-            }
-            dontplace = false;
-        }
     }
 
     nextTurn() {
