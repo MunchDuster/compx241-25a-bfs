@@ -23,6 +23,7 @@ function User(socketId) {
             return;
         }
         this.gameId = null;
+        // Player might want to go back to finding, or to main menu Client should decide
     };
     this.toString = function() {
         return (this.name ?? '[no_username]') + '@' + this.socketId;
