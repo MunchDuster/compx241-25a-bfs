@@ -169,13 +169,13 @@ class Game {
         const user2ShipsSunk = this.user2.board.ships.every(ship => ship.isSunk());
 
         if (user1ShipsSunk && user2ShipsSunk) { // Shouldnt be possible
-            this.gameState = "draw";
+            this.gameState = "gameDraw";
             this.winner = null;
         } else if (user1ShipsSunk) {
-            this.gameState = "over";
+            this.gameState = "gameOver";
             this.winner = this.user2.name;
         } else if (user2ShipsSunk) {
-            this.gameState = "over";
+            this.gameState = "gameOver";
             this.winner = this.user1.name;
         }
 
