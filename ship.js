@@ -60,6 +60,8 @@ class Ship {
 
     updateTilePositions() {
         const {x: centreX, y: centreY} = this.centreTile;
+        const halfLength = Math.floor(this.length / 2);
+        let newTiles = [];
         
         switch(this.rotation % 4) {
             case 0: // Rightwards
@@ -83,6 +85,8 @@ class Ship {
                 }
                 break;
         }
+
+        this.tileArray = newTiles;
     }
 
     rotate() {
