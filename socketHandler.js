@@ -4,7 +4,7 @@ const LobbyHandler = require('./lobbyHandler.js');
 
 const socketHandlers = new Map();
 
-function SocketHandler(socket, io) {
+function SocketHandler(socket, io, TEST_MODE) {
     console.log(`Connection made: ${socket.id}`);
 
     // Initialize new user state
@@ -47,6 +47,10 @@ function SocketHandler(socket, io) {
     };
 
     const lobby = new LobbyHandler(user, logError, onJoinedLobby, onGameRequested, this.onJoinGame);
+
+    if (TEST_MODE) { // assign the client a name 
+        socket.emit('testing-set-username', socketHandlers.size > 1 ? 'player2' : 'player1');
+    }
 
     // Handle user searching for a game
     socket.on('find', lobby.joinLobby);
