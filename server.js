@@ -23,7 +23,7 @@ app.use(express.static(join(__dirname, clientFolder)));
 
 // -- Socket.IO Connection Handling --
 io.on('connection', (socket) => {
-    new SocketHandler(socket, io, TEST_MODE);
+    new SocketHandler(socket, io);
 });
 
 // -- Start Server --

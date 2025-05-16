@@ -4,7 +4,7 @@ const LobbyHandler = require('./lobbyHandler.js');
 
 const socketHandlers = new Map();
 
-function SocketHandler(socket, io, TEST_MODE) {
+function SocketHandler(socket, io) {
     console.log(`Connection made: ${socket.id}`);
 
     // Initialize new user state
@@ -33,7 +33,7 @@ function SocketHandler(socket, io, TEST_MODE) {
         user.isFinding = false; // user is no longer finding a game
 
         socket.join(game.id); // Add user to the game room
-        socket.emit('joined', otherUser.name, game.id); // tell the client
+        socket.emit('joined', otherUser.name, game.id, !isLastPlayerToJoin); // tell the client
         game.setTurnCallbacks(user, this.onTurnBegin, this.onWaitBegin);
         opponent = otherUser;
 
@@ -47,10 +47,6 @@ function SocketHandler(socket, io, TEST_MODE) {
     };
 
     const lobby = new LobbyHandler(user, logError, onJoinedLobby, onGameRequested, this.onJoinGame);
-
-    if (TEST_MODE) { // assign the client a name 
-        socket.emit('testing-set-username', socketHandlers.size > 1 ? 'player2' : 'player1');
-    }
 
     // Handle user searching for a game
     socket.on('find', lobby.joinLobby);

@@ -50,46 +50,22 @@ socket.on('find-results', (usersFinding) => {
 
 // Handle incoming game requests
 socket.on('requested-game', (requesterUsername) => {
-    const listItem = document.getElementById(requesterUsername + '-list-item');
-    if (!listItem) {
-        alert('requested game from ' + requesterUsername + ', user is not in requester list, try refreshing?');
-        return;
-    }
-
-    // Prevent duplicate join buttons
-    const alreadyAskedJoin = listItem.getAttribute('has-requested-join');
-    if (alreadyAskedJoin) {
-        // TODO: play some ping sound/animation to show re-asking join
-        return;
-    }
-
-    listItem.setAttribute('has-requested-join', true);
-
-    // Add join button to accept request
-    const joinButton = document.createElement('button');
-    joinButton.innerText = 'Join';
-    joinButton.classList.add('join-button');
-    joinButton.addEventListener('click', () => socket.emit('join', requesterUsername));
-    listItem.appendChild(joinButton);
+    console.log('requested game from ' + requesterUsername + ', joining');
+    socket.emit('join', requesterUsername);
 });
 
 // Set up game state when joining a game
 socket.on('joined', (otherUsername, joinedGameRoom) => {
-    showMenu('game'); // Switch to game menu
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
-    startPlacingShips(); //place ships to be moved by the player
+    placeShips(); //place ships to be moved by the player
 });
 
 // Handle game ending 
 socket.on('game-ended', (message) => {
-    alert(message);
-    // Reset game state and show start menu
-    oppUsername = null;
-    gameRoom = null;
-    showMenu('start');
+    console.log('game-ended: ' + message);
 });
 
 // Handle disconnection from server
@@ -101,26 +77,13 @@ socket.on('disconnect', function() {
     gameRoom = null;
 });
 
-// Function to handle menu visibility
-function showMenu(name) {
-    for(let menu of menus) {
-        if (menu.name == name) {
-            // Show requested menu if not already shown
-            if (menu.shown) continue;
-            menu.shown = true;
-            menu.element.classList.remove('hidden');
-            continue;
-        }
-
-        // Hide other menus
-        if (!menu.shown) continue;
-        menu.shown = false;
-        menu.element.classList.add('hidden');
-    }
+function placeShips() {
+    const boats = isPlayer1 
+    ? [
+        // placements 1 here
+    ]
+    : [
+        // different but valid placements here
+    ];
+    socket.emit('set-placements', boats);
 }
-
-// TEST-SCRIPT ONLY SOCKET STUFF //
-socket.on('test-set-username', (testname) => {
-    username = testname;
-    find();
-});

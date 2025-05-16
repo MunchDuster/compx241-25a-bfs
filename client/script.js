@@ -27,6 +27,7 @@ const oppUsernameDisplay = document.getElementById('opp');
 let username = null;    // Current user's username
 let oppUsername = null; // Opponent's username
 let gameRoom = null;    // Current game room ID
+let isPlayer1 = null;
 
 // Successfully connected to server
 socket.on('connect', function() {
@@ -108,8 +109,9 @@ socket.on('requested-game', (requesterUsername) => {
 });
 
 // Set up game state when joining a game
-socket.on('joined', (otherUsername, joinedGameRoom) => {
+socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     showMenu('game'); // Switch to game menu
+    isPlayer1 = isFirstPlayer;
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
