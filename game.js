@@ -3,7 +3,7 @@ const Minefield = require('./minefield.js');
 
 const games = new Map();
 const BOARD_SIZE = 10;
-const NUM_OF_MINES = 10; //Per User.
+const NUM_OF_MINES = 10;
 
 class Game { 
     static getById(id) {
@@ -186,7 +186,7 @@ class Game {
         //Called when a player clicks ready (Clickable after the player places all boats)
         if(this.user1.ready == true && this.user2.ready == true){
             this.minefield.initilizeMines(this.user1.board.ships, this.user2.board.ships);
-            this.gameState = "mainGame";
+            this.gameState = "gameLoop";
         }
         return;
     }
