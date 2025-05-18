@@ -28,8 +28,8 @@ function SocketHandler(socket, io) {
     this.onWaitBegin = () => {
         socket.emit('wait-start');
     }
-    this.onJoinGame = (otherUser, game, isLastPlayerToJoin) => {
-        this.game = game;
+    this.onJoinGame = (otherUser, joinedGame, isLastPlayerToJoin) => {
+        game = joinedGame;
         socket.leave('finding'); // its time to stop
         user.isFinding = false; // user is no longer finding a game
 
@@ -83,13 +83,13 @@ function SocketHandler(socket, io) {
 
     // -- Game Events --
     // Handle placements
-    socket.on('set-placements', (boats) => {
-        if (!Game.isValidPlacements(boats, logError)) {
+    socket.on('set-placements', (placements) => {
+        if (!Game.isValidPlacements(placements, logError)) {
             return;
         }
 
-        game.setUserBoatPlacements(user, boats);
-        if (game.user1Board.setup && game.user1Board.setup) {
+        game.setUserBoatPlacements(user, placements);
+        if (game.user1.ready && game.user2.ready) {
             game.placeMines();
             game.nextTurn(); // start turns
         }

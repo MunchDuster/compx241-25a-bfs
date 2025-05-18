@@ -50,7 +50,7 @@ class Game {
         // Check that all boat tiles are within bounds (0-9 for a 10x10 board)
         for(let ship of ships) {
             if (ship.isOutOfBounds()) {
-                logError(`Ship out-of-bounds! Ship: ${ship.toString()}`);
+                logError(`Ship out-of-bounds! Ship: ${ship.toString()}\nwith tiles ${JSON.stringify(ship.getTiles(ship.centreTile))}`);
                 return false;
             }
         }
@@ -69,9 +69,7 @@ class Game {
                 turnBegin: null,
                 waitBegin: null,
             },
-            board: {
-                ships: [],
-            },
+            ships: [],
             ready:false
         };
         this.user2 = { 
@@ -81,9 +79,7 @@ class Game {
                 turnBegin: null,
                 waitBegin: null,
             },
-            board: {
-                ships: [],
-            },
+            ships: [],
             ready:false
         }
         
@@ -134,6 +130,11 @@ class Game {
         }
 
         return user1ShipsSunk || user2ShipsSunk;
+    }
+    setUserBoatPlacements(user, placements) {
+        const ships = placements.map(placement => new Ship(placement));
+        if (user.socketId == this.user1.socketId) this.user1.ships = ships;
+        else this.user2.ships = ships;
     }
 
     setupPhase(){

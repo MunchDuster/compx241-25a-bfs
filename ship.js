@@ -114,7 +114,7 @@ class Ship {
     }
 
     getTiles(newCentreTile) {
-        const halfLength = Math.floor(this.length / 2);
+        const halfLength = this.length % 2 == 0 ? (this.length - 1) / 2 : this.length / 2;
         let tiles = [];
 
         switch(this.rotation % 4) {
@@ -139,6 +139,8 @@ class Ship {
                 }
                 break;
         }
+
+
         return tiles;
     }
 
