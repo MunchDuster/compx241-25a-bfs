@@ -18,6 +18,27 @@ const menus = [
     },
 ];
 
+// Sound must player after an interaction like a click, browser will not play it otherwise
+function playAudio() {
+    console.log('playing audio')
+
+    const sound = new Audio("song.mp3");
+    sound.preload = 'auto';
+    sound.load();
+
+    const audioContext = new AudioContext();
+    const track = audioContext.createMediaElementSource(sound);
+
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = 0.5;
+
+    track.connect(gainNode).connect(audioContext.destination);
+    sound.play();
+
+    window.removeEventListener('click', playAudio);
+}
+window.addEventListener('click', playAudio);
+
 // Get references to DOM elements
 const findListContainer = document.getElementById('find-list');
 const usernameDisplays = document.querySelectorAll('.username-display:not([id="opp"])');
