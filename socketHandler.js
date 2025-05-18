@@ -23,11 +23,11 @@ function SocketHandler(socket, io) {
         socket.to(requesteeSocketId).emit('requested-game', user.name);
     }
     this.onTurnBegin = () => {
-        console.log(user.toString() + ' starting turn...');
+        console.log(user.toString() + ' starting turn');
         socket.emit('turn-start');
     };
     this.onWaitBegin = () => {
-        console.log(user.toString() + ' waiting turn...');
+        console.log(user.toString() + ' waiting turn');
         socket.emit('wait-start');
     }
     this.onJoinGame = (otherUser, joinedGame, isLastPlayerToJoin) => {
@@ -61,6 +61,21 @@ function SocketHandler(socket, io) {
     socket.on('join', lobby.joinGame);
 
     socket.on('play-turn', (turn, callback) => {
+        console.log(user.toString() + ' is playing a turn');
+        if (turn == null) {
+            console.log('turn is null');
+            if (callback != null) {
+                callback({success: false, result: 'turn is null'});
+                return;
+            }
+        }
+        if (callback == null) {
+            socket.emit('error', 'play-turn callback is null!');
+            console.log('play-turn callback is null');
+            return;
+        }
+
+
         const {success, result} = game.playTurn(user, turn);
         callback({success});
         if (!success) return;

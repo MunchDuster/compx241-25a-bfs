@@ -5,6 +5,12 @@ const games = new Map();
 const BOARD_SIZE = 10;
 const NUM_OF_MINES = 10;
 
+const TURN_TYPE = {
+    Missile: 'missile',
+    Recon: 'recon-missile',
+    Move: 'move'
+}
+
 class Game { 
     constructor(user1, user2) {
         // keep track of game by usernames
@@ -114,8 +120,8 @@ class Game {
     }
 
     checkGameOver() {
-        const user1ShipsSunk = this.user1.board.ships.every(ship => ship.isSunk());
-        const user2ShipsSunk = this.user2.board.ships.every(ship => ship.isSunk());
+        const user1ShipsSunk = this.user1.ships.every(ship => ship.isSunk());
+        const user2ShipsSunk = this.user2.ships.every(ship => ship.isSunk());
 
         if (user1ShipsSunk && user2ShipsSunk) { // Shouldnt be possible
             this.gameState = "gameDraw";
@@ -161,8 +167,40 @@ class Game {
         }
     }
 
-    playTurn(user, turn) {
-
+    playTurn(user, turn) { // returns {success, result}
+        const isUser1MakingTurn = user.socketId == this.user1.socketId;
+        
+        //check correct user
+        if (this.isUser1sTurn != isUser1MakingTurn) {
+            return {success: false, result: 'not your turn!'};
+        }
+        
+        //make turn with users ships
+        const userX = isUser1MakingTurn ? this.user1 : this.user2;
+        switch (turn.type) {
+            case TURN_TYPE.Missile:
+                // MISSILE CODE HERE
+                return { // example success
+                    success: true,
+                    result: {hit: false}
+                };
+            case TURN_TYPE.Recon:
+                // RECON CODE HERE
+                return { // example success
+                    success: true,
+                    result: {value: 8}
+                };
+            case TURN_TYPE.Move:
+                // MOVE CODE HERE
+                return { // example success
+                    success: true,
+                    result: {
+                        ships: userX.ships // simplify data sent, i.e to same format as placement
+                    }
+                };
+            default:
+                return {success: false, result: 'unrecognised turn type!'};
+        }
     }
     placeMines() {
         this.minefield.initilizeMines(this.user1.ships, this.user2.ships);

@@ -1,3 +1,22 @@
+const SHIP_TYPES = {
+    CARRIER: 'carrier', // length 5
+    BATTLESHIP: 'battleship', // length 4
+    CRUISER: 'cruiser', // length 3
+    SUBMARINE: 'submarine', // length 3
+    DESTROYER: 'destroyer' // length 2
+};
+const ROTATION = { // (0,1,2 or 3) starting at up turning clockwise
+    UP: 0,
+    LEFT: 1,
+    DOWN: 2,
+    RIGHT: 3,
+}
+const TURN_TYPE = {
+    Missile: 'missile',
+    Recon: 'recon-missile',
+    Move: 'move'
+}
+
 // Initialize Socket.IO connection to server
 const socket = io();
 
@@ -8,9 +27,13 @@ let username = null;    // Current user's username
 let oppUsername = null; // Opponent's username
 let gameRoom = null;    // Current game room ID
 
+// TESTING ONLY VARS
+let turnNo = 0;
+
 // Successfully connected to server
 socket.on('connect', function() {
     console.log('connected');
+    turnNo = 0;
 });
 socket.on('set-usernumber', (usernum) => {
     usernumber = usernum;
@@ -75,9 +98,47 @@ socket.on('joined', (otherUsername, joinedGameRoom, isPlayer1L) => {
 
 socket.on('turn-start', function() {
     console.log('turn-started');
+    
+    const turns = [
+        { // p1
+            type: TURN_TYPE.Missile,
+            targetTile: {x: 5, y: 5}
+        }, {// p2
+            type: TURN_TYPE.Missile,
+            targetTile: {x: 3, y: 3}
+        }, {// p1
+            type: TURN_TYPE.Recon,
+            targetTile: {x: 8, y: 8}
+        }, {// p2
+            type: TURN_TYPE.Recon,
+            targetTile: {x: 8, y: 2}
+        }, {// p1
+            type: TURN_TYPE.Move,
+            ship: SHIP_TYPES.BATTLESHIP,
+            direction: ROTATION.DOWN
+        }, {// p2
+            type: TURN_TYPE.Move,
+            ship: SHIP_TYPES.SUBMARINE,
+            direction: ROTATION.UP
+        }, {// p2
+            type: TURN_TYPE.Missile,
+            targetTile: {x: 3, y: 3}
+        }
+    ]
+
+    if (turnNo >= turns.length) {
+        console.log('RUN OUT OF SET TURNS');
+        return;
+    }
+    const turn = turns[turnNo++];
+    console.log('playing turn: ', turn);
+    socket.emit('play-turn', turn, ({success}) => {
+        console.log('play-turn-success: ' + success);
+    });
 });
 socket.on('wait-start', function() {
     console.log('wait-started');
+    turnNo++;
 });
 
 // Handle game ending 
@@ -95,19 +156,7 @@ socket.on('disconnect', function() {
 });
 
 function placeShips() {
-    const SHIP_TYPES = {
-        CARRIER: 'carrier', // length 5
-        BATTLESHIP: 'battleship', // length 4
-        CRUISER: 'cruiser', // length 3
-        SUBMARINE: 'submarine', // length 3
-        DESTROYER: 'destroyer' // length 2
-    };
-    const ROTATION = { // (0,1,2 or 3) starting at up turning clockwise
-        UP: 0,
-        LEFT: 1,
-        DOWN: 2,
-        RIGHT: 3,
-    }
+   
     const placements = isPlayer1 
     ? [
         // This should show how I've setup the test data -- Malachai
