@@ -1,4 +1,4 @@
-const Ship = require('./ship.js');
+const {Ship, SHIP_TYPES} = require('./ship.js');
 const Minefield = require('./minefield.js');
 
 const games = new Map();

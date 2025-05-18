@@ -173,4 +173,4 @@ class Ship {
     }
 }
 
-module.exports = Ship;
+module.exports = {Ship, SHIP_TYPES};
