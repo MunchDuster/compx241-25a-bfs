@@ -9,6 +9,7 @@ function SocketHandler(socket, io) {
 
     // Initialize new user state
     const user = new User(socket.id);
+    socket.emit('set-usernumber', socketHandlers.size);
     let game;
     let opponent; // (user)
 

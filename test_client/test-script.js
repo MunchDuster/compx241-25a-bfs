@@ -2,6 +2,8 @@
 const socket = io();
 
 // Track current game state
+let isPlayer1 = null;
+let usernumber = null;
 let username = null;    // Current user's username
 let oppUsername = null; // Opponent's username
 let gameRoom = null;    // Current game room ID
@@ -10,41 +12,48 @@ let gameRoom = null;    // Current game room ID
 socket.on('connect', function() {
     console.log('connected');
 });
+socket.on('set-usernumber', (usernum) => {
+    usernumber = usernum;
+    console.log('usernumber is ' + usernumber);
+    const numbers = ['One','Two','Three','Four','Five','BigNumberLol'];
+    username = 'user' + numbers[usernumber];
+    console.log('username is ' + username);
+    find();
+});
 
 
 // Handle user clicking "Find Game" button
 function find() {
-    // username given from server
-    // Prompt user to input username
-    if (username == null) {
+    if (username == null) {``
         console.error('trying to find when username is null!');
     }
 
     //Emit find event to server with username
     socket.emit('find', username, (response) => {
-        if (!response.success) return;
-        // Show the find menu and update username displays
-        showMenu('find');
-        console.log(usernameDisplays)
-        usernameDisplays.forEach(div => div.innerText = username);
+        if (!response.success) {
+            console.log('failed entering finding');
+            return;
+        }
+            console.log('failed entering finding');
     });
 }
 
 // Handle error messages from server
 socket.on('error', (message) => {
-    alert(message);
+    console.error('received error: ' + message);
 })
 
 // Handle updated list of available players
 socket.on('find-results', (usersFinding) => {
     console.log('find results are: ', usersFinding);
-    findListContainer.innerHTML = ''; // Clear exisiting list\
 
     // Create a new list item for each available player
     for (let findUsername of usersFinding) {
         if (findUsername == username) continue; // Skip the current player
-        
         console.log('seeing-player: ' + findUsername);
+        if (usernumber % 2 == 0) {// only make even users send request
+            socket.emit('request-game', findUsername);
+        }
     }
 });
 
@@ -55,8 +64,8 @@ socket.on('requested-game', (requesterUsername) => {
 });
 
 // Set up game state when joining a game
-socket.on('joined', (otherUsername, joinedGameRoom) => {
-    oppUsernameDisplay.innerText = otherUsername;
+socket.on('joined', (otherUsername, joinedGameRoom, isPlayer1L) => {
+    isPlayer1 = isPlayer1L;
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
