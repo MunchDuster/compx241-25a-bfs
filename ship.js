@@ -103,7 +103,7 @@ class Ship {
     }
 
     toString() {
-        return `${this.type}@${this.centreTile.x}, ${this.centreTile.y}`;
+        return `${this.id}|${this.type} @ (${this.centreTile.x}, ${this.centreTile.y}) rot ${this.rotation}`;
     }
 
     move(newCentreTile, gridSize = 10) {
