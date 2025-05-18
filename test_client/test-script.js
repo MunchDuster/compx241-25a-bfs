@@ -31,10 +31,10 @@ function find() {
     //Emit find event to server with username
     socket.emit('find', username, (response) => {
         if (!response.success) {
-            console.log('failed entering finding');
+            console.error('failed entering finding');
             return;
         }
-            console.log('failed entering finding');
+        console.log('succeeded entering finding');
     });
 }
 
