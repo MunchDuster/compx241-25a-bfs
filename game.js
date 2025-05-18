@@ -24,6 +24,7 @@ class Game {
                 waitBegin: null,
             },
             ships: [],
+            mines: new Minefield(NUM_OF_MINES),
             ready:false
         };
         this.user2 = { 
@@ -34,6 +35,7 @@ class Game {
                 waitBegin: null,
             },
             ships: [],
+            mines: new Minefield(NUM_OF_MINES),
             ready:false
         }
         
@@ -147,6 +149,8 @@ class Game {
         //Called when a player clicks ready (Clickable after the player places all boats)
         if(this.user1.ready == true && this.user2.ready == true){
             // this.placeMines();
+            this.user1.mines = this.minefield;
+            this.user2.mines = this.minefield;
             this.gameState = "mainGame";
             
             this.isUser1sTurn = true;
@@ -185,10 +189,17 @@ class Game {
                     result: {hit: false}
                 };
             case TURN_TYPE.Recon:
-                // RECON CODE HERE
-                return { // example success
-                    success: true,
-                    result: {value: 8}
+                //Check tile input is correct
+                if(x < 10 && x >=0 && y < 10 && y>= 0){
+                    minecount = this.userX.mines.receiveReconHit(x,y);
+                    return {
+                        success: true,
+                        result: {minecount}
+                    };
+                }
+                return {
+                    success: false,
+                    result: 'Invalid X or Y Coordinate. X: ' + x + ' Y: ' + y
                 };
             case TURN_TYPE.Move:
                 // MOVE CODE HERE

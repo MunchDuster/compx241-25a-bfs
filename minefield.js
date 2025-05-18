@@ -72,9 +72,9 @@ class Minefield {
         y--;
 
         for(i = 0; i < 3; i++){
-            if(y >= 0){
+            if(y >= 0 && y<10){
                 for(j = 0; j < 3; j++){
-                    if(x >= 0){
+                    if(x >= 0 && x<10){
                         if(this.mineArray[y*10+x] == true){
                             minecount++;
                         }
