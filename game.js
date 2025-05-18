@@ -17,9 +17,6 @@ class Game {
         //     rotation: ROTATION,
         //     type: SHIP_TYPES // length is inferred from this
         // }
-        function tileStr(tile) {
-            return `(${tile.x},${tile.y})`;
-        }
 
         // check that placements is an array
         if (!Array.isArray(placements)) {
@@ -45,6 +42,7 @@ class Game {
         if (!containsAllTypes) {
             const types = placements.map(placement => placement.type);
             logError(`There should be one of each type of boat! Given ${types.join(', ')}`)
+            return false;
         }
 
         for(let placement of placements) {
