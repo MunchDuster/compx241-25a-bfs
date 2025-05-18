@@ -54,7 +54,7 @@ class Game {
         // Check that all boat tiles are within bounds (0-9 for a 10x10 board)
         let allShipsGood = true;
         ships.forEach(ship => {
-            isAnyOOB &&= ship.isOutOfBounds();
+            allShipsGood &&= ship.isOutOfBounds();
             if (ship.isOutOfBounds) {
                 logError(`Ship out-of-bounds! Ship: ${ship.toString()}`);
             }
