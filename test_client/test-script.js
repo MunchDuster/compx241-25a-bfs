@@ -100,7 +100,7 @@ function placeShips() {
         DOWN: 2,
         RIGHT: 3,
     }
-    const boats = isPlayer1 
+    const placements = isPlayer1 
     ? [
         // This should show how I've setup the test data -- Malachai
         // (S)ubmarine, (B)attleship, (D)estroyer, c(A)rrier, cr(U)iser
@@ -120,28 +120,28 @@ function placeShips() {
         //
         // -- format -- 
         // {
-        //     centerTile: {x, y}, // starting at (0,0) ending at (9,9) where (0,0) is top-left corner
+        //     centreTile: {x, y}, // starting at (0,0) ending at (9,9) where (0,0) is top-left corner
         //     rotation: ROTATION,
         //     type: SHIP_TYPES // length is inferred from this
         // }
            { // top-left corner
-            centerTile: {x: 0,y : 2},
+            centreTile: {x: 0,y : 2},
             rotation: ROTATION.UP,
             type: SHIP_TYPES.CARRIER
         }, { // top-right corner
-            centerTile: {x: 7,y : 0},
+            centreTile: {x: 7,y : 0},
             rotation: ROTATION.RIGHT,
             type: SHIP_TYPES.BATTLESHIP
         }, { // centerish
-            centerTile: {x: 5,y : 5},
+            centreTile: {x: 5,y : 5},
             rotation: ROTATION.DOWN,
             type: SHIP_TYPES.SUBMARINE
         }, { // bottom-left corner
-            centerTile: {x: 0,y : 9},
+            centreTile: {x: 0,y : 9},
             rotation: ROTATION.UP,
             type: SHIP_TYPES.DESTROYER
         }, { // bottom-right corner
-            centerTile: {x: 8,y : 9},
+            centreTile: {x: 8,y : 9},
             rotation: ROTATION.LEFT,
             type: SHIP_TYPES.CRUISER
         }
@@ -164,26 +164,27 @@ function placeShips() {
         // 9   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         //
            {
-            centerTile: {x: 7,y : 3},
+            centreTile: {x: 7,y : 3},
             rotation: ROTATION.RIGHT,
             type: SHIP_TYPES.CARRIER
         }, {
-            centerTile: {x: 7,y : 5},
+            centreTile: {x: 7,y : 5},
             rotation: ROTATION.DOWN,
             type: SHIP_TYPES.BATTLESHIP
         }, {
-            centerTile: {x: 9,y : 5},
+            centreTile: {x: 9,y : 5},
             rotation: ROTATION.UP,
             type: SHIP_TYPES.SUBMARINE
         }, {
-            centerTile: {x: 8,y : 7},
+            centreTile: {x: 8,y : 7},
             rotation: ROTATION.RIGHT,
             type: SHIP_TYPES.DESTROYER
         }, {
-            centerTile: {x: 8,y : 5},
+            centreTile: {x: 8,y : 5},
             rotation: ROTATION.DOWN,
             type: SHIP_TYPES.CRUISER
         }
     ];
-    socket.emit('set-placements', boats);
+    console.log('setting-placements: ', placements);
+    socket.emit('set-placements', placements);
 }
