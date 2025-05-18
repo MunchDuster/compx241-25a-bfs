@@ -7,12 +7,14 @@ const SHIP_TYPES = {
 };
 const MOVEMENT_RADIUS = 3; // The maximum distance a ship can move in one turn
 
+let nextId = 0;
+
 class Ship {
-    constructor(id, type, centreTile) {
-        this.id = id; // Unique Identifier
+    constructor({type, centreTile, rotation}) {
+        this.id = nextId++; // Unique Identifier
         this.type = type; // Ship type
         this.centreTile = centreTile; // Middle position {x: 0, y: 0}
-        this.rotation = 0; // Tracks number of rotations
+        this.rotation = rotation; // Tracks number of rotations
         this.length = null; // Will be set based on type
         this.hitArray = []; // Will be initialized based on length
         this.tileArray = null; // Will be set based on rotation and length
