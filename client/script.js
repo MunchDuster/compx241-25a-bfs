@@ -1,3 +1,5 @@
+const { isTypedArray } = require("util/types");
+
 // Initialize Socket.IO connection to server
 const socket = io();
 
@@ -22,6 +24,8 @@ const menus = [
 const findListContainer = document.getElementById('find-list');
 const usernameDisplays = document.querySelectorAll('.username-display:not([id="opp"])');
 const oppUsernameDisplay = document.getElementById('opp');
+const fireButton = document.getElementById('fire-button');
+const scanButton = document.getElementById('scan-button');
 
 // Track current game state
 let username = null;    // Current user's username
@@ -151,5 +155,45 @@ function showMenu(name) {
         if (!menu.shown) continue;
         menu.shown = false;
         menu.element.classList.add('hidden');
+    }
+
+
+    function playerTurn() {
+        let action = null;
+        while(action = null) {
+
+        }
+        socket.emit('player-move', action, xpos, ypos);
+
+    }
+    function fireMissile() {
+        //get the x and y position for missile fire
+        let x;
+        let y;
+        socket.emit('fire-missile', x, y);
+    }
+    function scanForMine() {
+        let x;
+        let y;
+        socket.emit('scan-recon', x, y)
+    }
+     // Handle turn start 
+    socket.on('turn-start', () => {
+        isTurn = true;
+        playerTurn();
+
+    });
+
+    // Handle turn wait? 
+    socket.on('wait-start', () => {
+        isTurn = false;
+    });
+   
+    function updateGameButtons() {
+        if(isTurn) {
+            
+        } else {
+
+        }
     }
 }
