@@ -87,12 +87,103 @@ socket.on('disconnect', function() {
 });
 
 function placeShips() {
+    const SHIP_TYPES = {
+        CARRIER: 'carrier', // length 5
+        BATTLESHIP: 'battleship', // length 4
+        CRUISER: 'cruiser', // length 3
+        SUBMARINE: 'submarine', // length 3
+        DESTROYER: 'destroyer' // length 2
+    };
+    const ROTATION = { // (0,1,2 or 3) starting at up turning clockwise
+        UP: 0,
+        LEFT: 1,
+        DOWN: 2,
+        RIGHT: 3,
+    }
     const boats = isPlayer1 
     ? [
-        // placements 1 here
+        // This should show how I've setup the test data -- Malachai
+        // (S)ubmarine, (B)attleship, (D)estroyer, c(A)rrier, cr(U)iser
+        // square brackets [] indicate ship center
+        //   X 0 1 2 3 4 5 6 7 8 9
+        // Y 
+        // 0   A ~ ~ ~ ~ ~ B[B]B B
+        // 1   A ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+        // 2  [A]~ ~ ~ ~ ~ ~ ~ ~ ~
+        // 3   A ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // 4   A ~ ~ ~ ~ S ~ ~ ~ ~
+        // 5   ~ ~ ~ ~ ~[S]~ ~ ~ ~
+        // 6   ~ ~ ~ ~ ~ S ~ ~ ~ ~
+        // 7   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // 8   D ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // 9  [D]~ ~ ~ ~ ~ ~ U[U]U
+        //
+        // -- format -- 
+        // {
+        //     centerTile: {x, y}, // starting at (0,0) ending at (9,9) where (0,0) is top-left corner
+        //     rotation: ROTATION,
+        //     type: SHIP_TYPES // length is inferred from this
+        // }
+           { // top-left corner
+            centerTile: {x: 0,y : 2},
+            rotation: ROTATION.UP,
+            type: SHIP_TYPES.CARRIER
+        }, { // top-right corner
+            centerTile: {x: 7,y : 0},
+            rotation: ROTATION.RIGHT,
+            type: SHIP_TYPES.BATTLESHIP
+        }, { // centerish
+            centerTile: {x: 5,y : 5},
+            rotation: ROTATION.DOWN,
+            type: SHIP_TYPES.SUBMARINE
+        }, { // bottom-left corner
+            centerTile: {x: 0,y : 9},
+            rotation: ROTATION.UP,
+            type: SHIP_TYPES.DESTROYER
+        }, { // bottom-right corner
+            centerTile: {x: 8,y : 9},
+            rotation: ROTATION.LEFT,
+            type: SHIP_TYPES.CRUISER
+        }
     ]
     : [
-        // different but valid placements here
+        // different but valid placements
+        // note the [X[Y] is just because there is only one character gaps, same as [X][Y]
+        // (S)ubmarine, (B)attleship, (D)estroyer, c(A)rrier, cr(U)iser
+        //   X 0 1 2 3 4 5 6 7 8 9
+        // Y 
+        // 0   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // 1   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+        // 2   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // 3   ~ ~ ~ ~ ~ A A[A]A A
+        // 4   ~ ~ ~ ~ ~ ~ ~ B U S
+        // 5   ~ ~ ~ ~ ~ ~ ~[B[U[S]
+        // 6   ~ ~ ~ ~ ~ ~ ~ B U S
+        // 7   ~ ~ ~ ~ ~ ~ ~ B[D]D
+        // 8   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // 9   ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        //
+           {
+            centerTile: {x: 7,y : 3},
+            rotation: ROTATION.RIGHT,
+            type: SHIP_TYPES.CARRIER
+        }, {
+            centerTile: {x: 7,y : 5},
+            rotation: ROTATION.DOWN,
+            type: SHIP_TYPES.BATTLESHIP
+        }, {
+            centerTile: {x: 9,y : 5},
+            rotation: ROTATION.UP,
+            type: SHIP_TYPES.SUBMARINE
+        }, {
+            centerTile: {x: 8,y : 7},
+            rotation: ROTATION.RIGHT,
+            type: SHIP_TYPES.DESTROYER
+        }, {
+            centerTile: {x: 8,y : 5},
+            rotation: ROTATION.DOWN,
+            type: SHIP_TYPES.CRUISER
+        }
     ];
     socket.emit('set-placements', boats);
 }
