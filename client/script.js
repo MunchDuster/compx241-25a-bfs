@@ -20,6 +20,37 @@ const menus = [
     },
 ];
 
+// Sound must player after an interaction like a click, browser will not play it otherwise
+function playAudio() {
+    console.log('playing audio')
+    
+    // hide the tip
+    const tip = document.querySelector('.whyCantIHearTheSong');
+    tip.parentElement.removeChild(tip);
+
+    const sound = document.getElementById('songer');
+
+    const audioContext = new AudioContext();
+    const track = audioContext.createMediaElementSource(sound);
+
+    const gainNode = audioContext.createGain();
+
+    const volumeSlider = document.getElementById('volumeSlider');
+    const setGain = () => {
+        const volume = volumeSlider.value;
+        console.log('setting volume ' + volume);
+        gainNode.gain.value = volume;
+    }
+    volumeSlider.addEventListener('mousemove', setGain);
+    setGain();
+
+    track.connect(gainNode).connect(audioContext.destination);
+    sound.play();
+
+    window.removeEventListener('click', playAudio);
+}
+window.addEventListener('click', playAudio);
+
 // Get references to DOM elements
 const findListContainer = document.getElementById('find-list');
 const usernameDisplays = document.querySelectorAll('.username-display:not([id="opp"])');
@@ -31,6 +62,7 @@ const scanButton = document.getElementById('scan-button');
 let username = null;    // Current user's username
 let oppUsername = null; // Opponent's username
 let gameRoom = null;    // Current game room ID
+let isPlayer1 = null;
 
 // Successfully connected to server
 socket.on('connect', function() {
@@ -112,8 +144,9 @@ socket.on('requested-game', (requesterUsername) => {
 });
 
 // Set up game state when joining a game
-socket.on('joined', (otherUsername, joinedGameRoom) => {
+socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     showMenu('game'); // Switch to game menu
+    isPlayer1 = isFirstPlayer;
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;

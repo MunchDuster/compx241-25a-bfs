@@ -44,7 +44,7 @@ class Minefield {
             const x = Math.floor(Math.random() * BOARD_SIZE);
             const y = Math.floor(Math.random() * BOARD_SIZE);
             const tileKey = `${x},${y}`;
-            if(!occupiedTiles.includes(tileKey)){
+            if(!occupiedTiles.includes(tileKey) && this.mineArray[tile.y*10+tile.x] == false){
                 this.placeMine(tile.x, tile.y);
                 mineplaced++;
             }
@@ -62,6 +62,29 @@ class Minefield {
             return true;
         }
         return false;
+    }
+
+    receiveReconHit(x, y) { 
+        minecount = 0;   
+
+        //Turn x and y into the top left corner of 3x3 grid
+        x--;
+        y--;
+
+        for(i = 0; i < 3; i++){
+            if(y >= 0 && y<10){
+                for(j = 0; j < 3; j++){
+                    if(x >= 0 && x<10){
+                        if(this.mineArray[y*10+x] == true){
+                            minecount++;
+                        }
+                    }
+                    x++;
+                }
+            }
+            y++;
+        }
+        return minecount;
     }
 }
 

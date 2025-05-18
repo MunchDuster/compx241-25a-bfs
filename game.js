@@ -1,109 +1,17 @@
-const Ship = require('./ship.js');
+const {Ship, SHIP_TYPES} = require('./ship.js');
 const Minefield = require('./minefield.js');
 
 const games = new Map();
 const BOARD_SIZE = 10;
-const NUM_OF_MINES = 10; //Per User.
+const NUM_OF_MINES = 10;
+
+const TURN_TYPE = {
+    Missile: 'missile',
+    Recon: 'recon-missile',
+    Move: 'move'
+}
 
 class Game { 
-    static getById(id) {
-        return games.get(id);
-    }
-
-    static isValidPlacements(boats, logError) {
-        function tileStr(tile) {
-            return `(${tile.x},${tile.y})`;
-        }
-
-        // check that placements is an array
-        if (!Array.isArray(boats)) {
-            logError('Boats is not an array!');
-            return false;
-        }
-
-        // check that there are the correct number of boats
-        const expectedBoatsCount = 5;
-        if (boats.length !== expectedBoatsCount) {
-            logError(`There should be ${expectedBoatsCount} boats! Given ${boats.length}`);
-            return false;
-        }
-
-        // check that all boats valid: sizes of 5,4,3,3,2
-        const expectedSizes = [5, 4, 3, 3, 2].sort((a,b) => b-a); 
-        const actualSizes = boats.map(p => p.tiles.length).sort((a,b) => b-a); // Sort in descending order
-
-        if (JSON.stringify(expectedSizes) !== JSON.stringify(actualSizes)) {
-            logError(`Boat sizes are incorrect. Expected: ${expectedSizes.join(',')}. Got: ${actualSizes.join(',')}`);
-            return false;
-        }
-
-        // Check that all boat tiles are within bounds (0-9 for a 10x10 board)
-        for (let i = 0; i < boats.length; i++) {
-            const boatPlacement = boats[i];
-            for (let t = 0; t < boatPlacement.tileArray.length; t++) {
-                const tile = boatPlacement.tileArray[t];
-                const isWithinBounds = tile.x < BOARD_SIZE && tile.y < BOARD_SIZE && tile.x >= 0 && tile.y >= 0;
-                if (!isWithinBounds) {
-                    logError(`Boat tile out-of-bounds! Boat: ${boatPlacement.name || `Boat ${i}`}, Tile: ${tileStr(tile)}`);
-                    return false;
-                }
-            }
-        }
-
-        // Check that boat tiles are consecutive (boat is not disjoint)
-        // This also implicitly checks if a boat is straight (horizontal or vertical)
-        for (let i = 0; i < placements.length; i++) {
-            const boatPlacement = placements[i];
-            const tiles = boatPlacement.tiles;
-
-            if (tiles.length < 2) {
-                logError(`Boat is less than two tiles big! Boat: ${boatPlacement.name || `Boat ${i}`}`);
-                return false;
-            }
-
-            const isHorizontal = tiles[0].y === tiles[1].y;
-            const isVertical = tiles[0].x === tiles[1].x;
-
-            for (let t = 1; t < tiles.length; t++) {
-                const prevTile = tiles[t-1];
-                const currentTile = tiles[t];
-                let expectedX = prevTile.x;
-                let expectedY = prevTile.y;
-
-                if (isHorizontal) {
-                    expectedX = prevTile.x + (currentTile.x > prevTile.x ? 1 : -1);
-                } else { // isVertical
-                    expectedY = prevTile.y + (currentTile.y > prevTile.y ? 1 : -1);
-                }
-
-                const diffX = Math.abs(currentTile.x - prevTile.x);
-                const diffY = Math.abs(currentTile.y - prevTile.y);
-
-                if (!((isHorizontal && diffX === 1 && diffY === 0) || (isVertical && diffX === 0 && diffY === 1))) {
-                     logError(`Boat contains non-consecutive tiles! Boat: ${boatPlacement.name || `Boat ${i}`}, between ${tileStr(prevTile)} and ${tileStr(currentTile)}`);
-                     return false;
-                }
-            }
-
-            // Check that no boats intersect (no tile is the same position as any other tile)
-            const allOccupiedTiles = new Set();
-            for (let i = 0; i < placements.length; i++) {
-                const boatPlacement = placements[i];
-                for (let t = 0; t < boatPlacement.tiles.length; t++) {
-                    const tile = boatPlacement.tiles[t];
-                    const tileString = tileStr(tile);
-                    if (allOccupiedTiles.has(tileString)) {
-                        logError(`Boat tiles overlap! Boat: ${boatPlacement.name || `Boat ${i}`}, overlapping tile: ${tileString}`);
-                        return false;
-                    }
-                    allOccupiedTiles.add(tileString);
-                }
-            }
-
-            return true;
-        }
-    }   
-
     constructor(user1, user2) {
         // keep track of game by usernames
         // to allow for later quick-connect feature
@@ -115,9 +23,8 @@ class Game {
                 turnBegin: null,
                 waitBegin: null,
             },
-            board: {
-                ships: [],
-            },
+            ships: [],
+            mines: new Minefield(NUM_OF_MINES),
             ready:false
         };
         this.user2 = { 
@@ -127,21 +34,71 @@ class Game {
                 turnBegin: null,
                 waitBegin: null,
             },
-            board: {
-                ships: [],
-            },
+            ships: [],
+            mines: new Minefield(NUM_OF_MINES),
             ready:false
         }
         
-        this.currentPlayerSocketId = user1.socketId; 
+        this.isUser1sTurn = true; 
         this.gameState = "placing";
         this.winner = null;
         this.minefield = new Minefield(NUM_OF_MINES);
 
-        console.log(`Starting game ${this.id} between ${user1.name} and ${user2.name}`);
+        console.log(`created game ${this.id} between ${user1.name} and ${user2.name}`);
         games.set(this.id, this);
-
     }
+
+    static getById(id) {
+        return games.get(id);
+    }
+
+    static isValidPlacements(placements, logError) {
+        // -- format -- 
+        // {
+        //     centerTile: {x, y}, // starting at (0,0) ending at (9,9) where (0,0) is top-left corner
+        //     rotation: ROTATION,
+        //     type: SHIP_TYPES // length is inferred from this
+        // }
+
+        // check that placements is an array
+        if (!Array.isArray(placements)) {
+            logError('Boats is not an array!');
+            return false;
+        }
+
+        // check that there are the correct number of boats
+        const expectedBoatsCount = 5;
+        if (placements.length !== expectedBoatsCount) {
+            logError(`There should be ${expectedBoatsCount} boats! Given ${placements.length}`);
+            return false;
+        }
+
+        // check there is one of each type of boat
+        const containsAllTypes = ( // crude but works
+            placements.some(placement => placement.type == SHIP_TYPES.BATTLESHIP) &&
+            placements.some(placement => placement.type == SHIP_TYPES.CARRIER) &&
+            placements.some(placement => placement.type == SHIP_TYPES.CRUISER) &&
+            placements.some(placement => placement.type == SHIP_TYPES.DESTROYER) &&
+            placements.some(placement => placement.type == SHIP_TYPES.SUBMARINE)
+        );
+        if (!containsAllTypes) {
+            const types = placements.map(placement => placement.type);
+            logError(`There should be one of each type of boat! Given ${types.join(', ')}`)
+            return false;
+        }
+
+        const ships = placements.map(placement => new Ship(placement));
+
+        // Check that all boat tiles are within bounds (0-9 for a 10x10 board)
+        for(let ship of ships) {
+            if (ship.isOutOfBounds()) {
+                logError(`Ship out-of-bounds! Ship: ${ship.toString()}\nwith tiles ${JSON.stringify(ship.getTiles(ship.centreTile))}`);
+                return false;
+            }
+        }
+
+        return true;
+    }   
 
     delete() {
         console.log(`Deleting game ${this.id}`);
@@ -165,8 +122,8 @@ class Game {
     }
 
     checkGameOver() {
-        const user1ShipsSunk = this.user1.board.ships.every(ship => ship.isSunk());
-        const user2ShipsSunk = this.user2.board.ships.every(ship => ship.isSunk());
+        const user1ShipsSunk = this.user1.ships.every(ship => ship.isSunk());
+        const user2ShipsSunk = this.user2.ships.every(ship => ship.isSunk());
 
         if (user1ShipsSunk && user2ShipsSunk) { // Shouldnt be possible
             this.gameState = "gameDraw";
@@ -181,26 +138,96 @@ class Game {
 
         return user1ShipsSunk || user2ShipsSunk;
     }
+    setUserBoatPlacements(user, placements) {
+        const ships = placements.map(placement => new Ship(placement));
+        const userX = user.socketId == this.user1.socketId ? this.user1 : this.user2;
+        userX.ships = ships;
+        userX.ready = true;
+    }
 
-    setupPhase(){
+    startGame(){
         //Called when a player clicks ready (Clickable after the player places all boats)
         if(this.user1.ready == true && this.user2.ready == true){
-            this.minefield.initilizeMines(this.user1.board.ships, this.user2.board.ships);
+            // this.placeMines();
+            this.user1.mines = this.minefield;
+            this.user2.mines = this.minefield;
             this.gameState = "mainGame";
+            
+            this.isUser1sTurn = true;
+            this.nextTurn();
         }
         return;
     }
 
     setTurnCallbacks(user, onTurnBegin, onWaitBegin) {
-        
+        const userInGame = (user.socketId === this.user1.socketId) ? this.user1 : this.user2;
+
+        if (userInGame) {
+            userInGame.callbacks.turnBegin = onTurnBegin;
+            userInGame.callbacks.waitBegin = onWaitBegin;
+            console.log(`Callbacks set for ${userInGame.name}. Has turnBegin: ${!!onTurnBegin}, Has waitBegin: ${!!onWaitBegin}`);
+        } else {
+            console.error(`Error: Could not find user in game to set callbacks for socketId: ${user.socketId}`);
+        }
     }
 
-    playTurn(user, turn) {
-
+    playTurn(user, turn) { // returns {success, result}
+        const isUser1MakingTurn = user.socketId == this.user1.socketId;
+        
+        //check correct user
+        if (this.isUser1sTurn != isUser1MakingTurn) {
+            return {success: false, result: 'not your turn!'};
+        }
+        
+        //make turn with users ships
+        const userX = isUser1MakingTurn ? this.user1 : this.user2;
+        switch (turn.type) {
+            case TURN_TYPE.Missile:
+                // MISSILE CODE HERE
+                return { // example success
+                    success: true,
+                    result: {hit: false}
+                };
+            case TURN_TYPE.Recon:
+                //Check tile input is correct
+                if(x < 10 && x >=0 && y < 10 && y>= 0){
+                    minecount = this.userX.mines.receiveReconHit(x,y);
+                    return {
+                        success: true,
+                        result: {minecount}
+                    };
+                }
+                return {
+                    success: false,
+                    result: 'Invalid X or Y Coordinate. X: ' + x + ' Y: ' + y
+                };
+            case TURN_TYPE.Move:
+                // MOVE CODE HERE
+                return { // example success
+                    success: true,
+                    result: {
+                        ships: userX.ships // simplify data sent, i.e to same format as placement
+                    }
+                };
+            default:
+                return {success: false, result: 'unrecognised turn type!'};
+        }
+    }
+    placeMines() {
+        this.minefield.initilizeMines(this.user1.ships, this.user2.ships);
     }
 
     nextTurn() {
+        this.isUser1sTurn = !this.isUser1sTurn;
 
+        if (this.isUser1sTurn) {
+            this.user1.callbacks.turnBegin();
+            this.user2.callbacks.waitBegin();
+        }
+        else {
+            this.user2.callbacks.turnBegin();
+            this.user1.callbacks.waitBegin();
+        }
     }
 }
 

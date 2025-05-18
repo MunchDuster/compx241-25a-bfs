@@ -13,9 +13,13 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
+// check if set to test client script (while frontend isn't frontending yet)
+const TEST_MODE = process.argv.length > 2 && process.argv[2] == 'test';
+
 // -- Express Setup --
 // Setup static files from client directory
-app.use(express.static(join(__dirname,'/client')));
+const clientFolder = TEST_MODE ? '/test_client' : '/client';
+app.use(express.static(join(__dirname, clientFolder)));
 
 // -- Socket.IO Connection Handling --
 io.on('connection', (socket) => {
@@ -25,4 +29,7 @@ io.on('connection', (socket) => {
 // -- Start Server --
 httpServer.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
+    if (TEST_MODE) {
+        console.log('[test mode enabled]');
+    }
 });
