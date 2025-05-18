@@ -148,8 +148,7 @@ function SocketHandler(socket, io) {
 
     function logError(errorMsg) {
         socket.emit('error', errorMsg);
-        console.log('error occured on socket ' + socket.id + ': ' + errorMsg);
-        console.trace();
+        console.error('error occured on socket ' + socket.id + ': ' + errorMsg);
     }
 
     socketHandlers.set(socket.id, this);

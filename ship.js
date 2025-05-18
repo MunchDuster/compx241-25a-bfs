@@ -17,7 +17,7 @@ class Ship {
         this.rotation = rotation; // Tracks number of rotations
         this.length = null; // Will be set based on type
         this.hitArray = []; // Will be initialized based on length
-        this.tileArray = null; // Will be set based on rotation and length
+        this.tiles = null; // Will be set based on rotation and length
        
         switch(this.type) {
             case SHIP_TYPES.CARRIER:
@@ -43,7 +43,7 @@ class Ship {
     
     receiveHit(x, y) {
         // Find which tile position was hit
-        const hitIndex = this.tileArray.findIndex(tile => tile.x === x && tile.y === y);
+        const hitIndex = this.tiles.findIndex(tile => tile.x === x && tile.y === y);
         
         if (hitIndex !== -1) {
             this.hitArray[hitIndex] = 1;
@@ -61,34 +61,7 @@ class Ship {
     }
 
     updateTilePositions() {
-        const {x: centreX, y: centreY} = this.centreTile;
-        const halfLength = Math.floor(this.length / 2);
-        let newTiles = [];
-        
-        switch(this.rotation % 4) {
-            case 0: // Rightwards
-                for (let i = 0; i < this.length; i++) {
-                    newTiles.push({ x: centreX + (i - halfLength), y: centreY });
-                }
-                break;
-            case 1: // Downwards
-                for (let i = 0; i < this.length; i++) {
-                    newTiles.push({ x: centreX, y: centreY + (i - halfLength) });
-                }
-                break;
-            case 2: // Leftwards
-                for (let i = 0; i < this.length; i++) {
-                    newTiles.push({ x: centreX - (i - halfLength), y: centreY });
-                }
-                break;
-            case 3: // Upwards
-                for (let i = 0; i < this.length; i++) {
-                    newTiles.push({ x: centreX, y: centreY - (i - halfLength) });
-                }
-                break;
-        }
-
-        this.tileArray = newTiles;
+        this.tiles = this.getTiles(this.centreTile);
     }
 
     rotate() {
@@ -132,46 +105,48 @@ class Ship {
             return { valid: false, reason: 'Move exceeds maximum movement radius' };
         }
 
-        const newTiles = this.getNewTilePositions(newCentreTile);
-        if (this.isOutOfBounds(newTiles, gridSize)) {
+        const newTiles = this.getTiles(newCentreTile);
+        if (this.wouldBeOutOfBounds(newTiles, gridSize)) {
             return { valid: false, reason: 'Move is out of bounds' };
         }
 
         return { valid: true};
     }
 
-    getNewTilePositions(newCentreTile) {
+    getTiles(newCentreTile) {
         const halfLength = Math.floor(this.length / 2);
-        let newTiles = [];
+        let tiles = [];
 
         switch(this.rotation % 4) {
-            case 0: // Rightwards
+            case 0: // Upwards
                 for (let i = 0; i < this.length; i++) {
-                    newTiles.push({ x: newCentreTile.x + (i - halfLength), y: newCentreTile.y });
+                    tiles.push({ x: newCentreTile.x, y: newCentreTile.y - (i - halfLength) });
                 }
                 break;
-            case 1: // Downwards
+            case 1: // Rightwards
                 for (let i = 0; i < this.length; i++) {
-                    newTiles.push({ x: newCentreTile.x, y: newCentreTile.y + (i - halfLength) });
+                    tiles.push({ x: newCentreTile.x + (i - halfLength), y: newCentreTile.y });
                 }
                 break;
-            case 2: // Leftwards
+            case 2: // Downwards
                 for (let i = 0; i < this.length; i++) {
-                    newTiles.push({ x: newCentreTile.x - (i - halfLength), y: newCentreTile.y });
+                    tiles.push({ x: newCentreTile.x, y: newCentreTile.y + (i - halfLength) });
                 }
                 break;
-            case 3: // Upwards
+            case 3: // Leftwards
                 for (let i = 0; i < this.length; i++) {
-                    newTiles.push({ x: newCentreTile.x, y: newCentreTile.y - (i - halfLength) });
+                    tiles.push({ x: newCentreTile.x - (i - halfLength), y: newCentreTile.y });
                 }
                 break;
         }
-
-        return newTiles;
+        return tiles;
     }
 
-    isOutOfBounds(newTiles, gridSize = 10) {
-        return newTiles.some(tile => tile.x < 0 || tile.x >= gridSize || tile.y < 0 || tile.y >= gridSize);
+    isOutOfBounds() {
+        return this.wouldBeOutOfBounds(this.tiles);
+    }
+    wouldBeOutOfBounds(tiles, gridSize = 10) {
+        return tiles.some(tile => tile.x < 0 || tile.x >= gridSize || tile.y < 0 || tile.y >= gridSize);
     }
 }
 

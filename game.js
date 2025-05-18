@@ -45,22 +45,17 @@ class Game {
             return false;
         }
 
-        for(let placement of placements) {
-           console.log(placement); 
-        }
-
         const ships = placements.map(placement => new Ship(placement));
 
         // Check that all boat tiles are within bounds (0-9 for a 10x10 board)
-        let allShipsGood = true;
-        ships.forEach(ship => {
-            allShipsGood &&= ship.isOutOfBounds();
-            if (ship.isOutOfBounds) {
+        for(let ship of ships) {
+            if (ship.isOutOfBounds()) {
                 logError(`Ship out-of-bounds! Ship: ${ship.toString()}`);
+                return false;
             }
-        })
+        }
 
-        return allShipsGood;
+        return true;
     }   
 
     constructor(user1, user2) {
