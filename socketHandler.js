@@ -73,11 +73,11 @@ function SocketHandler(socket, io) {
             turn: turn,
             result: result
         }
-        io.to(otherUser.socketId).emit('see-turn', seeTurn);
+        io.to(opponent.socketId).emit('see-turn', seeTurn);
         if (gameOver) {
             game.delete();
             user.game = null;
-            otherUser.game = null;
+            opponent.game = null;
             return;
         }
         game.nextTurn();
@@ -93,8 +93,7 @@ function SocketHandler(socket, io) {
         console.log('set-placements for ' + user.toString());
         if (game.user1.ready && game.user2.ready) {
             console.log('starting ' + game.id);
-            game.placeMines();
-            game.nextTurn(); // start turns
+            game.startGame();
         }
     });
 

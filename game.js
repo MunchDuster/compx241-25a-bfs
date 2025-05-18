@@ -137,27 +137,35 @@ class Game {
         userX.ready = true;
     }
 
-    setupPhase(){
+    startGame(){
         //Called when a player clicks ready (Clickable after the player places all boats)
         if(this.user1.ready == true && this.user2.ready == true){
-            this.minefield.initilizeMines(this.user1.board.ships, this.user2.board.ships);
-            this.gameState = "gameLoop";
+            // this.placeMines();
+            this.gameState = "mainGame";
+            
+            this.isUser1sTurn = true;
+            this.nextTurn();
         }
         return;
     }
 
     setTurnCallbacks(user, onTurnBegin, onWaitBegin) {
-        const userX = user.socketId == this.user1.socketId ? this.user1 : this.user2;
-        
-        userX.callbacks.turnBegin = onTurnBegin;
-        userX.callbacks.waitBegin = onWaitBegin;
+        const userInGame = (user.socketId === this.user1.socketId) ? this.user1 : this.user2;
+
+        if (userInGame) {
+            userInGame.callbacks.turnBegin = onTurnBegin;
+            userInGame.callbacks.waitBegin = onWaitBegin;
+            console.log(`Callbacks set for ${userInGame.name}. Has turnBegin: ${!!onTurnBegin}, Has waitBegin: ${!!onWaitBegin}`);
+        } else {
+            console.error(`Error: Could not find user in game to set callbacks for socketId: ${user.socketId}`);
+        }
     }
 
     playTurn(user, turn) {
 
     }
     placeMines() {
-        
+        this.minefield.initilizeMines(this.user1.ships, this.user2.ships);
     }
 
     nextTurn() {
