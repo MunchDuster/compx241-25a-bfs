@@ -6,6 +6,40 @@ const BOARD_SIZE = 10;
 const NUM_OF_MINES = 10;
 
 class Game { 
+    constructor(user1, user2) {
+        // keep track of game by usernames
+        // to allow for later quick-connect feature
+        this.id = `game:${user1.name}-${user2.name}`;
+        this.user1 = { 
+            name: user1.name, 
+            socketId: user1.socketId,
+            callbacks: {
+                turnBegin: null,
+                waitBegin: null,
+            },
+            ships: [],
+            ready:false
+        };
+        this.user2 = { 
+            name: user2.name, 
+            socketId: user2.socketId,
+            callbacks: {
+                turnBegin: null,
+                waitBegin: null,
+            },
+            ships: [],
+            ready:false
+        }
+        
+        this.isUser1sTurn = true; 
+        this.gameState = "placing";
+        this.winner = null;
+        this.minefield = new Minefield(NUM_OF_MINES);
+
+        console.log(`created game ${this.id} between ${user1.name} and ${user2.name}`);
+        games.set(this.id, this);
+    }
+
     static getById(id) {
         return games.get(id);
     }
@@ -58,41 +92,6 @@ class Game {
         return true;
     }   
 
-    constructor(user1, user2) {
-        // keep track of game by usernames
-        // to allow for later quick-connect feature
-        this.id = `game:${user1.name}-${user2.name}`;
-        this.user1 = { 
-            name: user1.name, 
-            socketId: user1.socketId,
-            callbacks: {
-                turnBegin: null,
-                waitBegin: null,
-            },
-            ships: [],
-            ready:false
-        };
-        this.user2 = { 
-            name: user2.name, 
-            socketId: user2.socketId,
-            callbacks: {
-                turnBegin: null,
-                waitBegin: null,
-            },
-            ships: [],
-            ready:false
-        }
-        
-        this.currentPlayerSocketId = user1.socketId; 
-        this.gameState = "placing";
-        this.winner = null;
-        this.minefield = new Minefield(NUM_OF_MINES);
-
-        console.log(`Starting game ${this.id} between ${user1.name} and ${user2.name}`);
-        games.set(this.id, this);
-
-    }
-
     delete() {
         console.log(`Deleting game ${this.id}`);
         games.delete(this.id);
@@ -133,8 +132,9 @@ class Game {
     }
     setUserBoatPlacements(user, placements) {
         const ships = placements.map(placement => new Ship(placement));
-        if (user.socketId == this.user1.socketId) this.user1.ships = ships;
-        else this.user2.ships = ships;
+        const userX = user.socketId == this.user1.socketId ? this.user1 : this.user2;
+        userX.ships = ships;
+        userX.ready = true;
     }
 
     setupPhase(){
@@ -147,15 +147,28 @@ class Game {
     }
 
     setTurnCallbacks(user, onTurnBegin, onWaitBegin) {
+        const userX = user.socketId == this.user1.socketId ? this.user1 : this.user2;
         
+        userX.callbacks.turnBegin = onTurnBegin;
+        userX.callbacks.waitBegin = onWaitBegin;
     }
 
     playTurn(user, turn) {
 
     }
+    placeMines() {
+        
+    }
 
     nextTurn() {
-
+        if (this.isUser1sTurn) {
+            this.user1.callbacks.turnBegin();
+            this.user2.callbacks.waitBegin();
+        }
+        else {
+            this.user2.callbacks.turnBegin();
+            this.user1.callbacks.waitBegin();
+        }
     }
 }
 

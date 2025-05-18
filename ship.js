@@ -140,7 +140,6 @@ class Ship {
                 break;
         }
 
-
         return tiles;
     }
 

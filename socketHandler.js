@@ -23,9 +23,11 @@ function SocketHandler(socket, io) {
         socket.to(requesteeSocketId).emit('requested-game', user.name);
     }
     this.onTurnBegin = () => {
+        console.log(user.toString() + ' starting turn...');
         socket.emit('turn-start');
     };
     this.onWaitBegin = () => {
+        console.log(user.toString() + ' waiting turn...');
         socket.emit('wait-start');
     }
     this.onJoinGame = (otherUser, joinedGame, isLastPlayerToJoin) => {
@@ -87,9 +89,10 @@ function SocketHandler(socket, io) {
         if (!Game.isValidPlacements(placements, logError)) {
             return;
         }
-
         game.setUserBoatPlacements(user, placements);
+        console.log('set-placements for ' + user.toString());
         if (game.user1.ready && game.user2.ready) {
+            console.log('starting ' + game.id);
             game.placeMines();
             game.nextTurn(); // start turns
         }

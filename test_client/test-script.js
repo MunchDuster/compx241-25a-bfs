@@ -72,6 +72,13 @@ socket.on('joined', (otherUsername, joinedGameRoom, isPlayer1L) => {
     placeShips(); //place ships to be moved by the player
 });
 
+socket.on('turn-start', function () {
+    console.log('turn-started');
+});
+socket.on('wait-start', function () {
+    console.log('turn-started');
+});
+
 // Handle game ending 
 socket.on('game-ended', (message) => {
     console.log('game-ended: ' + message);
