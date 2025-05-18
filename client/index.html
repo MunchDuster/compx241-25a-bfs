@@ -7,7 +7,12 @@
     </head>
     <body>
         <h1>Battle fleet sweep</h1>
-
+        <div class="slidecontainer">
+            <audio src="song.mp3" loop id="songer"></audio>
+            Volume:<br>
+            <input type="range" min="0" max="1" step="0.01" value=".1" class="slider" id="volumeSlider">
+            <div class="whyCantIHearTheSong">click or tap to play song</div>
+        </div>
         <!-- Start Menu View -->
         <div id="start-menu">
             <label for="uname">Username:</label>
