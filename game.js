@@ -36,11 +36,11 @@ class Game {
 
         // check there is one of each type of boat
         const containsAllTypes = ( // crude but works
-            placements.some(placement => placement.type = SHIP_TYPES.BATTLESHIP) &&
-            placements.some(placement => placement.type = SHIP_TYPES.CARRIER) &&
-            placements.some(placement => placement.type = SHIP_TYPES.CRUISER) &&
-            placements.some(placement => placement.type = SHIP_TYPES.DESTROYER) &&
-            placements.some(placement => placement.type = SHIP_TYPES.SUBMARINE)
+            placements.some(placement => placement.type == SHIP_TYPES.BATTLESHIP) &&
+            placements.some(placement => placement.type == SHIP_TYPES.CARRIER) &&
+            placements.some(placement => placement.type == SHIP_TYPES.CRUISER) &&
+            placements.some(placement => placement.type == SHIP_TYPES.DESTROYER) &&
+            placements.some(placement => placement.type == SHIP_TYPES.SUBMARINE)
         );
         if (!containsAllTypes) {
             const types = placements.map(placement => placement.type);
