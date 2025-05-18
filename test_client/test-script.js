@@ -24,7 +24,7 @@ socket.on('set-usernumber', (usernum) => {
 
 // Handle user clicking "Find Game" button
 function find() {
-    if (username == null) {``
+    if (username == null) {
         console.error('trying to find when username is null!');
     }
 
@@ -53,6 +53,7 @@ socket.on('find-results', (usersFinding) => {
         console.log('seeing-player: ' + findUsername);
         if (usernumber % 2 == 0) {// only make even users send request
             socket.emit('request-game', findUsername);
+            return;
         }
     }
 });
@@ -72,11 +73,11 @@ socket.on('joined', (otherUsername, joinedGameRoom, isPlayer1L) => {
     placeShips(); //place ships to be moved by the player
 });
 
-socket.on('turn-start', function () {
+socket.on('turn-start', function() {
     console.log('turn-started');
 });
-socket.on('wait-start', function () {
-    console.log('turn-started');
+socket.on('wait-start', function() {
+    console.log('wait-started');
 });
 
 // Handle game ending 
