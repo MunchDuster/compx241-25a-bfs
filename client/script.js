@@ -180,6 +180,26 @@ socket.on('wait-start', () => {
     isTurn = false;
 });
 
+socket.on('see-turn', (turnInfo) => {
+    const {gameState, turn, result} = turnInfo;
+
+    switch(turn.type) {
+        case TURN_TYPE.Missile:
+            
+            break;
+        case TURN_TYPE.Recon:
+
+            break;
+        case TURN_TYPE.Move:
+
+            break;
+    }
+
+    if (gameState.isOver) {
+
+    }
+});
+
 /*
  *  ---- Functions ----
  */
