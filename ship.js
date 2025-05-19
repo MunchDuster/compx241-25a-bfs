@@ -110,7 +110,7 @@ class Ship {
             return { valid: false, reason: 'Move is out of bounds' };
         }
 
-        return { valid: true};
+        return { valid: true };
     }
 
     getTiles(newCentreTile) {
