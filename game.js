@@ -190,6 +190,9 @@ class Game {
                 };
             case TURN_TYPE.Recon:
                 //Check tile input is correct
+                x = targetTile.x;
+                y = targetTile.y;
+                
                 if(x < 10 && x >=0 && y < 10 && y>= 0){
                     minecount = this.userX.mines.receiveReconHit(x,y);
                     return {
@@ -199,7 +202,7 @@ class Game {
                 }
                 return {
                     success: false,
-                    result: 'Invalid X or Y Coordinate. X: ' + x + ' Y: ' + y
+                    result: 'Invalid X or Y Coordinate on Turn. X: ' + x + ' Y: ' + y
                 };
             case TURN_TYPE.Move:
                 // MOVE CODE HERE
