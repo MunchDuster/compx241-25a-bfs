@@ -64,6 +64,10 @@ let oppUsername = null; // Opponent's username
 let gameRoom = null;    // Current game room ID
 let isPlayer1 = null;
 
+let isTurn = false;   
+let selectedShip = null;
+let selectedTile = null;
+
 // Successfully connected to server
 socket.on('connect', function() {
     console.log('connected');
@@ -189,44 +193,39 @@ function showMenu(name) {
         menu.shown = false;
         menu.element.classList.add('hidden');
     }
+}
 
-
-    function playerTurn() {
-        let action = null;
-        while(action = null) {
-
-        }
-        socket.emit('player-move', action, xpos, ypos);
-
+function playerTurn() {
+    let action = null;
+    while(action = null) {
     }
-    function fireMissile() {
-        //get the x and y position for missile fire
-        let x;
-        let y;
-        socket.emit('fire-missile', x, y);
-    }
-    function scanForMine() {
-        let x;
-        let y;
-        socket.emit('scan-recon', x, y)
-    }
-     // Handle turn start 
-    socket.on('turn-start', () => {
-        isTurn = true;
-        playerTurn();
+    socket.emit('player-move', action, xpos, ypos);
+}
 
-    });
+function fireMissile() {
+    //get the x and y position for missile fire
+    let x;
+    let y;
+    socket.emit('fire-missile', x, y);
+}
+function scanForMine() {
+    let x;
+    let y;
+    socket.emit('scan-recon', x, y)
+}
+ // Handle turn start 
+socket.on('turn-start', () => {
+    isTurn = true;
+    playerTurn();
+});
+// Handle turn wait? 
+socket.on('wait-start', () => {
+    isTurn = false;
+});
 
-    // Handle turn wait? 
-    socket.on('wait-start', () => {
-        isTurn = false;
-    });
-   
-    function updateGameButtons() {
-        if(isTurn) {
-            
-        } else {
-
-        }
+function updateGameButtons() {
+    if(isTurn) {
+        
+    } else {
     }
 }
