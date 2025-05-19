@@ -24,7 +24,6 @@ class Game {
                 waitBegin: null,
             },
             ships: [],
-            mines: new Minefield(NUM_OF_MINES),
             ready:false
         };
         this.user2 = { 
@@ -35,7 +34,6 @@ class Game {
                 waitBegin: null,
             },
             ships: [],
-            mines: new Minefield(NUM_OF_MINES),
             ready:false
         }
         
@@ -180,36 +178,90 @@ class Game {
         }
         
         //make turn with users ships
-        const userX = isUser1MakingTurn ? this.user1 : this.user2;
+        const currentUser = isUser1MakingTurn ? this.user1 : this.user2;
+        const opponentUser = isUser1MakingTurn ? this.user2 : this.user1;
+
         switch (turn.type) {
             case TURN_TYPE.Missile:
-                // MISSILE CODE HERE
-                return { // example success
+                const x = turn.targetTile.x;
+                const y = turn.targetTile.y;
+
+                if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) {
+                    return {
+                        success: false,
+                        result: 'Invalid X or Y Coordinate on Turn. X: ' + x + ' Y: ' + y
+                    };
+                }
+
+                if (this.minefield.isMineHit(x, y)) {
+                    return {
+                        success: true,
+                        result: {hit: true}
+                    };
+                }
+
+                for (const ship of opponentUser.ships) {
+                    if (ship.isHit(x, y)) {
+                        ship.hit(x, y);
+                        return {
+                            success: true,
+                            result: {hit: true}
+                        };
+                    }
+                }
+
+                // No hit
+                return {
                     success: true,
                     result: {hit: false}
                 };
             case TURN_TYPE.Recon:
                 //Check tile input is correct
-                x = targetTile.x;
-                y = targetTile.y;
+                const reconX = turn.targetTile.x;
+                const reconY = turn.targetTile.y;
                 
-                if(x < 10 && x >=0 && y < 10 && y>= 0){
-                    minecount = this.userX.mines.receiveReconHit(x,y);
+                if (reconX < 0 || reconX >= BOARD_SIZE || reconY < 0 || reconY >= BOARD_SIZE) {
                     return {
-                        success: true,
-                        result: {minecount}
+                        success: false,
+                        result: 'Invalid X or Y Coordinate on Turn. X: ' + x + ' Y: ' + y
                     };
                 }
+
+                const mineCount = this.minefield.receiveReconHit(reconX, reconY);
+
                 return {
-                    success: false,
-                    result: 'Invalid X or Y Coordinate on Turn. X: ' + x + ' Y: ' + y
-                };
-            case TURN_TYPE.Move:
-                // MOVE CODE HERE
-                return { // example success
                     success: true,
                     result: {
-                        ships: userX.ships // simplify data sent, i.e to same format as placement
+                        mineCount: mineCount,
+                        position: {x: reconX, y: reconY}
+                    }
+                };
+            case TURN_TYPE.Move:
+                const shipToMove = currentUser.ships.find(ship => ship.type == turn.ship);
+
+                if (!shipToMove) {
+                    return {
+                        success: false,
+                        result: 'Ship not found!😔'
+                    };
+                }
+                
+                const validMove = shipToMove.isValidMove(turn.centreTile);
+
+                if (validMove.valid) {
+                    shipToMove.move(turn.centreTile);
+                    return {
+                        success: true,
+                        result: {
+                            ships: currentUser.ships
+                        }
+                    };
+                }
+
+                return {
+                    success: false,
+                    result: {
+                        ships: validMove.reason // simplify data sent, i.e to same format as placement
                     }
                 };
             default:
