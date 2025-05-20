@@ -73,11 +73,12 @@ function makeTiles(offsetX, gridNum) {
             tile.on('mouseout', function() {
                 document.body.style.cursor = 'default';
                 this.stroke('#234668');
+                
             });
 
             tile.on('click', function(e) {
                 e.cancelBubble = true;
-
+                
                 //have only one tile highlighted on the left grid
                 if(parseInt(this.id().split('-')[2]) == 1) {
 
@@ -105,6 +106,7 @@ function makeTiles(offsetX, gridNum) {
 
                 } else { //actions for the right grid go here
                     this.fill(this.fill() == '#5F85B5' ? '#4CAF50' : '#5F85B5'); //switch colours
+                    setSelectedTile(tile.x, tile.y);
                 }
                 
             });

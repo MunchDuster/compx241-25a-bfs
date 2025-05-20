@@ -244,6 +244,12 @@ function updateGameButtons() {
     scanButton.disabled = !isTurn;
 }
 
+function setSelectedTile(x, y) {
+    selectedTile = (x,y);
+    console.log("setting selected tile ");
+}
+
+
 /*
  *  ---- In Game Functions ----
  */
@@ -265,7 +271,7 @@ function fireMissile() {
             y: selectedTile.y
         }
     };
-
+    console.log("Firing");
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
         const result = response.result;
