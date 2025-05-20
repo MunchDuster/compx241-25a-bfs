@@ -45,3 +45,12 @@ body {
     margin: auto;
     background-color: #4279aa;
 }
+.slidecontainer {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+.whyCantIHearTheSong {
+    color: #ccc;
+    font-size: smaller;
+}

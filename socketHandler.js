@@ -9,6 +9,9 @@ function SocketHandler(socket, io) {
 
     // Initialize new user state
     const user = new User(socket.id);
+    socket.emit('set-usernumber', user.num);
+    let game;
+    let opponent; // (user)
 
     function onJoinedLobby() {
         socket.join('finding');   // Room for users searching for games
@@ -19,14 +22,24 @@ function SocketHandler(socket, io) {
     function onGameRequested(requesteeSocketId) {
         socket.to(requesteeSocketId).emit('requested-game', user.name);
     }
-
-    this.onJoinGame = (otherUser, game, isLastPlayerToJoin) => {
+    this.onTurnBegin = () => {
+        console.log(user.toString() + ' starting turn');
+        socket.emit('turn-start');
+    };
+    this.onWaitBegin = () => {
+        console.log(user.toString() + ' waiting turn');
+        socket.emit('wait-start');
+    }
+    this.onJoinGame = (otherUser, joinedGame, isLastPlayerToJoin) => {
+        game = joinedGame;
         socket.leave('finding'); // its time to stop
         user.isFinding = false; // user is no longer finding a game
 
         socket.join(game.id); // Add user to the game room
-        socket.emit('joined', otherUser.name, game.id); // tell the client
-        
+        socket.emit('joined', otherUser.name, game.id, !isLastPlayerToJoin); // tell the client
+        game.setTurnCallbacks(user, this.onTurnBegin, this.onWaitBegin);
+        opponent = otherUser;
+
         // Update finding list for everyone else
         if (isLastPlayerToJoin) { // prevent multiple updates for one game starting
             io.to('finding').emit('find-results', User.getAllFinding());
@@ -47,25 +60,62 @@ function SocketHandler(socket, io) {
     // Handle game join acceptance
     socket.on('join', lobby.joinGame);
 
+    socket.on('play-turn', (turn, callback) => {
+        console.log(user.toString() + ' is playing a turn');
+        if (turn == null) {
+            console.log('turn is null');
+            if (callback != null) {
+                callback({success: false, result: 'turn is null'});
+                return;
+            }
+        }
+        if (callback == null) {
+            socket.emit('error', 'play-turn callback is null!');
+            console.log('play-turn callback is null');
+            return;
+        }
+
+
+        const {success, result} = game.playTurn(user, turn);
+        callback({success});
+        if (!success) return;
+        const gameOver = game.checkGameOver();
+        const seeTurn = {
+            gameState: {
+                isOver: gameOver,
+                winner: game.winner
+            },
+            turn: turn,
+            result: result
+        }
+        io.to(opponent.socketId).emit('see-turn', seeTurn);
+        if (gameOver) {
+            game.delete();
+            user.game = null;
+            opponent.game = null;
+            return;
+        }
+        game.nextTurn();
+    });
+
+    // -- Game Events --
     // Handle placements
-    socket.on('placements-complete', (placements) => {
+    socket.on('set-placements', (placements) => {
         if (!Game.isValidPlacements(placements, logError)) {
             return;
         }
-        // TODO: set player's placement in game instance to these
-        // then check if other player's placements are set
-        // if yes then place mines
-        // then begin turns
+        game.setUserBoatPlacements(user, placements);
+        console.log('set-placements for ' + user.toString());
+        if (game.user1.ready && game.user2.ready) {
+            console.log('starting ' + game.id);
+            game.startGame();
+        }
     });
-
-    function logError(errorMsg) {
-        socket.emit('error', errorMsg);
-        console.log('error occured on socket ' + socket.id + ': ' + errorMsg);
-        console.trace();
-    }
 
     // Handle game clean up when a game ends
     this.gameEnded = () => {
+        this.game = null;
+
         // Reset user's game state
         if (user.gameId == null) {
             console.log('error: users\'s game ended but no gameId set! user: ' + user);
@@ -75,6 +125,7 @@ function SocketHandler(socket, io) {
         user.leaveGame();
     };
 
+    // -- Other Events --
     // Handle user disconnection
     socket.on('disconnect', () => {
         socketHandlers.delete(socket.id);
@@ -111,6 +162,11 @@ function SocketHandler(socket, io) {
             io.to('finding').emit('find-results', User.getAllFinding());
         }
     });
+
+    function logError(errorMsg) {
+        socket.emit('error', errorMsg);
+        console.error('error occured on socket ' + socket.id + ': ' + errorMsg);
+    }
 
     socketHandlers.set(socket.id, this);
 }

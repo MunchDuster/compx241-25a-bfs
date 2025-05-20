@@ -7,7 +7,12 @@
     </head>
     <body>
         <h1>Battle fleet sweep</h1>
-
+        <div class="slidecontainer">
+            <audio src="song.mp3" loop id="songer"></audio>
+            Volume:<br>
+            <input type="range" min="0" max="1" step="0.01" value=".1" class="slider" id="volumeSlider">
+            <div class="whyCantIHearTheSong">click or tap to play song</div>
+        </div>
         <!-- Start Menu View -->
         <div id="start-menu">
             <label for="uname">Username:</label>
@@ -33,6 +38,11 @@
         <div id="game-menu" class="hidden">
             <div><div class="username-display"></div> vs <div id="opp" class="username-display"></div></div>
             <div id="game-board"></div>
+            
+            <div>
+            <button id="fire-button" class="menu-button" onclick="fireMissile()" >Fire Missile</button> 
+            <button id="scan-button" class="menu-button" onclick="scanForMine()" >Scan</button>
+            </div>
         </div>
         
         <!-- Required JavaScript dependencies -->
@@ -43,6 +53,6 @@
         <!-- Custom game board drawing functionality -->
         <script src="drawer.js"></script>
         <!-- Main game logic and event handlers -->
-        <script src="script.js"></script>
+        <script defer src="script.js"></script>
     </body>
 </html>

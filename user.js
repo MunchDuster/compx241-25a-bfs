@@ -2,9 +2,11 @@
 // there should be no socket handling here
 
 const users = new Map();
+let userNum = 0;
 
 function User(socketId) {
     this.socketId = socketId;
+    this.num = userNum++;
     this.name = null;
     this.gameId = null;
     this.isFinding = false;
@@ -23,6 +25,7 @@ function User(socketId) {
             return;
         }
         this.gameId = null;
+        // Player might want to go back to finding, or to main menu Client should decide
     };
     this.toString = function() {
         return (this.name ?? '[no_username]') + '@' + this.socketId;

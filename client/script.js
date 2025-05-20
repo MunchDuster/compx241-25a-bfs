@@ -1,3 +1,5 @@
+// const { isTypedArray } = require("util/types");
+
 // Initialize Socket.IO connection to server
 const socket = io();
 
@@ -18,36 +20,64 @@ const menus = [
     },
 ];
 
+// Sound must player after an interaction like a click, browser will not play it otherwise
+function playAudio() {
+    console.log('playing audio')
+    
+    // hide the tip
+    const tip = document.querySelector('.whyCantIHearTheSong');
+    tip.parentElement.removeChild(tip);
+
+    const sound = document.getElementById('songer');
+
+    const audioContext = new AudioContext();
+    const track = audioContext.createMediaElementSource(sound);
+
+    const gainNode = audioContext.createGain();
+
+    const volumeSlider = document.getElementById('volumeSlider');
+    const setGain = () => {
+        const volume = volumeSlider.value;
+        console.log('setting volume ' + volume);
+        gainNode.gain.value = volume;
+    }
+    volumeSlider.addEventListener('mousemove', setGain);
+    setGain();
+
+    track.connect(gainNode).connect(audioContext.destination);
+    sound.play();
+
+    window.removeEventListener('click', playAudio);
+}
+window.addEventListener('click', playAudio);
+
 // Get references to DOM elements
 const findListContainer = document.getElementById('find-list');
 const usernameDisplays = document.querySelectorAll('.username-display:not([id="opp"])');
 const oppUsernameDisplay = document.getElementById('opp');
+const fireButton = document.getElementById('fire-button');
+const scanButton = document.getElementById('scan-button');
 
-// Track current game state
+/*
+ *  ---- Game State Variables ----
+ */
 let username = null;    // Current user's username
 let oppUsername = null; // Opponent's username
 let gameRoom = null;    // Current game room ID
+let isPlayer1 = null;
+
+let isTurn = false;   
+let selectedShip = null;
+let selectedTile = null;
+
+/*
+ *  ---- Sockets ----
+ */
 
 // Successfully connected to server
 socket.on('connect', function() {
     console.log('connected');
 });
-
-// Handle user clicking "Find Game" button
-function find() {
-    // Prompt user to input username
-    // username = prompt('enter user name: ');
-    username = document.getElementById("uname").value;
-
-    //Emit find event to server with username
-    socket.emit('find', username, (response) => {
-        if (!response.success) return;
-        // Show the find menu and update username displays
-        showMenu('find');
-        console.log(usernameDisplays)
-        usernameDisplays.forEach(div => div.innerText = username);
-    });
-}
 
 // Handle error messages from server
 socket.on('error', (message) => {
@@ -108,8 +138,9 @@ socket.on('requested-game', (requesterUsername) => {
 });
 
 // Set up game state when joining a game
-socket.on('joined', (otherUsername, joinedGameRoom) => {
+socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     showMenu('game'); // Switch to game menu
+    isPlayer1 = isFirstPlayer;
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
@@ -136,6 +167,59 @@ socket.on('disconnect', function() {
     gameRoom = null;
 });
 
+ // Handle turn start 
+socket.on('turn-start', () => {
+    console.log('turn started');
+    isTurn = true;
+    playerTurn();
+});
+
+// Handle turn wait? 
+socket.on('wait-start', () => {
+    console.log('wait started');
+    isTurn = false;
+});
+
+socket.on('see-turn', (turnInfo) => {
+    const {gameState, turn, result} = turnInfo;
+
+    switch(turn.type) {
+        case TURN_TYPE.Missile:
+            
+            break;
+        case TURN_TYPE.Recon:
+
+            break;
+        case TURN_TYPE.Move:
+
+            break;
+    }
+
+    if (gameState.isOver) {
+
+    }
+});
+
+/*
+ *  ---- Functions ----
+ */
+
+// Handle user clicking "Find Game" button
+function find() {
+    // Prompt user to input username
+    // username = prompt('enter user name: ');
+    username = document.getElementById("uname").value;
+
+    //Emit find event to server with username
+    socket.emit('find', username, (response) => {
+        if (!response.success) return;
+        // Show the find menu and update username displays
+        showMenu('find');
+        console.log(usernameDisplays)
+        usernameDisplays.forEach(div => div.innerText = username);
+    });
+}
+
 // Function to handle menu visibility
 function showMenu(name) {
     for(let menu of menus) {
@@ -153,3 +237,63 @@ function showMenu(name) {
         menu.element.classList.add('hidden');
     }
 }
+
+
+function updateGameButtons() {
+    fireButton.disabled = !isTurn;
+    scanButton.disabled = !isTurn;
+}
+
+function setSelectedTile(x, y) {
+    selectedTile = (x,y);
+    console.log("setting selected tile ");
+}
+
+
+/*
+ *  ---- In Game Functions ----
+ */
+
+function playerTurn() {
+    let action = null;
+    while(action = null) {
+    }
+    socket.emit('player-move', action, xpos, ypos);
+}
+
+function fireMissile() {
+    if (!isTurn || !selectedTile) return; // return for now
+
+    const turn = {
+        type: 'TURN_TYPE.Missile',
+        targetTile: {
+            x: selectedTile.x,
+            y: selectedTile.y
+        }
+    };
+    console.log("Firing");
+    socket.emit('play-turn', turn, (response) => {
+        const success = response.success;
+        const result = response.result;
+        // Pizza 🍕
+    });
+}
+
+function scanForMine() {
+    if (!isTurn || !selectedTile) return; // return for now
+
+    const turn = {
+        type: 'TURN_TYPE.Recon',
+        targetTile: {
+            x: selectedTile.x,
+            y: selectedTile.y
+        }
+    };
+
+    socket.emit('play-turn', turn, (response) => {
+        const success = response.success;
+        const result = response.result;
+        // 😎😎
+    });
+}
+
