@@ -80,31 +80,27 @@ function makeTiles(offsetX, gridNum) {
 
                 //have only one tile highlighted on the left grid
                 if(parseInt(this.id().split('-')[2]) == 1) {
+                    //left gird tile actions go here
+                    ships.forEach(ship => { 
+                        if(ship.opacity() == 0.5) { //get the ship that is selected (selected ship is the one thats has less opacity)
+                            console.log(ship.id());
+                            //move the ship to selected tile
+                            ship.x(this.x()); 
+                            ship.y(this.y());
+                            
+                            //centre ship on tile and account for the rotation
+                            //if (this.id().split('-')[1] == 1){
+                                ship.offsetY((ship.height() / 2) - (size / 2));
+                            //} else {ship.offsetX((ship.width() / 2) - (size / 2)); }
 
-                    if(this.fill() == '#5F85B5') {
-
-                        tiles.forEach(tile => { //reset each tile on the left grid so that only one tile is highlighted
-                            if(parseInt(this.id().split('-')[2]) == 1) {
-                                tile.fill('#5F85B5');
-                            }
-                        });
-                        this.fill('#4CAF50'); //highlight the clicked tile
-
-                        //left gird tile actions go here
-
-                        ships.forEach(ship => { 
-                            if(ship.opacity() == 0.5) { //get the ship that is selected (selected ship is the one thats has less opacity)
-                                console.log(ship.id());
-                                ship.x(this.x()); //move the ship to selected tile
-                                ship.y(this.y());
-                                ship.opacity(1);
-                            }
-                        });
-
-                    } else { this.fill('#5F85B5'); } //flip the tile colour
+                            //unselect ship
+                            ship.opacity(1);
+                        }
+                    });
 
                 } else { //actions for the right grid go here
                     this.fill(this.fill() == '#5F85B5' ? '#4CAF50' : '#5F85B5'); //switch colours
+                    console.log("tile X: " + this.x() + " tile Y: " + this.y());
                 }
                 
             });
@@ -155,16 +151,39 @@ function addShips() {
                 image: shipImg,
                 width: size,
                 height: (size + offset) * shipSize - offset, //math to get ship to fit within tiles
-                id: shipTypes[i] //id storing ship type
+                id: `${shipTypes[i]}-${1}`, //id storing ship type plus rotation (1 for up and down, 2 for left and right)
             });
             console.log(`Ship (${shipTypes[i]}) placed at position (${tiles[i].id()})`);
             layer.add(ship);
             ships.push(ship);
 
              ship.on('click', function() {
+                ships.forEach(ship => { //unselect the other ships to prevent multiple ships from being selected
+                    ship.opacity(1);
+                })
                 this.opacity(this.opacity() === 1 ? 0.5 : 1); //set the opacity of the ship to 50% when clicked on
                 console.log(`Selected ${this.id()}`);
             });
+
+            ship.on('wheel', function() {
+                if(ship.opacity() == 0.5) {
+                    //check the id (makes it easier to get ship rotation)
+                    if (this.id().split(' ')[1] == 1){ //rotate vertically
+                        this.id(`${shipTypes[i]} ${2}`);
+                        this.offsetY((this.height() / 2) - (size / 2));
+                        this.offsetX(0);
+                        this.rotate(90); //rotate ship 90 degrees 
+                        console.log("up");
+
+                    } else { //rotate horizontally
+                        this.id(`${shipTypes[i]} ${1}`);
+                        this.offsetX(size);
+                        this.rotate(-90);
+                        console.log("left");
+                    } 
+                }
+            })
+            
         };
        
         let shipPath = `../assets/${shipTypes[i]}.png`; //set ship image to correct ship
