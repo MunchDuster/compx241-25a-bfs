@@ -87,11 +87,8 @@ function makeTiles(offsetX, gridNum) {
                             //move the ship to selected tile
                             ship.x(this.x()); 
                             ship.y(this.y());
-                            
-                            //centre ship on tile and account for the rotation
-                            //if (this.id().split('-')[1] == 1){
-                                ship.offsetY((ship.height() / 2) - (size / 2));
-                            //} else {ship.offsetX((ship.width() / 2) - (size / 2)); }
+                            //aline ship when moving to selected tile
+                            ship.offsetY((ship.height() / 2) - (size / 2));
 
                             //unselect ship
                             ship.opacity(1);
@@ -100,7 +97,6 @@ function makeTiles(offsetX, gridNum) {
 
                 } else { //actions for the right grid go here
                     this.fill(this.fill() == '#5F85B5' ? '#4CAF50' : '#5F85B5'); //switch colours
-                    console.log("tile X: " + this.x() + " tile Y: " + this.y());
                 }
                 
             });
