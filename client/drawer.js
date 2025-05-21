@@ -8,6 +8,10 @@ const gridSize = 10; // same as normal battleships
 const offset = 4; //offset for tiles to get grid lines inbetween tiles for aesthetics.
 const size = Math.round(height / gridSize) - offset * 2;
 
+let isPlacementMode = false;
+let checkPlacement = false;
+const PLACEMENT_AREA_WIDTH = 150;
+
 const tiles = [];
 const ships = [];
 const shipTypes = ["carrier", "battleship", "cruiser", "submarine", "destroyer"]; //different ship types

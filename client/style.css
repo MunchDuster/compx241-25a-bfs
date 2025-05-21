@@ -14,43 +14,67 @@ body {
 .hidden {
     display: none;
 }
+
 .find-result {
     background-color: #ddd;
     margin: 4px;
     text-align: left;
     padding: 2px 12px;
 }
+
 .request-game-button {
     float: right;
 }
+
 .join-button {
     float: right;
     margin-right: 4px;
 }
+
 #find-menu {
     width: 400px;
     margin: auto;
 }
+
 .username-display {
     background-color: #bdddf9;
     display: inline-block;
 }
+
 #opp {
     background-color: #f9c3bd;
     display: inline-block;
 }
+
 #game-board {
     width: 1000px;
     height: 500px;
     margin: auto;
     background-color: #4279aa;
 }
+
 .slidecontainer {
     position: absolute;
     top: 10px;
     left: 10px;
 }
+
 .whyCantIHearTheSong {
     color: #ccc;
     font-size: smaller;
+}
+
+#ship-placement-controls{
+    margin-top: 10px;
+}
+
+#placement-feedback {
+    color: red;
+    margin: 10px 0;
+    min-height: 20px;
+}
+
+.invalid-placement {
+    stroke: red !important;
+    stroke-width: 2 !important;
 }
