@@ -181,6 +181,27 @@ function addShips() {
                     } 
                 }
             })
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key.toLowerCase() === 'r') {
+                    if(ship.opacity() == 0.5) {
+                    //check the id (makes it easier to get ship rotation)
+                    if (this.id().split(' ')[1] == 1){ //rotate vertically
+                        this.id(`${shipTypes[i]} ${2}`);
+                        this.offsetY((this.height() / 2) - (size / 2));
+                        this.offsetX(0);
+                        this.rotate(90); //rotate ship 90 degrees 
+                        console.log("up");
+
+                    } else { //rotate horizontally
+                        this.id(`${shipTypes[i]} ${1}`);
+                        this.offsetX(size);
+                        this.rotate(-90);
+                        console.log("left");
+                    } 
+                }
+                }
+            });
             
         };
        
