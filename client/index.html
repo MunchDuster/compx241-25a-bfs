@@ -38,10 +38,13 @@
         <div id="game-menu" class="hidden">
             <div><div class="username-display"></div> vs <div id="opp" class="username-display"></div></div>
             <div id="game-board"></div>
-            
-            <div>
-            <button id="fire-button" class="menu-button" onclick="fireMissile()" >Fire Missile</button> 
-            <button id="scan-button" class="menu-button" onclick="scanForMine()" >Scan</button>
+            <div id ="ship-placement-controls" class = "hidden">
+                <button id="ready-button" class="menu-button" onclick="confirmPlacements()">Ready</button>
+                <div id="placement-feedback"></div>
+            </div>
+            <div id="game-controls" class="hidden">
+                <button id="fire-button" class="menu-button" onclick="fireMissile()" >Fire Missile</button> 
+                <button id="scan-button" class="menu-button" onclick="scanForMine()" >Scan</button>
             </div>
         </div>
         
