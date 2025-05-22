@@ -3,7 +3,6 @@ const Minefield = require('./minefield.js');
 
 const games = new Map();
 const BOARD_SIZE = 10;
-const NUM_OF_MINES = 10;
 
 const TURN_TYPE = {
     Missile: 'missile',
@@ -40,7 +39,7 @@ class Game {
         this.isUser1sTurn = true; 
         this.gameState = "placing";
         this.winner = null;
-        this.minefield = new Minefield(NUM_OF_MINES);
+        this.minefield = null;
 
         console.log(`created game ${this.id} between ${user1.name} and ${user2.name}`);
         games.set(this.id, this);
@@ -146,9 +145,7 @@ class Game {
     startGame(){
         //Called when a player clicks ready (Clickable after the player places all boats)
         if(this.user1.ready == true && this.user2.ready == true){
-            // this.placeMines();
-            this.user1.mines = this.minefield;
-            this.user2.mines = this.minefield;
+            this.minefield = new Minefield(this.user1.ships, this.user2.ships);
             this.gameState = "mainGame";
             
             this.isUser1sTurn = true;
@@ -193,7 +190,7 @@ class Game {
                     };
                 }
 
-                if (this.minefield.isMineHit(x, y)) {
+                if (this.minefield.isMissileHit(x, y)) {
                     return {
                         success: true,
                         result: {hit: true}
@@ -267,9 +264,6 @@ class Game {
             default:
                 return {success: false, result: 'unrecognised turn type!'};
         }
-    }
-    placeMines() {
-        this.minefield.initilizeMines(this.user1.ships, this.user2.ships);
     }
 
     nextTurn() {

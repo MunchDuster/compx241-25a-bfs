@@ -1,62 +1,52 @@
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 10;
-
+const NUM_OF_MINES = 10;
 
 class Minefield {
-    constructor(NUM_OF_MINES) {
+    constructor(user1Ships, user2Ships) {
         this.NUM_OF_MINES= NUM_OF_MINES;
         this.mineArray = [BOARD_HEIGHT*BOARD_WIDTH];
-
-        this.initilizeMineField();
-    }
-
-    initilizeMineField() {
-        //for(i = 0; i < BOARD_HEIGHT*BOARD_WIDTH; i++){
-            //x = i % 10;
-            //y = i-x;
-            //this.mineArray[i] = false;
-        //}
         this.mineArray.fill(false);
-    }
 
-    initilizeMines(user1Ships, user2Ships) {
-        occupiedTiles = [];
-
-        forEach(user1Ships, ship => {
-            forEach(ship.tileArray, tile => {
-                if(!occupiedTiles.includes(`${tile.x},${tile.y}`)){
-                    occupiedTiles.push(`${tile.x},${tile.y}`);
-                }
-            })
-        })
-
-        forEach(user2Ships, ship => {
-            forEach(ship.tileArray, tile => {
-                if(!occupiedTiles.includes(`${tile.x},${tile.y}`)){
-                    occupiedTiles.push(`${tile.x},${tile.y}`);
-                }
-            })
-        })
-
-        mineplaced = 0;
-        
-        while(mineplaced != NUM_OF_MINES){
-            const x = Math.floor(Math.random() * BOARD_SIZE);
-            const y = Math.floor(Math.random() * BOARD_SIZE);
-            const tileKey = `${x},${y}`;
-            if(!occupiedTiles.includes(tileKey) && this.mineArray[tile.y*10+tile.x] == false){
-                this.placeMine(tile.x, tile.y);
-                mineplaced++;
+        const availableTiles = []; // const pointer to array
+        const gridSize = 10;
+        for (let x = 0; x < gridSize; x++) {
+            for (let y = 0; y < gridSize; y++) {
+                availableTiles.push({x: x, y: y});
             }
+        }
+
+        function removeAvailableTiles(userShips) {
+            for (let ship of userShips) {
+                for (let tile of ship.tiles) {
+                    const index = availableTiles.indexOf(tile);
+                    if(index != -1) {
+                        availableTiles.splice(index, 1);
+                    }
+                }
+            }
+        }
+        function randomInt(min, max) {
+            return Math.floor((max - min) * Math.random() + min);
+        }
+
+        removeAvailableTiles(user1Ships);
+        removeAvailableTiles(user2Ships);
+
+        for(let i = 0; i < this.NUM_OF_MINES; i++) {
+            const index = randomInt(0, availableTiles.length);
+            const tile = availableTiles[index];
+            this.placeMine(tile);
+            availableTiles.splice(index, 1);
         }
     }
 
-    placeMine(x,y){
-        index = (y*10)+x;
+    placeMine({x, y}){
+        const index = (y * 10) + x;
         this.mineArray[index] = true;
     }
     
-    receiveMissileHit(x, y) {    
+    isMissileHit(x, y) {
         if(this.mineArray[y*10+x] == true){
             this.mineArray[y*10+x] = false;
             return true;
