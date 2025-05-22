@@ -243,7 +243,13 @@ class Game {
                     };
                 }
                 
-                const validMove = shipToMove.isValidMove(turn.centreTile);
+                if (!turn.targetTile) {
+                    return {
+                        success: false,
+                        result: 'no targetTile set'
+                    }
+                }
+                const validMove = shipToMove.isValidMove(turn.targetTile, BOARD_SIZE);
 
                 if (validMove.valid) {
                     shipToMove.move(turn.centreTile);

@@ -5,7 +5,7 @@ const SHIP_TYPES = {
     DESTROYER: 'destroyer',
     SUBMARINE: 'submarine'
 };
-const MOVEMENT_RADIUS = 3; // The maximum distance a ship can move in one turn
+// const MOVEMENT_RADIUS = 3; // The maximum distance a ship can move in one turn
 
 let nextId = 0;
 
@@ -99,11 +99,33 @@ class Ship {
             return { valid: false, reason: 'Ship is damaged and cannot move' };
         }
 
-        const deltaX = Math.abs(newCentreTile.x - this.centreTile.x);
-        const deltaY = Math.abs(newCentreTile.y - this.centreTile.y);
-        if (deltaX > MOVEMENT_RADIUS || deltaY > MOVEMENT_RADIUS) {
-            return { valid: false, reason: 'Move exceeds maximum movement radius' };
+        const offset = {
+            x: newCentreTile.x - this.centreTile.x,
+            y: newCentreTile.y - this.centreTile.y
         }
+
+        // is moving at all?
+        if (Math.abs(offset.x) + Math.abs(offset.y) == 0) {
+            return false; // must actually move on a move turn
+        }
+
+        // checks is moving only one tile 
+        if (Math.abs(offset.x) > 1 || Math.abs(offset.y) > 1) {
+            return false;
+        }
+
+        // checks moving along correct axis
+        const isVertical = this.rotation % 2 == 0;
+        if (Math.abs(offset.x) > 0 && !isVertical
+        || Math.abs(offset.y) > 0 && isVertical) {
+            return false; // must only move along correct axis
+        }
+            
+        // const deltaX = Math.abs(newCentreTile.x - this.centreTile.x);
+        // const deltaY = Math.abs(newCentreTile.y - this.centreTile.y);
+        // if (deltaX > MOVEMENT_RADIUS || deltaY > MOVEMENT_RADIUS) {
+        //     return { valid: false, reason: 'Move exceeds maximum movement radius' };
+        // }
 
         const newTiles = this.getTiles(newCentreTile);
         if (this.wouldBeOutOfBounds(newTiles, gridSize)) {
@@ -141,6 +163,9 @@ class Ship {
         }
 
         return tiles;
+    }
+    isHit(x, y) {
+        return this.tiles.some(tile => tile.x == x & tile.y == y);
     }
 
     isOutOfBounds() {
