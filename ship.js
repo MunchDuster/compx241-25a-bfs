@@ -79,14 +79,8 @@ class Ship {
         return `${this.id}|${this.type} @ (${this.centreTile.x}, ${this.centreTile.y}) rot ${this.rotation}`;
     }
 
-    move(newCentreTile, gridSize = 10) {
-        const moveCheck = this.isValidMove(newCentreTile, gridSize);
-        if (!moveCheck.valid) {
-            console.error(`Invalid move: ${moveCheck.reason}`);
-            return;
-        }
-
-        this.centreTile = newCentreTile;
+    move(direction) {
+        this.centreTile = this.getMovedCenter(direction);
         this.updateTilePositions();
     }
 
@@ -95,6 +89,7 @@ class Ship {
     }
 
     isValidMove(direction, gridSize = 10) {
+
         if(!this.canMove()) {
             return { valid: false, reason: 'Ship is damaged and cannot move' };
         }
@@ -108,7 +103,8 @@ class Ship {
         const isVertical = this.rotation % 2 == 0;
         const movingVertical = direction % 2 == 0;
         if (isVertical ^ movingVertical) {
-            return {valid: false, reason: 'cant move sideways'};
+            throw new Error("bad");
+            return {valid: false, reason: 'cant move ' + this.toString() + ' in direction ' + direction};
         }
             
         // const deltaX = Math.abs(newCentreTile.x - this.centreTile.x);
@@ -117,29 +113,26 @@ class Ship {
         //     return { valid: false, reason: 'Move exceeds maximum movement radius' };
         // }
 
-        let newCentreTile;
-        switch (direction) {
-            case 0:
-                newCentreTile = {x: this.centreTile, y: this.centreTile + 1};
-                break;
-            case 1:
-                newCentreTile = {x: this.centreTile + 1, y: this.centreTile};
-                break;
-            case 2:
-                newCentreTile = {x: this.centreTile, y: this.centreTile - 1};
-                break;
-            case 3:
-                newCentreTile = {x: this.centreTile - 1, y: this.centreTile};
-                break;
-        }
-        const newTiles = this.getTiles(newCentreTile);
+        const centre = this.getMovedCenter(direction);
+        const newTiles = this.getTiles(centre);
         if (this.wouldBeOutOfBounds(newTiles, gridSize)) {
             return { valid: false, reason: 'Move is out of bounds' };
         }
 
         return { valid: true };
     }
-
+    getMovedCenter(direction) {
+        switch (direction) {
+            case 0: 
+            return {x: this.centreTile, y: this.centreTile + 1};
+            case 1: 
+            return {x: this.centreTile + 1, y: this.centreTile};
+            case 2: 
+            return {x: this.centreTile, y: this.centreTile - 1};
+            case 3: 
+            return {x: this.centreTile - 1, y: this.centreTile};
+        }
+    }
     getTiles(newCentreTile) {
         const halfLength = this.length % 2 == 0 ? (this.length - 1) / 2 : this.length / 2;
         let tiles = [];

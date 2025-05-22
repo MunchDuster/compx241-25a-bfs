@@ -243,16 +243,16 @@ class Game {
                     };
                 }
                 
-                if (!turn.direction) {
+                if (!Number.isInteger(turn.direction)) {
                     return {
                         success: false,
-                        result: 'no direction set'
+                        result: 'no direction set or not integer'
                     }
                 }
                 const validMove = shipToMove.isValidMove(turn.direction, BOARD_SIZE);
 
                 if (validMove.valid) {
-                    shipToMove.move(turn.centreTile);
+                    shipToMove.move(turn.direction);
                     return {
                         success: true,
                         result: {
