@@ -351,6 +351,6 @@ function getLengthOfShip(ship) {
         case SHIP_TYPES.CARRIER: return 5;
         case SHIP_TYPES.CRUISER: return 3;
         case SHIP_TYPES.DESTROYER: return 2;
-        case SHIP_TYPES.SUBMARINE: return 2;
+        case SHIP_TYPES.SUBMARINE: return 3;
     }
 }
