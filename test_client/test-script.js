@@ -26,6 +26,8 @@ let usernumber = null;
 let username = null;    // Current user's username
 let oppUsername = null; // Opponent's username
 let gameRoom = null;    // Current game room ID
+let placements = null;
+let otherBoard = null; // 100 length array filled with null or true or false
 
 // TESTING ONLY VARS
 let turnNo = 0;
@@ -94,6 +96,8 @@ socket.on('joined', (otherUsername, joinedGameRoom, isPlayer1L) => {
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
     placeShips(); //place ships to be moved by the player
+    otherBoard = [100];
+    otherBoard.fill(null);
 });
 
 socket.on('turn-start', function() {
@@ -156,8 +160,7 @@ socket.on('disconnect', function() {
 });
 
 function placeShips() {
-   
-    const placements = isPlayer1 
+    placements = isPlayer1 
     ? [
         // This should show how I've setup the test data -- Malachai
         // (S)ubmarine, (B)attleship, (D)estroyer, c(A)rrier, cr(U)iser
@@ -243,5 +246,111 @@ function placeShips() {
         }
     ];
     console.log('setting-placements: ', placements);
+    
     socket.emit('set-placements', placements);
+}
+
+socket.on('see-turn', (turnInfo) => {
+    console.log('seeing-turn!!!!!!!!')
+    drawBoard();
+})
+
+// "quick" and dirty game state debugging
+function drawBoard() {
+    //NEEDS TO BE MONOSPACE FONT
+    
+    // draw header rows
+    let str = '';
+    str += '        my board               enemy board\n';
+    str += '  0 1 2 3 4 5 6 7 8 9  |   0 1 2 3 4 5 6 7 8 9\n';
+
+    // draw main board
+    for(let row = 0; row < 10; row++) {
+        str += row;
+        
+        // my row
+        for (let col = 0; col < 10; col++) {
+            str += ' ';
+            // quadruple nested for-loop lol
+            // performance, whats that?
+            str += getShipLetterAtPoint(col, row);
+        }
+        str += '  | ';
+
+        // other row
+        str += row;
+        for (let col = 0; col < 10; col++) {
+            str += ' ';
+            str += getEnemyMarker(col, row);
+        }
+        str += '\n';
+    }
+    console.log(str);
+
+}
+function getEnemyMarker(x, y) {
+    const marker = otherBoard[x + y * 10];
+    if (marker === null) return '~';
+    if (marker === true) return 'H';
+    if (marker === false) return 'M';
+    return '?';
+}
+function getShipLetterAtPoint(x, y) {
+    for (let ship of placements) { 
+        // console.log('ship', ship, 'tiles ', getTilesOfShip(ship))
+
+        for (let tile of getTilesOfShip(ship)) {
+            
+            if (tile.x != x || tile.y != y) {
+                continue;
+            }
+            switch(ship.type) {
+                case SHIP_TYPES.BATTLESHIP: return 'B';
+                case SHIP_TYPES.CARRIER: return 'A';
+                case SHIP_TYPES.CRUISER: return 'U';
+                case SHIP_TYPES.DESTROYER: return 'D';
+                case SHIP_TYPES.SUBMARINE: return 'S';
+            }
+        }
+    }
+    return '~'
+}
+function getTilesOfShip(ship) {
+    const newCentreTile = ship.centreTile;
+    const length = getLengthOfShip(ship);
+    const halfLength = length % 2 == 0 ? length / 2 - 1: (length - 1) / 2;
+    let tiles = [];
+
+    switch(ship.rotation % 4) {
+        case 0: // Upwards
+            for (let i = 0; i < length; i++) {
+                tiles.push({ x: newCentreTile.x, y: newCentreTile.y - (i - halfLength) });
+            }
+            break;
+        case 1: // Rightwards
+            for (let i = 0; i < length; i++) {
+                tiles.push({ x: newCentreTile.x + (i - halfLength), y: newCentreTile.y });
+            }
+            break;
+        case 2: // Downwards
+            for (let i = 0; i < length; i++) {
+                tiles.push({ x: newCentreTile.x, y: newCentreTile.y + (i - halfLength) });
+            }
+            break;
+        case 3: // Leftwards
+            for (let i = 0; i < length; i++) {
+                tiles.push({ x: newCentreTile.x - (i - halfLength), y: newCentreTile.y });
+            }
+            break;
+    }
+    return tiles;
+}
+function getLengthOfShip(ship) {
+    switch(ship.type) {
+        case SHIP_TYPES.BATTLESHIP: return 4;
+        case SHIP_TYPES.CARRIER: return 5;
+        case SHIP_TYPES.CRUISER: return 3;
+        case SHIP_TYPES.DESTROYER: return 2;
+        case SHIP_TYPES.SUBMARINE: return 2;
+    }
 }
