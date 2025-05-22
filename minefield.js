@@ -54,25 +54,19 @@ class Minefield {
         return false;
     }
 
-    receiveReconHit(x, y) { 
-        minecount = 0;   
+    receiveReconHit(xCentre, yCentre) {
+        //return count of 3x3 grid
+        let minecount = 0;
 
-        //Turn x and y into the top left corner of 3x3 grid
-        x--;
-        y--;
-
-        for(i = 0; i < 3; i++){
-            if(y >= 0 && y<10){
-                for(j = 0; j < 3; j++){
-                    if(x >= 0 && x<10){
-                        if(this.mineArray[y*10+x] == true){
-                            minecount++;
-                        }
-                    }
-                    x++;
+        for(let x = xCentre - 1; x <= xCentre + 1; x++) {
+            for(let y = yCentre - 1; y <= yCentre + 1; y++) {
+                if(x < 0 || x >= BOARD_WIDTH 
+                    || y < 0 || y >= BOARD_HEIGHT
+                    || this.mineArray[y*10+x] !== true) {
+                    continue;
                 }
+                minecount++
             }
-            y++;
         }
         return minecount;
     }
