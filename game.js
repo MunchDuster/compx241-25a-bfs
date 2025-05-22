@@ -193,7 +193,7 @@ class Game {
                 if (this.minefield.isMissileHit(x, y)) {
                     return {
                         success: true,
-                        result: {hit: true}
+                        result: {hit: true, tile: turn.targetTile}
                     };
                 }
 
@@ -202,7 +202,7 @@ class Game {
                         ship.hit(x, y);
                         return {
                             success: true,
-                            result: {hit: true}
+                            result: {hit: true, tile: turn.targetTile, ship: ship.type},
                         };
                     }
                 }
@@ -210,7 +210,7 @@ class Game {
                 // No hit
                 return {
                     success: true,
-                    result: {hit: false}
+                    result: {hit: false, tile: turn.targetTile},
                 };
             case TURN_TYPE.Recon:
                 //Check tile input is correct
@@ -230,7 +230,6 @@ class Game {
                     success: true,
                     result: {
                         mineCount: mineCount,
-                        position: {x: reconX, y: reconY}
                     }
                 };
             case TURN_TYPE.Move:
@@ -249,23 +248,22 @@ class Game {
                         result: 'no direction set or not integer'
                     }
                 }
-                const validMove = shipToMove.isValidMove(turn.direction, BOARD_SIZE);
+                const {valid, reason} = shipToMove.isValidMove(turn.direction, BOARD_SIZE);
 
-                if (validMove.valid) {
+                if (valid) {
                     shipToMove.move(turn.direction);
                     return {
                         success: true,
                         result: {
-                            ships: currentUser.ships
+                            ship: shipToMove.type,
+                            centreTile: shipToMove.centreTile
                         }
                     };
                 }
 
                 return {
                     success: false,
-                    result: {
-                        ships: validMove.reason // simplify data sent, i.e to same format as placement
-                    }
+                    result: reason
                 };
             default:
                 return {success: false, result: 'unrecognised turn type!'};

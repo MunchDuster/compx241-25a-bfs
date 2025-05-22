@@ -52,8 +52,8 @@ class Ship {
         return false;
     }
 
-    isHitAt(index) {
-        return this.hitArray[index] === 1;
+    isHit() {
+        return this.hitArray.some(isHit => isHit === true);
     }
 
     isSunk() {
@@ -117,18 +117,18 @@ class Ship {
             return { valid: false, reason: 'Move is out of bounds' };
         }
 
-        return { valid: true };
+        return { valid: true, reason: 'it succeeded you twat'};
     }
     getMovedCenter(direction) {
         switch (direction) {
             case 0: 
-            return {x: this.centreTile, y: this.centreTile + 1};
+            return {x: this.centreTile.x, y: this.centreTile.y + 1};
             case 1: 
-            return {x: this.centreTile + 1, y: this.centreTile};
+            return {x: this.centreTile.x + 1, y: this.centreTile.y};
             case 2: 
-            return {x: this.centreTile, y: this.centreTile - 1};
+            return {x: this.centreTile.x, y: this.centreTile.y - 1};
             case 3: 
-            return {x: this.centreTile - 1, y: this.centreTile};
+            return {x: this.centreTile.x - 1, y: this.centreTile.y};
         }
     }
     getTiles(newCentreTile) {
@@ -163,7 +163,10 @@ class Ship {
     isHit(x, y) {
         return this.tiles.some(tile => tile.x == x & tile.y == y);
     }
-
+    hit(x, y) {
+        const index = y * 10 + x;
+        this.hitArray[index] = true;
+    }
     isOutOfBounds() {
         return this.wouldBeOutOfBounds(this.tiles);
     }
