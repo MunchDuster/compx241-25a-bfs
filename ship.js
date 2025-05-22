@@ -89,7 +89,6 @@ class Ship {
     }
 
     isValidMove(direction, gridSize = 10) {
-
         if(!this.canMove()) {
             return { valid: false, reason: 'Ship is damaged and cannot move' };
         }
@@ -103,7 +102,6 @@ class Ship {
         const isVertical = this.rotation % 2 == 0;
         const movingVertical = direction % 2 == 0;
         if (isVertical ^ movingVertical) {
-            throw new Error("bad");
             return {valid: false, reason: 'cant move ' + this.toString() + ' in direction ' + direction};
         }
             
@@ -134,7 +132,7 @@ class Ship {
         }
     }
     getTiles(newCentreTile) {
-        const halfLength = this.length % 2 == 0 ? (this.length - 1) / 2 : this.length / 2;
+        const halfLength = length % 2 == 0 ? length / 2 - 1: (length - 1) / 2;
         let tiles = [];
 
         switch(this.rotation % 4) {
