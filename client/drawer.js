@@ -61,9 +61,38 @@ function drawSingleBoard(startX, gridNum) {
     }
 }
 
+function renderShipsPlacementDock(ships) {
+    shipPlacementLayer.destroyChildren();
+    ships.forEach(ship => {
+        const shipImg = new Image();
+        shipImg.onload = function () {
+            const shipImage = new Konva.Image({
+                x: ship.x,
+                y: ship.y,
+                image: shipImg,
+                width: ship.width,
+                height: ship.height,
+                rotation: ship.rotation,
+                draggable: true,
+                shipType: ship.type,
+            });
+            shipPlacementLayer.add(shipImage);
+            shipPlacementLayer.batchDraw();
+        }
+        shipImg.src = ship.imgPath;
+
+        shipImg.onerror = function() {
+            console.error(`Failed to load ship image: ${ship.imgPath}`);
+        };
+    });
+    console.log("Ships Placement Dock Rendered");
+}
+
 window.initCanvas = initCanvas;
+window.renderShipsPlacementDock = renderShipsPlacementDock;
+/* window.renderPlacedShips = renderPlacedShips; */
 window.getDrawerValues = () => ({
-    GRID_SIZE, TILE_SIZE, GRID_X_OFFSET_P1, GRID_X_OFFSET_P2, PLACEMENT_AREA_WIDTH, PLAYER_GRID_WIDTH
+    GRID_SIZE, TILE_SIZE, GRID_X_OFFSET_P1, GRID_X_OFFSET_P2, PLACEMENT_AREA_WIDTH, PLAYER_GRID_WIDTH, OFFSET, CANVAS_WIDTH, CANVAS_HEIGHT
 });
 
 
