@@ -20,37 +20,6 @@ const menus = [
     },
 ];
 
-// Sound must player after an interaction like a click, browser will not play it otherwise
-function playAudio() {
-    console.log('playing audio')
-    
-    // hide the tip
-    const tip = document.querySelector('.whyCantIHearTheSong');
-    tip.parentElement.removeChild(tip);
-
-    const sound = document.getElementById('songer');
-
-    const audioContext = new AudioContext();
-    const track = audioContext.createMediaElementSource(sound);
-
-    const gainNode = audioContext.createGain();
-
-    const volumeSlider = document.getElementById('volumeSlider');
-    const setGain = () => {
-        const volume = volumeSlider.value;
-        console.log('setting volume ' + volume);
-        gainNode.gain.value = volume;
-    }
-    volumeSlider.addEventListener('mousemove', setGain);
-    setGain();
-
-    track.connect(gainNode).connect(audioContext.destination);
-    sound.play();
-
-    window.removeEventListener('click', playAudio);
-}
-window.addEventListener('click', playAudio);
-
 // Get references to DOM elements
 const findListContainer = document.getElementById('find-list');
 const usernameDisplays = document.querySelectorAll('.username-display:not([id="opp"])');
@@ -249,6 +218,36 @@ function setSelectedTile(x, y) {
     console.log("setting selected tile ");
 }
 
+// Sound must player after an interaction like a click, browser will not play it otherwise
+function playAudio() {
+    console.log('playing audio')
+    
+    // hide the tip
+    const tip = document.querySelector('.whyCantIHearTheSong');
+    tip.parentElement.removeChild(tip);
+
+    const sound = document.getElementById('songer');
+
+    const audioContext = new AudioContext();
+    const track = audioContext.createMediaElementSource(sound);
+
+    const gainNode = audioContext.createGain();
+
+    const volumeSlider = document.getElementById('volumeSlider');
+    const setGain = () => {
+        const volume = volumeSlider.value;
+        console.log('setting volume ' + volume);
+        gainNode.gain.value = volume;
+    }
+    volumeSlider.addEventListener('mousemove', setGain);
+    setGain();
+
+    track.connect(gainNode).connect(audioContext.destination);
+    sound.play();
+
+    window.removeEventListener('click', playAudio);
+}
+window.addEventListener('click', playAudio);
 
 /*
  *  ---- In Game Functions ----
