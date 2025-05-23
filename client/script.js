@@ -114,7 +114,7 @@ socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
-    startDrawing(); // Initialize drawing state
+    initCanvas(); // Initialize drawing state
     startPlacingShips(); //place ships to be moved by the player
 });
 

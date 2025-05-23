@@ -1,4 +1,73 @@
-let stage;
+let stage, gridLayer, shipLayer, shipFeedbackLayer, shipPlacementLayer;
+
+const CANVAS_WIDTH = 1320;
+const CANVAS_HEIGHT = 500
+const GRID_SIZE = 10;
+
+const OFFSET = 4;
+let TILE_SIZE
+
+const PLACEMENT_AREA_WIDTH = 160;
+const PLAYER_GRID_WIDTH = (CANVAS_WIDTH) / 2;
+const GRID_X_OFFSET_P1 = PLACEMENT_AREA_WIDTH;
+const GRID_X_OFFSET_P2 = PLAYER_GRID_WIDTH;
+
+let isUserPlayer1;
+
+function initCanvas(isPlayer1) {
+    stage = new Konva.Stage({
+        container: 'game-board',
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT
+    });
+
+    isUserPlayer1 = isPlayer1;
+
+    gridLayer = new Konva.Layer();
+    shipLayer = new Konva.Layer();
+    shipFeedbackLayer = new Konva.Layer();
+    shipPlacementLayer = new Konva.Layer();
+
+    stage.add(gridLayer, shipLayer, shipFeedbackLayer, shipPlacementLayer);
+
+    TILE_SIZE = Math.round(CANVAS_HEIGHT / GRID_SIZE) - OFFSET * 2;
+    drawGameBoard(isPlayer1);
+    console.log("Konva Drawer Initialised. Grid is on the " + (isPlayer1 ? "left" : "right"));
+}
+
+function drawGameBoard(isPlayer1) {
+    gridLayer.destroyChildren();
+    drawSingleBoard(GRID_X_OFFSET_P1, isPlayer1 ? "1" : "2");
+    drawSingleBoard(GRID_X_OFFSET_P2, isPlayer1 ? "2" : "1");
+    gridLayer.batchDraw();
+}
+
+function drawSingleBoard(startX, gridNum) {
+    for (let y = 0; y < GRID_SIZE; y++) {
+        for (let x = 0; x < GRID_SIZE; x++) {
+            const xPos = startX + (TILE_SIZE / 2) + (x * (TILE_SIZE + OFFSET));
+            const yPos = (TILE_SIZE / 2) + (y * (TILE_SIZE + OFFSET));
+
+            const tileRect = new Konva.Rect({
+                x: xPos, y: yPos,
+                width: TILE_SIZE, height: TILE_SIZE,
+                fill: '#5F85B5', stroke: '#234668', strokeWidth: 1,
+                name: `tile ${gridNum} ${x}-${y}`
+            });
+            gridLayer.add(tileRect);
+
+            console.log(`Tile (${x}, ${y}, ${gridNum}) at position (${xPos}, ${yPos})`);
+        }
+    }
+}
+
+window.initCanvas = initCanvas;
+window.getDrawerValues = () => ({
+    GRID_SIZE, TILE_SIZE, GRID_X_OFFSET_P1, GRID_X_OFFSET_P2, PLACEMENT_AREA_WIDTH, PLAYER_GRID_WIDTH
+});
+
+
+/* let stage;
 let layer;
 
 const width = 1000;
@@ -305,3 +374,4 @@ function getGridStartYPos(y) {
 window.startDrawing = startDrawing;
 window.clear = clear;
 window.startPlacingShips = startPlacingShips;
+ */
