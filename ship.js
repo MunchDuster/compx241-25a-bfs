@@ -52,8 +52,8 @@ class Ship {
         return false;
     }
 
-    isHitAt(index) {
-        return this.hitArray[index] === 1;
+    isHit() {
+        return this.hitArray.some(isHit => isHit === true);
     }
 
     isSunk() {
@@ -79,14 +79,8 @@ class Ship {
         return `${this.id}|${this.type} @ (${this.centreTile.x}, ${this.centreTile.y}) rot ${this.rotation}`;
     }
 
-    move(newCentreTile, gridSize = 10) {
-        const moveCheck = this.isValidMove(newCentreTile, gridSize);
-        if (!moveCheck.valid) {
-            console.error(`Invalid move: ${moveCheck.reason}`);
-            return;
-        }
-
-        this.centreTile = newCentreTile;
+    move(direction) {
+        this.centreTile = this.getMovedCenter(direction);
         this.updateTilePositions();
     }
 
@@ -94,31 +88,21 @@ class Ship {
         return this.hitArray.every(hit => hit === 0);
     }
 
-    isValidMove(newCentreTile, gridSize = 10) {
+    isValidMove(direction, gridSize = 10) {
         if(!this.canMove()) {
             return { valid: false, reason: 'Ship is damaged and cannot move' };
         }
 
-        const offset = {
-            x: newCentreTile.x - this.centreTile.x,
-            y: newCentreTile.y - this.centreTile.y
-        }
-
-        // is moving at all?
-        if (Math.abs(offset.x) + Math.abs(offset.y) == 0) {
-            return false; // must actually move on a move turn
-        }
-
-        // checks is moving only one tile 
-        if (Math.abs(offset.x) > 1 || Math.abs(offset.y) > 1) {
-            return false;
+        // does direction exist?
+        if (direction < 0 || direction > 3) {
+            return {valid: false, reason: 'invalid direction'};
         }
 
         // checks moving along correct axis
         const isVertical = this.rotation % 2 == 0;
-        if (Math.abs(offset.x) > 0 && !isVertical
-        || Math.abs(offset.y) > 0 && isVertical) {
-            return false; // must only move along correct axis
+        const movingVertical = direction % 2 == 0;
+        if (isVertical ^ movingVertical) {
+            return {valid: false, reason: 'cant move ' + this.toString() + ' in direction ' + direction};
         }
             
         // const deltaX = Math.abs(newCentreTile.x - this.centreTile.x);
@@ -127,16 +111,28 @@ class Ship {
         //     return { valid: false, reason: 'Move exceeds maximum movement radius' };
         // }
 
-        const newTiles = this.getTiles(newCentreTile);
+        const centre = this.getMovedCenter(direction);
+        const newTiles = this.getTiles(centre);
         if (this.wouldBeOutOfBounds(newTiles, gridSize)) {
             return { valid: false, reason: 'Move is out of bounds' };
         }
 
-        return { valid: true };
+        return { valid: true, reason: 'it succeeded you twat'};
     }
-
+    getMovedCenter(direction) {
+        switch (direction) {
+            case 0: 
+            return {x: this.centreTile.x, y: this.centreTile.y + 1};
+            case 1: 
+            return {x: this.centreTile.x + 1, y: this.centreTile.y};
+            case 2: 
+            return {x: this.centreTile.x, y: this.centreTile.y - 1};
+            case 3: 
+            return {x: this.centreTile.x - 1, y: this.centreTile.y};
+        }
+    }
     getTiles(newCentreTile) {
-        const halfLength = this.length % 2 == 0 ? (this.length - 1) / 2 : this.length / 2;
+        const halfLength = this.length % 2 == 0 ? this.length / 2 - 1: (this.length - 1) / 2;
         let tiles = [];
 
         switch(this.rotation % 4) {
@@ -167,7 +163,10 @@ class Ship {
     isHit(x, y) {
         return this.tiles.some(tile => tile.x == x & tile.y == y);
     }
-
+    hit(x, y) {
+        const index = y * 10 + x;
+        this.hitArray[index] = true;
+    }
     isOutOfBounds() {
         return this.wouldBeOutOfBounds(this.tiles);
     }

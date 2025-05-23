@@ -77,16 +77,22 @@ function SocketHandler(socket, io) {
 
 
         const {success, result} = game.playTurn(user, turn);
-        callback({success});
-        if (!success) return;
+        callback({success, result});
+        if (!success) {
+            console.log('turn ' + turn.type + ' failed, reason: ', result);
+            return;
+        }
+
         const gameOver = game.checkGameOver();
+
+        // other player only sees missile or secret (they dont get move or recon info)
         const seeTurn = {
             gameState: {
                 isOver: gameOver,
                 winner: game.winner
             },
-            turn: turn,
-            result: result
+            type: turn.type == 'missile' ? 'missile' : 'secret',
+            result: turn.type == 'missile' ? result : null
         }
         io.to(opponent.socketId).emit('see-turn', seeTurn);
         if (gameOver) {
