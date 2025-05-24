@@ -102,6 +102,12 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
     console.log("Ships Placement Dock Rendered");
 }
 
+function renderPlacedShip(ship) {
+    const konvaShip = ship.konvaImg;
+    konvaImg.moveTo(shipLayer);
+    shipLayer.batchDraw();
+}
+
 function highlightShipSnapCells(cells, isValid) {
     
     shipFeedbackLayer.destroyChildren();
@@ -181,6 +187,7 @@ function getStageAndLayers() {
 
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
+window.renderPlacedShip = renderPlacedShip;
 window.highlightShipSnapCells = highlightShipSnapCells;
 window.getDrawerValues = getDrawerValues;
 window.getStageAndLayers = getStageAndLayers;
