@@ -22,26 +22,31 @@ function initPlacements(isPlayer1) {
     drawerValues = window.getDrawerValues();
     stagesAndLayers = window.getStageAndLayers();
     console.log("Drawer values: ", drawerValues);
-    let shipPlacementX = isPlayer1 ? 15: drawerValues.CANVAS_WIDTH - drawerValues.TILE_SIZE - 15;
-    let shipPlacementY = 20;
+    
+    let shipPlacementX = isPlayer1 ?
+        25 + (drawerValues.TILE_SIZE / 2) :
+        drawerValues.CANVAS_WIDTH - 25 - (drawerValues.TILE_SIZE / 2);
+    let shipPlacementY = 25;
 
     SHIP_DEFINITIONS.forEach(def => {
-        const shipWidth = drawerValues.TILE_SIZE;
         const shipHeight = (drawerValues.TILE_SIZE + drawerValues.OFFSET) * def.size - drawerValues.OFFSET;
+        const shipWidth = drawerValues.TILE_SIZE;
 
         if (shipPlacementY > drawerValues.CANVAS_HEIGHT - shipHeight) {
             shipPlacementX = isPlayer1 ? shipPlacementX + shipWidth * 2: shipPlacementX - shipWidth * 2;
-            shipPlacementY = 20;
+            shipPlacementY = 25;
         }
+
+        const tempY = shipPlacementY + (((drawerValues.TILE_SIZE + drawerValues.OFFSET) * def.size - drawerValues.OFFSET) / 2);
 
         unplacedShips.push({
             type: def.type,
             size: def.size,
             imgPath: def.imgPath,
             x: shipPlacementX,
-            y: shipPlacementY,
+            y: tempY,
             dockX: shipPlacementX,
-            dockY: shipPlacementY,
+            dockY: tempY,
             centerTile: {
                 x: -1,
                 y: -1
@@ -53,7 +58,7 @@ function initPlacements(isPlayer1) {
             konvaImg: null,
         });
 
-        console.log("Ship " + def.type + " placement x: ", shipPlacementX, " y: ", shipPlacementY);
+        console.log("Ship " + def.type + " placement x: ", shipPlacementX, " y: ", tempY);
 
         shipPlacementY = shipPlacementY + shipHeight + shipWidth;
     });
@@ -126,6 +131,7 @@ function handlePlacementRotationKey(e) {
 
 function updateSnapToTile(konvaShip) {
     const ship = konvaShip.shipRef;
+    
     const playerGridStartX = isCurrentPlayerP1 ? drawerValues.GRID_X_OFFSET_P1 : drawerValues.GRID_X_OFFSET_P2;
     const stage = stagesAndLayers.stage;
     const pointerPos = stage.getPointerPosition();
@@ -136,18 +142,18 @@ function updateSnapToTile(konvaShip) {
     if (hoverGridCoords) {
         const cellsToOccupy = getShipCellsFromCentre(ship, hoverGridCoords.x, hoverGridCoords.y);
         const isValid = isPlacementValid(ship, cellsToOccupy);
-        const length = ship.size;
-        const yOffset = length % 2 === 0 ? length/2 * (drawerValues.TILE_SIZE + drawerValues.OFFSET) : Math.floor(length/2) * (drawerValues.TILE_SIZE + drawerValues.OFFSET);
-        konvaShip.offsetY(yOffset);
+        
         const snappedCanvasPos = window.getCanvasPosFromGridPos(
             hoverGridCoords.x, 
             hoverGridCoords.y,
             isCurrentPlayerP1 ? 1 : 2
         );
         
+        const verticalOffset = ship.size % 2 === 0 ? drawerValues.TILE_SIZE / 2 : 0;
+
         konvaShip.position({
-            x: snappedCanvasPos.x,
-            y: snappedCanvasPos.y
+            x: snappedCanvasPos.x + drawerValues.TILE_SIZE / 2,
+            y: snappedCanvasPos.y + drawerValues.TILE_SIZE / 2 - verticalOffset
         });
         window.highlightShipSnapCells(cellsToOccupy, isValid);
     } else {
@@ -236,18 +242,21 @@ function placeShip(konvaShip) {
             const cellsToOccupy = getShipCellsFromCentre(ship, hoverGridCoords.x, hoverGridCoords.y);
 
             if (isPlacementValid(ship, cellsToOccupy)) {
-                const length = ship.size;
-                const yOffset = length % 2 === 0 ? length/2 * (drawerValues.TILE_SIZE + drawerValues.OFFSET) : Math.floor(length/2) * (drawerValues.TILE_SIZE + drawerValues.OFFSET);
-                konvaShip.offsetY(yOffset);
                 ship.centerTile = hoverGridCoords;
                 ship.isPlaced = true;
 
-                const snappedPos = window.getCanvasPosFromGridPos(
+                const snappedCanvasPos = window.getCanvasPosFromGridPos(
                     hoverGridCoords.x, 
                     hoverGridCoords.y,
                     isCurrentPlayerP1 ? 1 : 2
                 );
-                konvaShip.position({x: snappedPos.x, y: snappedPos.y});
+
+                const verticalOffset = ship.size % 2 === 0 ? drawerValues.TILE_SIZE / 2 : 0;
+
+                konvaShip.position({
+                    x: snappedCanvasPos.x + drawerValues.TILE_SIZE / 2,
+                    y: snappedCanvasPos.y + drawerValues.TILE_SIZE / 2 - verticalOffset
+                });
                 konvaShip.draggable(false);
                 konvaShip.moveTo(stagesAndLayers.shipLayer);
 

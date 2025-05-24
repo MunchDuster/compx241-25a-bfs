@@ -79,8 +79,8 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 rotation: ship.rotation,
                 draggable: true,
                 shipType: ship.type,
-                offsetX: 0,
-                offsetY: 0,
+                offsetX: ship.width / 2,
+                offsetY: ship.height / 2,
                 shipRef: ship,
             });
             shipImage.shipRef = ship;
