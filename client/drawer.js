@@ -148,11 +148,22 @@ function getDrawerValues() {
     };
 }
 
+function getStageAndLayers() {
+    return {
+        stage,
+        gridLayer,
+        shipLayer,
+        shipFeedbackLayer,
+        shipPlacementLayer
+    };
+}
+
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
 /* window.renderPlacedShips = renderPlacedShips; */
 window.highlightShipSnapCells = highlightShipSnapCells;
 window.getDrawerValues = getDrawerValues;
+window.getStageAndLayers = getStageAndLayers;
 
 
 /* let stage;
