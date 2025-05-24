@@ -81,6 +81,7 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 shipType: ship.type,
                 shipRef: ship,
             });
+            shipImage.shipRef = ship;
             ship.konvaImg = shipImage;
             shipPlacementLayer.add(shipImage);
             shipPlacementLayer.batchDraw();
@@ -126,12 +127,32 @@ function highlightShipSnapCells(highlightedCells, isValid) {
     console.log("Ship Snap Cells Highlighted " + highlightedCells);
 }
 
-function getCanvasPosFromGridPos(x, y) {
-    const gridXOffset = isUserPlayer1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
+function getCanvasPosFromGridPos(gridx, gridY, gridNum = 1) {
+    let gridXOffset;
+    if (gridNum == 1) {
+        gridXOffset = isUserPlayer1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
+    } else {
+        gridXOffset = isUserPlayer1 ? GRID_X_OFFSET_P2 : GRID_X_OFFSET_P1;
+    }
+
     return {
-        x: gridXOffset + (TILE_SIZE / 2) + (x * (TILE_SIZE + OFFSET)),
-        y: (TILE_SIZE / 2) + (y * (TILE_SIZE + OFFSET))
+        x: gridXOffset + (TILE_SIZE / 2) + (gridx * (TILE_SIZE + OFFSET)),
+        y: (TILE_SIZE / 2) + (gridY * (TILE_SIZE + OFFSET))
     };
+}
+
+function getGridPosFromCanvasPos(canvasX, canvasY, specificGridStartX) {
+    const relativeX = canvasX - (specificGridStartX + TILE_SIZE / 2);
+    const relativeY = canvasY - (TILE_SIZE / 2);
+
+    const gridX = Math.floor(relativeX / (TILE_SIZE + OFFSET));
+    const gridY = Math.floor(relativeY / (TILE_SIZE + OFFSET));
+
+
+    if (gridX >= 0 && gridX < GRID_SIZE && gridY >= 0 && gridY < GRID_SIZE) {
+        return { x: gridX, y: gridY};
+    }
+    return null;
 }
 
 function getDrawerValues() {
@@ -164,6 +185,8 @@ window.renderShipsPlacementDock = renderShipsPlacementDock;
 window.highlightShipSnapCells = highlightShipSnapCells;
 window.getDrawerValues = getDrawerValues;
 window.getStageAndLayers = getStageAndLayers;
+window.getCanvasPosFromGridPos = getCanvasPosFromGridPos;
+window.getGridPosFromCanvasPos = getGridPosFromCanvasPos;
 
 
 /* let stage;
