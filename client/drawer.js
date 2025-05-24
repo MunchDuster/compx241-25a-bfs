@@ -61,9 +61,13 @@ function drawSingleBoard(startX, gridNum) {
     }
 }
 
-function renderShipsPlacementDock(ships) {
+function renderShipsPlacementDock(ships, onShipsLoaded) {
     shipPlacementLayer.destroyChildren();
+    let loadedShips = 0;
+
     ships.forEach(ship => {
+        if (ship.isPlaced) return;
+
         const shipImg = new Image();
         shipImg.onload = function () {
             const shipImage = new Konva.Image({
@@ -75,9 +79,16 @@ function renderShipsPlacementDock(ships) {
                 rotation: ship.rotation,
                 draggable: true,
                 shipType: ship.type,
+                shipRef: ship,
             });
+            ship.konvaImg = shipImage;
             shipPlacementLayer.add(shipImage);
             shipPlacementLayer.batchDraw();
+
+            loadedShips++;
+            if (loadedShips === ships.length && onShipsLoaded) {
+                onShipsLoaded();
+            }
         }
         shipImg.src = ship.imgPath;
 
@@ -123,13 +134,25 @@ function getCanvasPosFromGridPos(x, y) {
     };
 }
 
+function getDrawerValues() {
+    return {
+        GRID_SIZE,
+        TILE_SIZE,
+        GRID_X_OFFSET_P1,
+        GRID_X_OFFSET_P2,
+        PLACEMENT_AREA_WIDTH,
+        PLAYER_GRID_WIDTH,
+        OFFSET,
+        CANVAS_WIDTH,
+        CANVAS_HEIGHT
+    };
+}
+
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
 /* window.renderPlacedShips = renderPlacedShips; */
-window.renderShipSnapFeedback = renderShipSnapFeedback;
-window.getDrawerValues = () => ({
-    GRID_SIZE, TILE_SIZE, GRID_X_OFFSET_P1, GRID_X_OFFSET_P2, PLACEMENT_AREA_WIDTH, PLAYER_GRID_WIDTH, OFFSET, CANVAS_WIDTH, CANVAS_HEIGHT
-});
+window.highlightShipSnapCells = highlightShipSnapCells;
+window.getDrawerValues = getDrawerValues;
 
 
 /* let stage;

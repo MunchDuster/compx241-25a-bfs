@@ -2,6 +2,7 @@ let isCurrentTurn = false;
 let isCurrentPlayerP1 = null;
 let unplacedShips = [];
 let currentPlacedShips = [];
+let draggedShip = null;
 
 const SHIP_DEFINITIONS = [
     { type: "carrier",    size: 5, imgPath: "../assets/carrier.png"},
@@ -23,8 +24,8 @@ function initPlacements(isPlayer1) {
     let shipPlacementY = 20;
 
     SHIP_DEFINITIONS.forEach(def => {
-        let shipWidth = drawerValues.TILE_SIZE;
-        let shipHeight = (drawerValues.TILE_SIZE + drawerValues.OFFSET) * def.size - drawerValues.OFFSET;
+        const shipWidth = drawerValues.TILE_SIZE;
+        const shipHeight = (drawerValues.TILE_SIZE + drawerValues.OFFSET) * def.size - drawerValues.OFFSET;
 
         if (shipPlacementY > drawerValues.CANVAS_HEIGHT - shipHeight) {
             shipPlacementX = isPlayer1 ? shipPlacementX + shipWidth * 2: shipPlacementX - shipWidth * 2;
@@ -35,14 +36,13 @@ function initPlacements(isPlayer1) {
             type: def.type,
             size: def.size,
             imgPath: def.imgPath,
-            initialX: shipPlacementX,
-            initialY: shipPlacementY,
             x: shipPlacementX,
             y: shipPlacementY,
             width: shipWidth,
             height: shipHeight,
             rotation: 0,
             isPlaced: false,
+            konvaImg: null,
         });
 
         console.log("Ship " + def.type + " placement x: ", shipPlacementX, " y: ", shipPlacementY);
@@ -50,12 +50,45 @@ function initPlacements(isPlayer1) {
         shipPlacementY = shipPlacementY + shipHeight + shipWidth;
     });
 
-    window.renderShipsPlacementDock(unplacedShips);
-    setupInputListeners();
+    window.renderShipsPlacementDock(unplacedShips, () => {
+        console.log("All ships loaded, setting up input listeners");
+        setupInputListeners();
+    });
 }
 
 function setupInputListeners() {
-    // TODO: Add event listeners for ship placement and rotation
+    unplacedShips.forEach(ship => {
+        if (ship.konvaImg) {
+            ship.konvaImg.on('dragstart', function () {
+                if (ship.isPlaced) {
+                    this.draggable(false);
+                    return;
+                }
+                draggedShip = this;
+                this.moveToTop();
+                console.log("Dragging ship: ", ship.type);
+            });
+
+            ship.konvaImg.on('dragend', function () {
+                if (draggedShip === this) {
+                    this.position({x: ship.x, y: ship.y});
+                    this.getLayer().batchDraw();
+                    draggedShip = null;
+                    console.log("Dropped ship: ", ship.type);
+                }
+            });
+        } else {
+            console.error("Ship image not found for type: ", ship.type);
+        }
+    });
+    console.log("Input listeners set up for unplaced ships");
+    window.addEventListener('keydown', handlePlacementRotationKey);
+}
+
+function handlePlacementRotationKey(e) {
+    if (e.key.toLowerCase() === 'r' && draggedShip && !draggedShip.shipRef.isPlaced) {
+        console.log("Rotating ship: ", draggedShip.ship.type);
+    }
 }
 
 window.initPlacements = initPlacements;
