@@ -100,44 +100,41 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
     console.log("Ships Placement Dock Rendered");
 }
 
-function highlightShipSnapCells(highlightedCells, isValid) {
+function highlightShipSnapCells(cells, isValid) {
+    
     shipFeedbackLayer.destroyChildren();
 
-    if (!highlightedCells || highlightedCells.length === 0) {
+    if (!cells || cells.length === 0) {
         shipFeedbackLayer.batchDraw();
         return;
     }
 
-    highlightedCells.forEach(cell => {
-        const { xPos, yPos } = getCanvasPosFromGridPos(cell.x, cell.y);
-        const highlightRect = new Konva.Rect({
-            x: xPos,
-            y: yPos,
-            width: TILE_SIZE,
-            height: TILE_SIZE,
-            fill: isValid ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)',
-            stroke: isValid ? 'green' : 'red',
-            strokeWidth: 1,
-            listening: false,
-        });
+    const color = isValid ? 'rgba(0,255,0,0.4)' : 'rgba(255,0,0,0.4)';
+    for (const cell of cells) {
+        const gridNum = isUserPlayer1 ? 1 : 2;
+        const pos = window.getCanvasPosFromGridPos(cell.x, cell.y, gridNum);
 
-        shipFeedbackLayer.add(highlightRect);
-    });
+        const rect = new Konva.Rect({
+            x: pos.x,
+            y: pos.y,
+            width: drawerValues.TILE_SIZE,
+            height: drawerValues.TILE_SIZE,
+            fill: color,
+            stroke: 'black',
+            strokeWidth: 1,
+            opacity: 0.5
+        });
+        shipFeedbackLayer.add(rect);
+    }
     shipFeedbackLayer.batchDraw();
-    console.log("Ship Snap Cells Highlighted " + highlightedCells);
 }
 
-function getCanvasPosFromGridPos(gridx, gridY, gridNum = 1) {
-    let gridXOffset;
-    if (gridNum == 1) {
-        gridXOffset = isUserPlayer1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
-    } else {
-        gridXOffset = isUserPlayer1 ? GRID_X_OFFSET_P2 : GRID_X_OFFSET_P1;
-    }
+function getCanvasPosFromGridPos(gridX, gridY, gridNum) {
+    const gridXOffset = gridNum === 1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
 
     return {
-        x: gridXOffset + (TILE_SIZE / 2) + (gridx * (TILE_SIZE + OFFSET)),
-        y: (TILE_SIZE / 2) + (gridY * (TILE_SIZE + OFFSET))
+        x: gridXOffset + gridX * (TILE_SIZE + OFFSET),
+        y: gridY * (TILE_SIZE + OFFSET)
     };
 }
 
@@ -148,7 +145,7 @@ function getGridPosFromCanvasPos(canvasX, canvasY, specificGridStartX) {
     const gridX = Math.floor(relativeX / (TILE_SIZE + OFFSET));
     const gridY = Math.floor(relativeY / (TILE_SIZE + OFFSET));
 
-
+    console.log(`Canvas Position: (${canvasX}, ${canvasY}) -> Grid Position: (${gridX}, ${gridY})`);
     if (gridX >= 0 && gridX < GRID_SIZE && gridY >= 0 && gridY < GRID_SIZE) {
         return { x: gridX, y: gridY};
     }
