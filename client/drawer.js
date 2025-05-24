@@ -88,9 +88,45 @@ function renderShipsPlacementDock(ships) {
     console.log("Ships Placement Dock Rendered");
 }
 
+function highlightShipSnapCells(highlightedCells, isValid) {
+    shipFeedbackLayer.destroyChildren();
+
+    if (!highlightedCells || highlightedCells.length === 0) {
+        shipFeedbackLayer.batchDraw();
+        return;
+    }
+
+    highlightedCells.forEach(cell => {
+        const { xPos, yPos } = getCanvasPosFromGridPos(cell.x, cell.y);
+        const highlightRect = new Konva.Rect({
+            x: xPos,
+            y: yPos,
+            width: TILE_SIZE,
+            height: TILE_SIZE,
+            fill: isValid ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)',
+            stroke: isValid ? 'green' : 'red',
+            strokeWidth: 1,
+            listening: false,
+        });
+
+        shipFeedbackLayer.add(highlightRect);
+    });
+    shipFeedbackLayer.batchDraw();
+    console.log("Ship Snap Cells Highlighted " + highlightedCells);
+}
+
+function getCanvasPosFromGridPos(x, y) {
+    const gridXOffset = isUserPlayer1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
+    return {
+        x: gridXOffset + (TILE_SIZE / 2) + (x * (TILE_SIZE + OFFSET)),
+        y: (TILE_SIZE / 2) + (y * (TILE_SIZE + OFFSET))
+    };
+}
+
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
 /* window.renderPlacedShips = renderPlacedShips; */
+window.renderShipSnapFeedback = renderShipSnapFeedback;
 window.getDrawerValues = () => ({
     GRID_SIZE, TILE_SIZE, GRID_X_OFFSET_P1, GRID_X_OFFSET_P2, PLACEMENT_AREA_WIDTH, PLAYER_GRID_WIDTH, OFFSET, CANVAS_WIDTH, CANVAS_HEIGHT
 });
