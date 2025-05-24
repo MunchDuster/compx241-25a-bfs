@@ -79,6 +79,8 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 rotation: ship.rotation,
                 draggable: true,
                 shipType: ship.type,
+                offsetX: 0,
+                offsetY: 0,
                 shipRef: ship,
             });
             shipImage.shipRef = ship;
@@ -110,7 +112,7 @@ function highlightShipSnapCells(cells, isValid) {
     }
 
     const color = isValid ? 'rgba(0,255,0,0.4)' : 'rgba(255,0,0,0.4)';
-    for (const cell of cells) {
+    cells.forEach(cell => {
         const gridNum = isUserPlayer1 ? 1 : 2;
         const pos = window.getCanvasPosFromGridPos(cell.x, cell.y, gridNum);
 
@@ -125,7 +127,7 @@ function highlightShipSnapCells(cells, isValid) {
             opacity: 0.5
         });
         shipFeedbackLayer.add(rect);
-    }
+    });
     shipFeedbackLayer.batchDraw();
 }
 
@@ -146,7 +148,7 @@ function getGridPosFromCanvasPos(canvasX, canvasY, gridStartX) {
 
 function getCanvasPosFromGridPos(gridX, gridY, gridNum) {
     const gridXOffset = gridNum === 1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
-
+    
     return {
         x: gridXOffset + (TILE_SIZE / 2) + (gridX * (TILE_SIZE + OFFSET)),
         y: (TILE_SIZE / 2) + (gridY * (TILE_SIZE + OFFSET))
@@ -179,7 +181,7 @@ function getStageAndLayers() {
 
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
-/* window.renderPlacedShips = renderPlacedShips; */
+window.renderPlacedShip = renderPlacedShip;
 window.highlightShipSnapCells = highlightShipSnapCells;
 window.getDrawerValues = getDrawerValues;
 window.getStageAndLayers = getStageAndLayers;

@@ -138,7 +138,7 @@ function updateSnapToTile(konvaShip) {
         const isValid = isPlacementValid(ship, cellsToOccupy);
         const length = ship.size;
         const yOffset = length % 2 === 0 ? length/2 * (drawerValues.TILE_SIZE + drawerValues.OFFSET) : Math.floor(length/2) * (drawerValues.TILE_SIZE + drawerValues.OFFSET);
-
+        konvaShip.offsetY(yOffset);
         const snappedCanvasPos = window.getCanvasPosFromGridPos(
             hoverGridCoords.x, 
             hoverGridCoords.y,
@@ -147,7 +147,7 @@ function updateSnapToTile(konvaShip) {
         
         konvaShip.position({
             x: snappedCanvasPos.x,
-            y: snappedCanvasPos.y - yOffset
+            y: snappedCanvasPos.y
         });
         window.highlightShipSnapCells(cellsToOccupy, isValid);
     } else {
@@ -238,7 +238,7 @@ function placeShip(konvaShip) {
             if (isPlacementValid(ship, cellsToOccupy)) {
                 const length = ship.size;
                 const yOffset = length % 2 === 0 ? length/2 * (drawerValues.TILE_SIZE + drawerValues.OFFSET) : Math.floor(length/2) * (drawerValues.TILE_SIZE + drawerValues.OFFSET);
-
+                konvaShip.offsetY(yOffset);
                 ship.centerTile = hoverGridCoords;
                 ship.isPlaced = true;
 
@@ -247,7 +247,7 @@ function placeShip(konvaShip) {
                     hoverGridCoords.y,
                     isCurrentPlayerP1 ? 1 : 2
                 );
-                konvaShip.position({x: snappedPos.x, y: snappedPos.y - yOffset});
+                konvaShip.position({x: snappedPos.x, y: snappedPos.y});
                 konvaShip.draggable(false);
                 konvaShip.moveTo(stagesAndLayers.shipLayer);
 
