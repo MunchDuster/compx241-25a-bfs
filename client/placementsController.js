@@ -112,6 +112,18 @@ function setupInputListeners() {
         } else {
             console.error("Ship image not found for type: ", ship.type);
         }
+
+        const stage = stagesAndLayers.stage;
+        stage.on('wheel', function(e) {
+        if (draggedShip) {
+            e.evt.preventDefault(); // Prevent page scrolling
+            const shipData = draggedShip.shipRef;
+            if (shipData && !shipData.isPlaced) {
+                handleRotation(draggedShip, e.evt.deltaY < 0);
+            }
+        }
+    });
+    window.addEventListener('keydown', handlePlacementRotationKey);
     });
 
     console.log("Input listeners set up for unplaced ships");
@@ -120,13 +132,27 @@ function setupInputListeners() {
 
 function handlePlacementRotationKey(e) {
     if (e.key.toLowerCase() === 'r' && draggedShip) {
-        const ship = draggedShip.shipRef;
-        if (!ship || ship.isPlaced) {
-            console.error("Ship not found or already placed: ", ship);
-            return;
+        const shipData = draggedShip.shipRef;
+        if (shipData && !shipData.isPlaced) {
+            handleRotation(draggedShip, true);
         }
-        console.log("Rotating ship: ", ship.type);
     }
+}
+
+function handleRotation(konvaShip, isClockwise = true) {
+    const shipData = konvaShip.shipRef;
+    if (!shipData || shipData.isPlaced) return;
+
+    if (isClockwise) {
+        shipData.rotation = (shipData.rotation + 1) % 4;
+    } else {
+        shipData.rotation = (shipData.rotation + 3) % 4;
+    }
+
+    konvaShip.rotation(shipData.rotation * 90);
+
+    updateSnapToTile(konvaShip);
+    konvaShip.getLayer().batchDraw();
 }
 
 function updateSnapToTile(konvaShip) {
@@ -148,13 +174,32 @@ function updateSnapToTile(konvaShip) {
             hoverGridCoords.y,
             isCurrentPlayerP1 ? 1 : 2
         );
-        
-        const verticalOffset = ship.size % 2 === 0 ? drawerValues.TILE_SIZE / 2 : 0;
-
+    
+        let verticalOffset = 0;
+        let horizontalOffset = 0;
+        if (ship.size % 2 === 0) {
+            const offset = (drawerValues.TILE_SIZE / 2) + 1;
+            switch (ship.rotation) {
+                case 0: // UP
+                    verticalOffset = -offset;
+                    break;
+                case 1: // RIGHT
+                    horizontalOffset = offset;
+                    break;
+                case 2: // DOWN
+                    verticalOffset = offset;
+                    break;
+                case 3: // LEFT
+                    horizontalOffset = -offset;
+                    break;
+            }
+        }
+    
         konvaShip.position({
-            x: snappedCanvasPos.x + drawerValues.TILE_SIZE / 2,
-            y: snappedCanvasPos.y + drawerValues.TILE_SIZE / 2 - verticalOffset
+            x: snappedCanvasPos.x + drawerValues.TILE_SIZE / 2 + horizontalOffset,
+            y: snappedCanvasPos.y + drawerValues.TILE_SIZE / 2 + verticalOffset
         });
+
         window.highlightShipSnapCells(cellsToOccupy, isValid);
     } else {
         window.highlightShipSnapCells([], false);
@@ -165,7 +210,7 @@ function getShipCellsFromCentre(ship, centreX, centreY) {
     const cells = [];
     const length = ship.size;
     const rotation = ship.rotation;
-    const halfLen = length % 2 === 0 ? (length / 2) - 1 : Math.floor((length - 1) / 2);
+    const halfLen = length % 2 === 0 ? (length / 2) - 1 : ((length - 1) / 2);
 
     for (let i = 0; i < length; i++) {
         let cellX = centreX;
@@ -251,12 +296,31 @@ function placeShip(konvaShip) {
                     isCurrentPlayerP1 ? 1 : 2
                 );
 
-                const verticalOffset = ship.size % 2 === 0 ? drawerValues.TILE_SIZE / 2 : 0;
-
+                let verticalOffset = 0;
+                let horizontalOffset = 0;
+                if (ship.size % 2 === 0) {
+                    const offset = (drawerValues.TILE_SIZE / 2) + 1;
+                    switch (ship.rotation) {
+                        case 0: // UP
+                            verticalOffset = -offset;
+                            break;
+                        case 1: // RIGHT
+                            horizontalOffset = offset;
+                            break;
+                        case 2: // DOWN
+                            verticalOffset = offset;
+                            break;
+                        case 3: // LEFT
+                            horizontalOffset = -offset;
+                            break;
+                    }
+                }
+            
                 konvaShip.position({
-                    x: snappedCanvasPos.x + drawerValues.TILE_SIZE / 2,
-                    y: snappedCanvasPos.y + drawerValues.TILE_SIZE / 2 - verticalOffset
+                    x: snappedCanvasPos.x + drawerValues.TILE_SIZE / 2 + horizontalOffset,
+                    y: snappedCanvasPos.y + drawerValues.TILE_SIZE / 2 + verticalOffset
                 });
+
                 konvaShip.draggable(false);
                 konvaShip.moveTo(stagesAndLayers.shipLayer);
 
