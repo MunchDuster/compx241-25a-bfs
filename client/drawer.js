@@ -129,27 +129,28 @@ function highlightShipSnapCells(cells, isValid) {
     shipFeedbackLayer.batchDraw();
 }
 
+function getGridPosFromCanvasPos(canvasX, canvasY, gridStartX) {
+    const relativeX = canvasX - gridStartX;
+    const relativeY = canvasY;
+
+    const gridX = Math.floor((relativeX - TILE_SIZE/2) / (TILE_SIZE + OFFSET));
+    const gridY = Math.floor((relativeY - TILE_SIZE/2) / (TILE_SIZE + OFFSET));
+
+    if (gridX >= 0 && gridX < GRID_SIZE && 
+        gridY >= 0 && gridY < GRID_SIZE) {
+        return { x: gridX, y: gridY };
+    }
+    return null;
+}
+
+
 function getCanvasPosFromGridPos(gridX, gridY, gridNum) {
     const gridXOffset = gridNum === 1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
 
     return {
-        x: gridXOffset + gridX * (TILE_SIZE + OFFSET),
-        y: gridY * (TILE_SIZE + OFFSET)
+        x: gridXOffset + (TILE_SIZE / 2) + (gridX * (TILE_SIZE + OFFSET)),
+        y: (TILE_SIZE / 2) + (gridY * (TILE_SIZE + OFFSET))
     };
-}
-
-function getGridPosFromCanvasPos(canvasX, canvasY, specificGridStartX) {
-    const relativeX = canvasX - (specificGridStartX + TILE_SIZE / 2);
-    const relativeY = canvasY - (TILE_SIZE / 2);
-
-    const gridX = Math.floor(relativeX / (TILE_SIZE + OFFSET));
-    const gridY = Math.floor(relativeY / (TILE_SIZE + OFFSET));
-
-    console.log(`Canvas Position: (${canvasX}, ${canvasY}) -> Grid Position: (${gridX}, ${gridY})`);
-    if (gridX >= 0 && gridX < GRID_SIZE && gridY >= 0 && gridY < GRID_SIZE) {
-        return { x: gridX, y: gridY};
-    }
-    return null;
 }
 
 function getDrawerValues() {
