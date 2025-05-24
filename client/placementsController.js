@@ -332,6 +332,7 @@ function placeShip(konvaShip) {
 
     if (!shipPlaced) {
         konvaShip.rotation(0);
+        konvaShip.shipRef.rotation = 0;
         konvaShip.position({ x: ship.dockX, y: ship.dockY });
         konvaShip.moveTo(stagesAndLayers.shipPlacementLayer);
         ship.isPlaced = false;
