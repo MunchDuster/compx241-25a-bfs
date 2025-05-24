@@ -104,7 +104,7 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
 
 function renderPlacedShip(ship) {
     const konvaShip = ship.konvaImg;
-    konvaImg.moveTo(shipLayer);
+    konvaShip.moveTo(shipLayer);
     shipLayer.batchDraw();
 }
 
