@@ -181,7 +181,6 @@ function getStageAndLayers() {
 
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
-window.renderPlacedShip = renderPlacedShip;
 window.highlightShipSnapCells = highlightShipSnapCells;
 window.getDrawerValues = getDrawerValues;
 window.getStageAndLayers = getStageAndLayers;
