@@ -243,11 +243,7 @@ function showMenu(name) {
 }
 
 function updateReadyButton() {
-    if (currentPlacedShipsArray.length == 5) {
-        document.getElementById('ready-button').disabled = false;
-    } else {
-        document.getElementById('ready-button').disabled = true;
-    }
+    document.getElementById('ready-button').disabled = currentPlacedShipsArray.length == 5 ? false : true;
 }
 
 window.updateReadyButton = updateReadyButton;
