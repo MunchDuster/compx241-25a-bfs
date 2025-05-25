@@ -173,12 +173,12 @@ function highlightShipSnapCells(cells, isValid) {
 
 function playMissSplash(x, y) {
     console.log("Miss Splash");
-    animateGif(x, y, 9, 100, 'miss', 'gif');
+    animateGif(x, y, 9, 100, 'splash', 'gif');
 }
 
 function playHitExplosion(x, y) {
     console.log("Hit Explosion");
-    animateGif(x, y, 8, 100, 'explosion', 'gif');
+    animateGif(x, y, 8, 100, 'boom', 'gif');
 }
 
 function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
