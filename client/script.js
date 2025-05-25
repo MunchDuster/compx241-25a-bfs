@@ -1,5 +1,3 @@
-// const { isTypedArray } = require("util/types");
-
 // Initialize Socket.IO connection to server
 const socket = io();
 
@@ -118,10 +116,16 @@ socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     oppUsername = otherUsername;
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
+
     initCanvas(isPlayer1); // Initialize drawing state
     currentPlacedShipsArray = [];
     unplacedShipsArray = [];
     initPlacements(isPlayer1); //place ships to be moved by the player
+    isReady = false;
+   
+    document.getElementById('ship-placement-controls').classList.remove('hidden');
+    document.getElementById('ready-button').disabled = true;
+    document.getElementById('placement-feedback').innerText = '👽';
 });
 
 // Handle game ending 
@@ -146,13 +150,20 @@ socket.on('disconnect', function() {
 socket.on('turn-start', () => {
     console.log('turn started');
     isTurn = true;
-    playerTurn();
+    document.getElementById('ship-placement-controls').classList.add('hidden');
+    document.getElementById('game-controls').classList.remove('hidden');
+    fireButton.disabled = false;
+    scanButton.disabled = false;
 });
 
 // Handle turn wait? 
 socket.on('wait-start', () => {
     console.log('wait started');
     isTurn = false;
+    document.getElementById('ship-placement-controls').classList.add('hidden');
+    document.getElementById('game-controls').classList.remove('hidden');
+    fireButton.disabled = true;
+    scanButton.disabled = true;
 });
 
 socket.on('see-turn', (turnInfo) => {
@@ -230,10 +241,15 @@ function showMenu(name) {
     }
 }
 
-function updateGameButtons() {
-    fireButton.disabled = !isTurn;
-    scanButton.disabled = !isTurn;
+function updateReadyButton() {
+    if (currentPlacedShipsArray.length == 5) {
+        document.getElementById('ready-button').disabled = false;
+    } else {
+        document.getElementById('ready-button').disabled = true;
+    }
 }
+
+window.updateReadyButton = updateReadyButton;
 
 function setSelectedTile(x, y) {
     selectedTile = (x,y);
@@ -274,6 +290,21 @@ window.addEventListener('click', playAudio);
 /*
  *  ---- In Game Functions ----
  */
+
+function confirmPlacements () {
+    if (currentPlacedShipsArray.length != 5) return;
+
+    const placements = currentPlacedShipsArray.map(ship => ({
+        type: ship.type,
+        centreTile: {x: ship.centerTile.x, y: ship.centerTile.y},
+        rotation: ship.rotation
+    }));
+
+    socket.emit('set-placements', placements);
+
+    document.getElementById('ready-button').disabled = true;
+    document.getElementById('placement-feedback').innerText = 'Wating for opponent...'; 
+}
 
 function playerTurn() {
     let action = null;
