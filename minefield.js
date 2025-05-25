@@ -78,4 +78,4 @@ class Minefield {
     }
 }
 
-export default Minefield;
+module.exports = Minefield;
