@@ -296,6 +296,9 @@ function placeShip(konvaShip) {
                     isCurrentPlayerP1 ? 1 : 2
                 );
 
+                unplacedShips.splice(unplacedShips.indexOf(ship), 1);
+                console.log(`Placed ships ${unplacedShips}`);
+
                 let verticalOffset = 0;
                 let horizontalOffset = 0;
                 if (ship.size % 2 === 0) {
@@ -332,11 +335,16 @@ function placeShip(konvaShip) {
 
     if (!shipPlaced) {
         konvaShip.rotation(0);
-        konvaShip.shipRef.rotation = 0;
+        ship.rotation = 0;
         konvaShip.position({ x: ship.dockX, y: ship.dockY });
         konvaShip.moveTo(stagesAndLayers.shipPlacementLayer);
         ship.isPlaced = false;
         ship.centerTile = { x: -1, y: -1 };
+
+        if (unplacedShips.indexOf(ship) === -1) {
+            unplacedShips.push(ship);
+            currentPlacedShips.splice(currentPlacedShips.indexOf(ship), 1);
+        }
     }
 
     stagesAndLayers.shipPlacementLayer.batchDraw();
