@@ -253,8 +253,9 @@ window.updateReadyButton = updateReadyButton;
 
 function setSelectedTile(x, y) {
     selectedTile = (x,y);
-    console.log("setting selected tile ");
+    console.log("Selected tile: " + x + ", " + y);
 }
+window.setSelectedTile = setSelectedTile;
 
 // Sound must player after an interaction like a click, browser will not play it otherwise
 function playAudio() {
