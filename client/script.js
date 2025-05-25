@@ -252,8 +252,8 @@ function updateReadyButton() {
 window.updateReadyButton = updateReadyButton;
 
 function setSelectedTile(x, y) {
-    selectedTile = (x,y);
-    console.log("Selected tile: " + x + ", " + y);
+    selectedTile = {x: x, y: y};
+    console.log("Selected tile:", selectedTile);
 }
 window.setSelectedTile = setSelectedTile;
 
