@@ -176,7 +176,7 @@ function updateSnapToTile(konvaShip) {
         const snappedCanvasPos = window.getCanvasPosFromGridPos(
             hoverGridCoords.x, 
             hoverGridCoords.y,
-            isCurrentPlayerP1 ? 1 : 2
+            1
         );
     
         let verticalOffset = 0;
@@ -297,7 +297,7 @@ function placeShip(konvaShip) {
                 const snappedCanvasPos = window.getCanvasPosFromGridPos(
                     hoverGridCoords.x, 
                     hoverGridCoords.y,
-                    isCurrentPlayerP1 ? 1 : 2
+                    1
                 );
 
                 unplacedShips.splice(unplacedShips.indexOf(ship), 1);
