@@ -302,6 +302,7 @@ function confirmPlacements () {
     }));
 
     socket.emit('set-placements', placements);
+    isReady = true;
 
     document.getElementById('ready-button').disabled = true;
     document.getElementById('placement-feedback').innerText = 'Wating for opponent...'; 
