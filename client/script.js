@@ -35,7 +35,8 @@ let oppUsername = null; // Opponent's username
 let gameRoom = null;    // Current game room ID
 let isPlayer1 = null;
 
-let isTurn = false;   
+let isTurn = false;
+let isReady = false;
 let selectedShip = null;
 let selectedTile = null;
 
@@ -207,7 +208,6 @@ function showMenu(name) {
     }
 }
 
-
 function updateGameButtons() {
     fireButton.disabled = !isTurn;
     scanButton.disabled = !isTurn;
@@ -295,4 +295,3 @@ function scanForMine() {
         // 😎😎
     });
 }
-
