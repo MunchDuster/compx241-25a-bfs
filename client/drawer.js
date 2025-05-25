@@ -1,4 +1,4 @@
-let stage, gridLayer, shipLayer, shipFeedbackLayer, shipPlacementLayer;
+let stage, gridLayer, shipLayer, feedbackLayer, shipPlacementLayer;
 
 const CANVAS_WIDTH = 1320;
 const CANVAS_HEIGHT = 500
@@ -25,10 +25,10 @@ function initCanvas(isPlayer1) {
 
     gridLayer = new Konva.Layer();
     shipLayer = new Konva.Layer();
-    shipFeedbackLayer = new Konva.Layer();
+    feedbackLayer = new Konva.Layer();
     shipPlacementLayer = new Konva.Layer();
 
-    stage.add(gridLayer, shipLayer, shipFeedbackLayer, shipPlacementLayer);
+    stage.add(gridLayer, shipLayer, feedbackLayer, shipPlacementLayer);
 
     TILE_SIZE = Math.round(CANVAS_HEIGHT / GRID_SIZE) - OFFSET * 2;
     drawGameBoard(isPlayer1);
@@ -140,10 +140,10 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
 
 function highlightShipSnapCells(cells, isValid) {
     
-    shipFeedbackLayer.destroyChildren();
+    feedbackLayer.destroyChildren();
 
     if (!cells || cells.length === 0) {
-        shipFeedbackLayer.batchDraw();
+        feedbackLayer.batchDraw();
         return;
     }
 
@@ -162,9 +162,9 @@ function highlightShipSnapCells(cells, isValid) {
             strokeWidth: 1,
             opacity: 0.5
         });
-        shipFeedbackLayer.add(rect);
+        feedbackLayer.add(rect);
     });
-    shipFeedbackLayer.batchDraw();
+    feedbackLayer.batchDraw();
 }
 
 function getGridPosFromCanvasPos(canvasX, canvasY, gridStartX) {
@@ -210,7 +210,7 @@ function getStageAndLayers() {
         stage,
         gridLayer,
         shipLayer,
-        shipFeedbackLayer,
+        feedbackLayer,
         shipPlacementLayer
     };
 }
