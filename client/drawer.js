@@ -193,6 +193,7 @@ function playMissSplash(x, y) {
     };
 
     splashImg.src = '../assets/splash.png';
+    // TODO: Implement way to actually play gif for splash as konva images does not support gif files
 }
 
 /*
