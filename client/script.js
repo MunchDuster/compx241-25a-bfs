@@ -43,6 +43,8 @@ let currentPlacedShipsArray = [];
 
 let isMissileMode = true;
 
+let sfx = null;
+
 /*
  *  ---- Sockets ----
  */
@@ -287,6 +289,22 @@ function playAudio() {
 }
 window.addEventListener('click', playAudio);
 
+function playsfx(sfxName) {
+    if (!sfx) {
+        sfx = new AudioContext();
+    }
+
+    const audio = new Audio(`../assets/${sfxName}.mp3`);
+    const track = sfx.createMediaElementSource(audio);
+
+    const gainNode = sfx.createGain();
+    const volumeSlider = document.getElementById('volumeSlider');
+    gainNode.gain.value = volumeSlider ? volumeSlider.value : 0.2;
+
+    track.connect(gainNode).connect(sfx.destination);
+    audio.play();
+}
+
 /*
  *  ---- In Game Functions ----
  */
@@ -339,9 +357,11 @@ function fireMissile() {
             if (!response.playerResponse.hit){
                 const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 window.playMissSplash(canvasTilepos.x, canvasTilepos.y);
+                playsfx('splash');
             } else if (response.playerResponse.hit) {
                 const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
+                playsfx('boom');
             }
             selectedTile = null;
             const tiles = stagesAndLayers.gridLayer.find('Rect');
