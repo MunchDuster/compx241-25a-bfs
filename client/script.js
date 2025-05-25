@@ -40,6 +40,9 @@ let isReady = false;
 let selectedShip = null;
 let selectedTile = null;
 
+let unplacedShipsArray = [];
+let currentPlacedShipsArray = [];
+
 /*
  *  ---- Sockets ----
  */
@@ -116,6 +119,8 @@ socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     gameRoom = joinedGameRoom;
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
     initCanvas(isPlayer1); // Initialize drawing state
+    currentPlacedShipsArray = [];
+    unplacedShipsArray = [];
     initPlacements(isPlayer1); //place ships to be moved by the player
 });
 
@@ -173,6 +178,23 @@ socket.on('see-turn', (turnInfo) => {
 /*
  *  ---- Functions ----
  */
+
+function getGameState() {
+    return {
+        isPlayer1: isPlayer1,
+        username: username,
+        oppUsername: oppUsername,
+        gameRoom: gameRoom,
+        isTurn: isTurn,
+        isReady: isReady,
+        selectedShip: selectedShip,
+        selectedTile: selectedTile,
+        unplacedShips: unplacedShipsArray,
+        currentPlacedShips: currentPlacedShipsArray
+    };
+}
+
+window.getGameState = getGameState;
 
 // Handle user clicking "Find Game" button
 function find() {

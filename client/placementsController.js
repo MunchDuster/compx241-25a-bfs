@@ -1,6 +1,7 @@
 let isCurrentPlayerP1 = null;
-let unplacedShips = [];
-let currentPlacedShips = [];
+let gameState = null;
+let unplacedShips = null;
+let currentPlacedShips = null;
 let draggedShip = null;
 let drawerValues = null;
 let stagesAndLayers = null;
@@ -16,8 +17,11 @@ const SHIP_DEFINITIONS = [
 
 function initPlacements(isPlayer1) {
     isCurrentPlayerP1 = isPlayer1;
-    unplacedShips = [];
-    currentPlacedShips = [];
+
+    gameState = window.getGameState();
+
+    unplacedShips = gameState.unplacedShips;
+    currentPlacedShips = gameState.currentPlacedShips;
 
     drawerValues = window.getDrawerValues();
     stagesAndLayers = window.getStageAndLayers();
@@ -324,9 +328,8 @@ function placeShip(konvaShip) {
                     y: snappedCanvasPos.y + drawerValues.TILE_SIZE / 2 + verticalOffset
                 });
 
-                konvaShip.draggable(false);
+                //konvaShip.draggable(false);
                 konvaShip.moveTo(stagesAndLayers.shipLayer);
-
                 currentPlacedShips.push(ship);
                 shipPlaced = true;
             }
@@ -350,6 +353,14 @@ function placeShip(konvaShip) {
     stagesAndLayers.shipPlacementLayer.batchDraw();
     stagesAndLayers.shipLayer.batchDraw();
     window.highlightShipSnapCells([], false);
+}
+
+function lockShips() {
+    currentPlacedShips.forEach(ship => {
+        ship.isPlaced = true;
+        ship.konvaImg.draggable(false);
+    });
+    stagesAndLayers.shipLayer.batchDraw();
 }
 
 window.initPlacements = initPlacements;
