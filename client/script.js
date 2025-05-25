@@ -23,7 +23,7 @@ const findListContainer = document.getElementById('find-list');
 const usernameDisplays = document.querySelectorAll('.username-display:not([id="opp"])');
 const oppUsernameDisplay = document.getElementById('opp');
 const fireButton = document.getElementById('fire-button');
-const scanButton = document.getElementById('scan-button');
+const toggleMissileModeButton = document.getElementById('toggle-missile-mode-button');
 
 /*
  *  ---- Game State Variables ----
@@ -40,6 +40,8 @@ let selectedTile = null;
 
 let unplacedShipsArray = [];
 let currentPlacedShipsArray = [];
+
+let isMissileMode = true;
 
 /*
  *  ---- Sockets ----
@@ -153,7 +155,7 @@ socket.on('turn-start', () => {
     document.getElementById('ship-placement-controls').classList.add('hidden');
     document.getElementById('game-controls').classList.remove('hidden');
     fireButton.disabled = false;
-    scanButton.disabled = false;
+    toggleMissileModeButton.disabled = false;
 });
 
 // Handle turn wait? 
@@ -163,7 +165,7 @@ socket.on('wait-start', () => {
     document.getElementById('ship-placement-controls').classList.add('hidden');
     document.getElementById('game-controls').classList.remove('hidden');
     fireButton.disabled = true;
-    scanButton.disabled = true;
+    toggleMissileModeButton.disabled = true;
 });
 
 socket.on('see-turn', (turnInfo) => {
@@ -182,7 +184,7 @@ socket.on('see-turn', (turnInfo) => {
     }
 
     if (gameState.isOver) {
-
+        
     }
 });
 
@@ -315,11 +317,17 @@ function playerTurn() {
     socket.emit('player-move', action, xpos, ypos);
 }
 
+function toggleMissileMode() {
+    isMissileMode = !isMissileMode;
+    toggleMissileModeButton.innerText = isMissileMode ? 'Switch to Scan' : 'Switch to Missile';
+    console.log('Switching to ' + (isMissileMode ? 'Missile' : 'Scan'));
+}
+
 function fireMissile() {
     if (!isTurn || !selectedTile) return; // return for now
 
     const turn = {
-        type: 'TURN_TYPE.Missile',
+        type: isMissileMode ? 'missile' : 'recon-missile',
         targetTile: {
             x: selectedTile.x,
             y: selectedTile.y
@@ -328,25 +336,12 @@ function fireMissile() {
     console.log("Firing");
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
-        const result = response.result;
-        // Pizza 🍕
-    });
-}
 
-function scanForMine() {
-    if (!isTurn || !selectedTile) return; // return for now
-
-    const turn = {
-        type: 'TURN_TYPE.Recon',
-        targetTile: {
-            x: selectedTile.x,
-            y: selectedTile.y
+        if (success) {
+            selectedTile = null;
+            const tiles = stagesAndLayers.gridLayer.find('Rect');
+            tiles.forEach(t => t.fill('#5F85B5'));
+            stagesAndLayers.gridLayer.batchDraw();
         }
-    };
-
-    socket.emit('play-turn', turn, (response) => {
-        const success = response.success;
-        const result = response.result;
-        // 😎😎
     });
 }
