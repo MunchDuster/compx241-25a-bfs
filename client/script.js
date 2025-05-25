@@ -336,6 +336,10 @@ function fireMissile() {
         console.log(response);
 
         if (success) {
+            if (!response.playerResponse.hit){
+                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
+                window.playMissSplash(canvasTilepos.x, canvasTilepos.y);
+            }
             selectedTile = null;
             const tiles = stagesAndLayers.gridLayer.find('Rect');
             tiles.forEach(t => t.fill('#5F85B5'));
