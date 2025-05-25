@@ -169,17 +169,14 @@ socket.on('wait-start', () => {
 });
 
 socket.on('see-turn', (turnInfo) => {
-    const {gameState, turn, result} = turnInfo;
+    const {gameState, type, result} = turnInfo;
 
-    switch(turn.type) {
-        case TURN_TYPE.Missile:
-            
+    switch(type) {
+        case 'missile':
+            console.log('See Turn: Missile ', result);
             break;
-        case TURN_TYPE.Recon:
-
-            break;
-        case TURN_TYPE.Move:
-
+        case 'secret':
+            console.log('Opponent made a move')
             break;
     }
 
@@ -336,6 +333,7 @@ function fireMissile() {
     console.log("Firing");
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
+        console.log(response);
 
         if (success) {
             selectedTile = null;
