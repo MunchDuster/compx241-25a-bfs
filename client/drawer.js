@@ -221,7 +221,42 @@ function playHitExplosion(x, y) {
     // TODO: Implement way to actually play gif for explosion as konva images does not support gif files
 }
 
+function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
+    let currentFrame = 0;
+    let frame = null;
 
+    function showNextFrame() {
+        const frameImg = new Image();
+        frameImg.onload = function() {
+            if (frame) {
+                frame.destroy();
+            }
+            frame = new Konva.Image({
+                x: x,
+                y: y,
+                image: frameImg,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+            });
+            feedbackLayer.add(frame);
+            feedbackLayer.batchDraw();
+            
+            if (currentFrame < totalFrames - 1) {
+                currentFrame++;
+                setTimeout(showNextFrame, frameDuration);
+            } else {
+                setTimeout(() => {
+                    frame.destroy();
+                    feedbackLayer.batchDraw();
+                }, frameDuration);
+            }
+        };
+        
+        frameImg.src = `../assets/${gifname}/${currentFrame}.${filetype}`;
+    }
+
+    showNextFrame();
+}
 
 /*
  * ---- Helper Functions ----
