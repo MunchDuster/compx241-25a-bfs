@@ -339,6 +339,9 @@ function fireMissile() {
             if (!response.playerResponse.hit){
                 const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 window.playMissSplash(canvasTilepos.x, canvasTilepos.y);
+            } else if (response.playerResponse.hit) {
+                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
+                window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
             }
             selectedTile = null;
             const tiles = stagesAndLayers.gridLayer.find('Rect');

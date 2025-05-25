@@ -196,6 +196,33 @@ function playMissSplash(x, y) {
     // TODO: Implement way to actually play gif for splash as konva images does not support gif files
 }
 
+function playHitExplosion(x, y) {
+    console.log("Hit Explosion");
+    const explosionImg = new Image();
+    explosionImg.onload = function() {
+        const explosion = new Konva.Image({
+            x: x,
+            y: y,
+            image: explosionImg,
+            width: TILE_SIZE,
+            height: TILE_SIZE,
+        })
+
+        feedbackLayer.add(explosion);
+        feedbackLayer.batchDraw();
+
+        setTimeout(() => {
+            explosion.destroy();
+            feedbackLayer.batchDraw();
+        }, 1000);
+    };
+
+    explosionImg.src = '../assets/boom.png';
+    // TODO: Implement way to actually play gif for explosion as konva images does not support gif files
+}
+
+
+
 /*
  * ---- Helper Functions ----
  */
