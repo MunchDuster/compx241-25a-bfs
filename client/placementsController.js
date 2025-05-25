@@ -353,6 +353,7 @@ function placeShip(konvaShip) {
     stagesAndLayers.shipPlacementLayer.batchDraw();
     stagesAndLayers.shipLayer.batchDraw();
     window.highlightShipSnapCells([], false);
+    window.updateReadyButton();
 }
 
 function lockShips() {
