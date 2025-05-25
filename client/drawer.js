@@ -68,13 +68,27 @@ function drawSingleBoard(startX, gridNum) {
 
                     this.fill(this.fill() === '#5F85B5' ? '#4CAF50' : '#5F85B5');
 
-                    const tilePos = { x: this.gridx(), y: this.gridy() };
-                    window.setSelectedTile(tilePos.x, tilePos.y);
+                    window.setSelectedTile(x, y);
 
                     gridLayer.batchDraw();
                 });
-            }
 
+                tileRect.on('mouseover', function() {
+                    const gameState = window.getGameState();
+                    if (!gameState.isReady || !gameState.isTurn) return;
+
+                    document.body.style.cursor = 'pointer';
+                    this.stroke('#4CAF50');
+                })
+
+                tileRect.on('mouseout', function() {
+                    const gameState = window.getGameState();
+                    if (!gameState.isReady || !gameState.isTurn) return;
+
+                    document.body.style.cursor = 'default';
+                    this.stroke('#234668');
+                })
+            }
 
             gridLayer.add(tileRect);
 
