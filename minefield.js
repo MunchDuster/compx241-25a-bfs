@@ -1,40 +1,50 @@
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 10;
-const NUM_OF_MINES = 10;
+const NUM_OF_MINES = 20;
 
 class Minefield {
     constructor(user1Ships, user2Ships) {
         this.NUM_OF_MINES= NUM_OF_MINES;
-        this.mineArray = [BOARD_HEIGHT*BOARD_WIDTH];
+        this.mineArray = [BOARD_HEIGHT * BOARD_WIDTH];
         this.mineArray.fill(false);
+        this.initializeMines(user1Ships, user2Ships);
+    }
 
-        const availableTiles = []; // const pointer to array
-        const gridSize = 10;
-        for (let x = 0; x < gridSize; x++) {
-            for (let y = 0; y < gridSize; y++) {
+    initializeMines(user1Ships, user2Ships) {
+        const availableTiles = this.getInitialAvailableTiles();
+        this.removeShipTiles(availableTiles, user1Ships);
+        this.removeShipTiles(availableTiles, user2Ships);
+        this.placeMinesRandomly(availableTiles);
+    }
+
+    getInitialAvailableTiles() {
+        const availableTiles = [];
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+            for (let y = 0; y < BOARD_HEIGHT; y++) {
                 availableTiles.push({x: x, y: y});
             }
         }
+        return availableTiles;
+    }
 
-        function removeAvailableTiles(userShips) {
-            for (let ship of userShips) {
-                for (let tile of ship.tiles) {
-                    const index = availableTiles.indexOf(tile);
-                    if(index != -1) {
-                        availableTiles.splice(index, 1);
-                    }
+    removeShipTiles(availableTiles, userShips) {
+        for (let ship of userShips) {
+            for (let tile of ship.tiles) {
+                const index = availableTiles.indexOf(tile);
+                if(index != -1) {
+                    availableTiles.splice(index, 1);
                 }
             }
         }
-        function randomInt(min, max) {
-            return Math.floor((max - min) * Math.random() + min);
-        }
+    }
 
-        removeAvailableTiles(user1Ships);
-        removeAvailableTiles(user2Ships);
+    randomInt(min, max) {
+        return Math.floor((max - min) * Math.random() + min);
+    }
 
+    placeMinesRandomly(availableTiles) {
         for(let i = 0; i < this.NUM_OF_MINES; i++) {
-            const index = randomInt(0, availableTiles.length);
+            const index = this.randomInt(0, availableTiles.length);
             const tile = availableTiles[index];
             this.placeMine(tile);
             availableTiles.splice(index, 1);
@@ -68,4 +78,4 @@ class Minefield {
     }
 }
 
-module.exports = Minefield;
+export default Minefield;
