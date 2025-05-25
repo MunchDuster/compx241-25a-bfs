@@ -14,6 +14,10 @@ const GRID_X_OFFSET_P2 = PLAYER_GRID_WIDTH;
 
 let isUserPlayer1;
 
+/*
+ * ---- Draw Functions ----
+ */
+
 function initCanvas(isPlayer1) {
     stage = new Konva.Stage({
         container: 'game-board',
@@ -167,6 +171,33 @@ function highlightShipSnapCells(cells, isValid) {
     feedbackLayer.batchDraw();
 }
 
+function playMissSplash(x, y) {
+    const splashImg = new Image();
+    splashImg.onload = function() {
+        const splash = new Konva.Image({
+            x: x,
+            y: y,
+            image: splashImg,
+            width: TILE_SIZE,
+            height: TILE_SIZE,
+        })
+
+        feedbackLayer.add(splash);
+        feedbackLayer.batchDraw();
+
+        setTimeout(() => {
+            splash.destroy();
+            feedbackLayer.batchDraw();
+        }, 1000);
+    };
+
+    splashImg.src = '../assets/splash.gif';
+}
+
+/*
+ * ---- Helper Functions ----
+ */
+
 function getGridPosFromCanvasPos(canvasX, canvasY, gridStartX) {
     const relativeX = canvasX - gridStartX;
     const relativeY = canvasY;
@@ -215,9 +246,17 @@ function getStageAndLayers() {
     };
 }
 
+/*
+ * ---- Exports ----
+ */
+
+// Draw Functions
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
 window.highlightShipSnapCells = highlightShipSnapCells;
+window.playMissSplash = playMissSplash;
+
+// Helper Functions
 window.getDrawerValues = getDrawerValues;
 window.getStageAndLayers = getStageAndLayers;
 window.getCanvasPosFromGridPos = getCanvasPosFromGridPos;
