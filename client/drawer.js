@@ -153,7 +153,7 @@ function highlightShipSnapCells(cells, isValid) {
 
     const color = isValid ? 'rgba(0,255,0,0.4)' : 'rgba(255,0,0,0.4)';
     cells.forEach(cell => {
-        const gridNum = isUserPlayer1 ? 1 : 2;
+        const gridNum = 1;
         const pos = window.getCanvasPosFromGridPos(cell.x, cell.y, gridNum);
 
         const rect = new Konva.Rect({
@@ -172,6 +172,7 @@ function highlightShipSnapCells(cells, isValid) {
 }
 
 function playMissSplash(x, y) {
+    console.log("Miss Splash");
     const splashImg = new Image();
     splashImg.onload = function() {
         const splash = new Konva.Image({
@@ -191,7 +192,7 @@ function playMissSplash(x, y) {
         }, 1000);
     };
 
-    splashImg.src = '../assets/splash.gif';
+    splashImg.src = '../assets/splash.png';
 }
 
 /*
@@ -214,7 +215,12 @@ function getGridPosFromCanvasPos(canvasX, canvasY, gridStartX) {
 
 
 function getCanvasPosFromGridPos(gridX, gridY, gridNum) {
-    const gridXOffset = gridNum === 1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
+    let gridXOffset;
+    if (isUserPlayer1) {
+        gridXOffset = gridNum == 1 ? GRID_X_OFFSET_P1 : GRID_X_OFFSET_P2;
+    } else {
+        gridXOffset = gridNum == 1 ? GRID_X_OFFSET_P2 : GRID_X_OFFSET_P1;
+    }
     
     return {
         x: gridXOffset + (TILE_SIZE / 2) + (gridX * (TILE_SIZE + OFFSET)),
