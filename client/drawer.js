@@ -228,9 +228,12 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
     function showNextFrame() {
         const frameImg = new Image();
         frameImg.onload = function() {
+            // Clear previous frame
             if (frame) {
                 frame.destroy();
             }
+
+            // Create new frame and show it
             frame = new Konva.Image({
                 x: x,
                 y: y,
@@ -241,10 +244,15 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
             feedbackLayer.add(frame);
             feedbackLayer.batchDraw();
             
+            // Check if there are more frames
             if (currentFrame < totalFrames - 1) {
                 currentFrame++;
+                // Set timeout works by after a certain amount of time it calls a function
+                // Here it calls the showNextFrame function "recursively" though not true recursion
+                // As it only calls itself total frames times
                 setTimeout(showNextFrame, frameDuration);
             } else {
+                // Last frame so destroy it and stop animating
                 setTimeout(() => {
                     frame.destroy();
                     feedbackLayer.batchDraw();
