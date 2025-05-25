@@ -271,8 +271,6 @@ class Game {
     }
 
     nextTurn() {
-        this.isUser1sTurn = !this.isUser1sTurn;
-
         if (this.isUser1sTurn) {
             this.user1.callbacks.turnBegin();
             this.user2.callbacks.waitBegin();
@@ -281,6 +279,8 @@ class Game {
             this.user2.callbacks.turnBegin();
             this.user1.callbacks.waitBegin();
         }
+
+        this.isUser1sTurn = !this.isUser1sTurn;
     }
 }
 
