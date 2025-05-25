@@ -52,8 +52,30 @@ function drawSingleBoard(startX, gridNum) {
                 x: xPos, y: yPos,
                 width: TILE_SIZE, height: TILE_SIZE,
                 fill: '#5F85B5', stroke: '#234668', strokeWidth: 1,
+                gridnum: gridNum, gridx: x, gridy: y,
                 name: `tile ${gridNum} ${x}-${y}`
             });
+
+            const isEnemyGrid = gridNum == 2;
+            if (isEnemyGrid) {
+                tileRect.on('click', function() {
+                    const gameState = window.getGameState();
+                    if (!gameState.isReady || !gameState.isTurn) return;
+
+                    gridLayer.find('Rect').forEach(tile => {
+                        tile.fill('#5F85B5');
+                    });
+
+                    this.fill(this.fill() === '#5F85B5' ? '#4CAF50' : '#5F85B5');
+
+                    const tilePos = { x: this.gridx(), y: this.gridy() };
+                    window.setSelectedTile(tilePos.x, tilePos.y);
+
+                    gridLayer.batchDraw();
+                });
+            }
+
+
             gridLayer.add(tileRect);
 
             console.log(`Tile (${x}, ${y}, ${gridNum}) at position (${xPos}, ${yPos})`);
