@@ -173,52 +173,12 @@ function highlightShipSnapCells(cells, isValid) {
 
 function playMissSplash(x, y) {
     console.log("Miss Splash");
-    const splashImg = new Image();
-    splashImg.onload = function() {
-        const splash = new Konva.Image({
-            x: x,
-            y: y,
-            image: splashImg,
-            width: TILE_SIZE,
-            height: TILE_SIZE,
-        })
-
-        feedbackLayer.add(splash);
-        feedbackLayer.batchDraw();
-
-        setTimeout(() => {
-            splash.destroy();
-            feedbackLayer.batchDraw();
-        }, 1000);
-    };
-
-    splashImg.src = '../assets/splash.png';
-    // TODO: Implement way to actually play gif for splash as konva images does not support gif files
+    animateGif(x, y, 9, 100, 'miss');
 }
 
 function playHitExplosion(x, y) {
     console.log("Hit Explosion");
-    const explosionImg = new Image();
-    explosionImg.onload = function() {
-        const explosion = new Konva.Image({
-            x: x,
-            y: y,
-            image: explosionImg,
-            width: TILE_SIZE,
-            height: TILE_SIZE,
-        })
-
-        feedbackLayer.add(explosion);
-        feedbackLayer.batchDraw();
-
-        setTimeout(() => {
-            explosion.destroy();
-            feedbackLayer.batchDraw();
-        }, 1000);
-    };
-
-    explosionImg.src = '../assets/boom.png';
-    // TODO: Implement way to actually play gif for explosion as konva images does not support gif files
+    animateGif(x, y, 8, 100, 'explosion');
 }
 
 function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
