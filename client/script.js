@@ -174,8 +174,8 @@ socket.on('see-turn', (turnInfo) => {
     const {gameState, type, result} = turnInfo;
     console.log('see-turn', turnInfo);
     if (type === 'missile') {
-        const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
-        if (result.hit) {
+        if (result.hit && result.ship) {
+            const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
             window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
             playsfx('boom');
             setTimeout(() => {
