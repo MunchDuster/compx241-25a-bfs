@@ -351,20 +351,23 @@ function fireMissile() {
         const success = response.success;
         console.log(response);
 
-        if (success) {
-            if (!response.playerResponse.hit){
-                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
-                window.playMissSplash(canvasTilepos.x, canvasTilepos.y);
-                playsfx('splash');
-            } else if (response.playerResponse.hit) {
-                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
-                window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
-                playsfx('boom');
+        if (turn.type == 'missile') {
+            if (success) {
+                if (!response.playerResponse.hit){
+                    const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
+                    window.playMissSplash(canvasTilepos.x, canvasTilepos.y);
+                    playsfx('splash');
+                } else if (response.playerResponse.hit) {
+                    const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
+                    window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
+                    playsfx('boom');
+                }
             }
-            selectedTile = null;
-            const tiles = stagesAndLayers.gridLayer.find('Rect');
-            tiles.forEach(t => t.fill('#5F85B5'));
-            stagesAndLayers.gridLayer.batchDraw();
         }
+
+        selectedTile = null;
+        const tiles = stagesAndLayers.gridLayer.find('Rect');
+        tiles.forEach(t => t.fill('#5F85B5'));
+        stagesAndLayers.gridLayer.batchDraw();
     });
 }
