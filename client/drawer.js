@@ -311,6 +311,8 @@ window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
 window.highlightShipSnapCells = highlightShipSnapCells;
 window.playMissSplash = playMissSplash;
+window.playHitExplosion = playHitExplosion;
+window.renderShipDamage = renderShipDamage;
 
 // Helper Functions
 window.getDrawerValues = getDrawerValues;
