@@ -265,7 +265,6 @@ function getGridPosFromCanvasPos(canvasX, canvasY, gridStartX) {
     return null;
 }
 
-
 function getCanvasPosFromGridPos(gridX, gridY, gridNum) {
     let gridXOffset;
     if (isUserPlayer1) {
