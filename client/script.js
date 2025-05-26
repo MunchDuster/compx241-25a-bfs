@@ -333,6 +333,7 @@ function playerTurn() {
 function toggleMissileMode() {
     isMissileMode = !isMissileMode;
     toggleMissileModeButton.innerText = isMissileMode ? 'Switch to Scan' : 'Switch to Missile';
+    fireButton.innerText = isMissileMode ? 'Fire Missile' : 'Fire Recon Missile';
     console.log('Switching to ' + (isMissileMode ? 'Missile' : 'Scan'));
 }
 
