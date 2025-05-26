@@ -245,6 +245,8 @@ function renderShipDamage(x, y) {
     damageImg.src = `../assets/damage_${randDamageSprite}.png`;
 }
 
+
+
 /*
  * ---- Helper Functions ----
  */
@@ -300,6 +302,22 @@ function getStageAndLayers() {
         feedbackLayer,
         shipPlacementLayer
     };
+}
+
+function getMineCountColor(count) {
+    switch(count) {
+        // i love mine sweeper 💥🧹
+        case 0: return '#808080'; // Gray
+        case 1: return '#0000FF'; // Blue
+        case 2: return '#008000'; // Green
+        case 3: return '#FF0000'; // Red
+        case 4: return '#000080'; // Dark Blue
+        case 5: return '#800000'; // Maroon
+        case 6: return '#008080'; // Teal
+        case 7: return '#000000'; // Black
+        case 8: return '#808080'; // Gray
+        default: return '#000000';
+    }
 }
 
 /*
