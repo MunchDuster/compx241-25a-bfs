@@ -187,17 +187,19 @@ function highlightShipSnapCells(cells, isValid) {
     feedbackLayer.batchDraw();
 }
 
-function playMissSplash(x, y) {
+function playMissSplash(x, y, showPermanentImage = false) {
     console.log("Miss Splash");
-    animateGif(x, y, 9, 100, 'splash', 'gif');
+    const permaImagePath = showPermanentImage ? '../assets/perma-miss.png' : null;
+    animateGif(x, y, 9, 100, 'splash', 'gif', permaImagePath);
 }
 
-function playHitExplosion(x, y) {
+function playHitExplosion(x, y, showPermanentImage = false) {
     console.log("Hit Explosion");
-    animateGif(x, y, 8, 100, 'boom', 'gif');
+    const permaImagePath = showPermanentImage ? '../assets/perma-hit.png' : null;
+    animateGif(x, y, 8, 100, 'boom', 'gif', permaImagePath);
 }
 
-function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
+function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, permaImagePath) {
     let currentFrame = 0;
     let frame = null;
 
@@ -219,6 +221,10 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
             });
             feedbackLayer.add(frame);
             feedbackLayer.batchDraw();
+
+            if (permaImagePath !== null && frameImg.src === permaImagePath) {
+                return;
+            }
             
             // Check if there are more frames
             if (currentFrame < totalFrames - 1) {
@@ -230,6 +236,10 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
             } else {
                 // Last frame so destroy it and stop animating
                 setTimeout(() => {
+                    if (permaImagePath != null) {
+                        frameImg.src = permaImagePath;
+                        return;
+                    }
                     frame.destroy();
                     feedbackLayer.batchDraw();
                 }, frameDuration);

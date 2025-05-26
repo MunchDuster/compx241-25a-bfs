@@ -356,10 +356,10 @@ function fireMissile() {
             if (success) {
                 const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 if (!response.playerResponse.hit){
-                    window.playMissSplash(canvasTilepos.x, canvasTilepos.y);
+                    window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
                     playsfx('splash');
                 } else if (response.playerResponse.hit) {
-                    window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
+                    window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
                     playsfx('boom');
                 }
             }
