@@ -252,8 +252,8 @@ function showMineCount(x, y, count) {
         width: TILE_SIZE,
         height: TILE_SIZE,
         text: count.toString(),
-        fontSize: TILE_SIZE / 2,
-        fontFamily: 'Arial',
+        fontSize: TILE_SIZE,
+        fontFamily: 'Micro 5',
         fill: getMineCountColor(count),
         align: 'center',
         verticalAlign: 'middle'
