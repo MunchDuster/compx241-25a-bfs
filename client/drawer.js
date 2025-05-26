@@ -261,6 +261,22 @@ function showMineCount(x, y, count) {
 
     feedbackLayer.add(text);
     feedbackLayer.batchDraw();
+
+    // Fade out animation
+    const fadeOut = new Konva.Tween({
+        node: text,
+        duration: 2, // 2 seconds
+        opacity: 0,
+        onFinish: () => {
+            text.destroy();
+            feedbackLayer.batchDraw();
+        }
+    });
+
+    // Start fade after 3 seconds
+    setTimeout(() => {
+        fadeOut.play();
+    }, 2000);
 }
 
 
