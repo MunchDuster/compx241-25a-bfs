@@ -363,7 +363,8 @@ function fireMissile() {
                 }
             }
         } else if (turn.type == 'recon-missile') {
-            
+            const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
+            window.showMineCount(canvasTilepos.x, canvasTilepos.y, response.playerResponse.mineCount);
         }
 
         selectedTile = null;
