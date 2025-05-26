@@ -353,16 +353,17 @@ function fireMissile() {
 
         if (turn.type == 'missile') {
             if (success) {
+                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 if (!response.playerResponse.hit){
-                    const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                     window.playMissSplash(canvasTilepos.x, canvasTilepos.y);
                     playsfx('splash');
                 } else if (response.playerResponse.hit) {
-                    const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                     window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
                     playsfx('boom');
                 }
             }
+        } else if (turn.type == 'recon-missile') {
+            
         }
 
         selectedTile = null;
