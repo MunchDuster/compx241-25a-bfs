@@ -245,6 +245,23 @@ function renderShipDamage(x, y) {
     damageImg.src = `../assets/damage_${randDamageSprite}.png`;
 }
 
+function showMineCount(x, y, count) {
+    const text = new Konva.Text({
+        x: x,
+        y: y,
+        width: TILE_SIZE,
+        height: TILE_SIZE,
+        text: count.toString(),
+        fontSize: TILE_SIZE / 2,
+        fontFamily: 'Arial',
+        fill: getMineCountColor(count),
+        align: 'center',
+        verticalAlign: 'middle'
+    });
+
+    feedbackLayer.add(text);
+    feedbackLayer.batchDraw();
+}
 
 
 /*
@@ -330,6 +347,7 @@ window.highlightShipSnapCells = highlightShipSnapCells;
 window.playMissSplash = playMissSplash;
 window.playHitExplosion = playHitExplosion;
 window.renderShipDamage = renderShipDamage;
+window.showMineCount = showMineCount;
 
 // Helper Functions
 window.getDrawerValues = getDrawerValues;
