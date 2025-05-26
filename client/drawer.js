@@ -226,6 +226,25 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
     showNextFrame();
 }
 
+function renderShipDamage(x, y) {
+    // Generate a random number from 0 to 3 for the damage sprite
+    const randDamageSprite = Math.floor(Math.random() * 4);
+    const damageImg = new Image();
+    damageImg.onload = function() {
+        const damageImage = new Konva.Image({
+            x: x,
+            y: y,
+            image: damageImg,
+            width: TILE_SIZE,
+            height: TILE_SIZE,
+        });
+        // Draw on ship layer as it is like part of the ship or smth 
+        shipLayer.add(damageImage);
+        shipLayer.batchDraw();
+    };
+    damageImg.src = `../assets/damage_${randDamageSprite}.png`;
+}
+
 /*
  * ---- Helper Functions ----
  */
