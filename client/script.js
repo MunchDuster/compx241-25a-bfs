@@ -172,14 +172,16 @@ socket.on('wait-start', () => {
 
 socket.on('see-turn', (turnInfo) => {
     const {gameState, type, result} = turnInfo;
-
-    switch(type) {
-        case 'missile':
-            console.log('See Turn: Missile ', result);
-            break;
-        case 'secret':
-            console.log('Opponent made a move')
-            break;
+    console.log('see-turn', turnInfo);
+    if (type === 'missile') {
+        const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
+        if (result.hit) {
+            window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
+            playsfx('boom');
+            setTimeout(() => {
+                window.renderShipDamage(canvasTilepos.x, canvasTilepos.y);
+            }, 800);
+        }
     }
 
     if (gameState.isOver) {
