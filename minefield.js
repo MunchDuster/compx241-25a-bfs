@@ -57,7 +57,12 @@ class Minefield {
     }
     
     isMissileHit(x, y) {
-        return this.mineArray[y*10+x] === true;
+        const mineIndex = (y * 10) + x;
+        const wasHit = this.mineArray[mineIndex] === true;
+        if (wasHit) {
+            this.mineArray[mineIndex] = false;
+        }
+        return wasHit;
     }
 
     receiveReconHit(xCentre, yCentre) {
