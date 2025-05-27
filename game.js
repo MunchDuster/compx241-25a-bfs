@@ -191,6 +191,7 @@ class Game {
                 }
 
                 const isMineHit = this.minefield.isMissileHit(x, y);
+                console.log(`${currentUser.name} hit mine at ${x}, ${y}?: ${isMineHit}`);
                 let shipHit = null;
 
                 for (const ship of opponentUser.ships) {
@@ -202,6 +203,7 @@ class Game {
                 }
 
                 if (shipHit) {
+                    console.log(`${currentUser.name} Hit ship ${shipHit.type} at ${x}, ${y}`);
                     return {
                         success: true,
                         result: {hit: true, tile: turn.targetTile, ship: shipHit.type},
