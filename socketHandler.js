@@ -82,15 +82,16 @@ function SocketHandler(socket, io) {
         // Do not send what the player hit, e.g. type of ship / mines
         const playerResponse = turn.type == 'missile' ? { hit: result.hit, tile: result.tile,} : result;
 
+        const gameOver = game.checkGameOver();
         // Send callback to player who made turn
-        callback({success, playerResponse});
+        callback({success, playerResponse, gameOver});
         
         if (!success) {
             console.log('turn ' + turn.type + ' failed, reason: ', result);
             return;
         }
 
-        const gameOver = game.checkGameOver();
+        // const gameOver = game.checkGameOver();
 
         // other player only sees missile or secret (they dont get move or recon info)
         const seeTurn = {
