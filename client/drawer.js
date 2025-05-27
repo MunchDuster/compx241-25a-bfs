@@ -45,7 +45,7 @@ function initCanvas(isPlayer1) {
 async function preloadFont() {
     if (fontLoaded) return;
     
-    const font = new FontFace('Micro 5', 'url(../assets/fonts/Micro5-Regular.ttf)');
+    const font = new FontFace('\"Micro 5\"', 'url(assets/fonts/Micro5-Regular.ttf)');
     try {
         await font.load();
         document.fonts.add(font);
