@@ -140,7 +140,7 @@ function drawSingleBoard(startX, gridNum) {
     for (let i = 0; i < tileRects.length; i++) {
         const tileRect = tileRects[i];
         const x = i % GRID_SIZE;
-        const y = i / GRID_SIZE;
+        const y = Math.floor(i / GRID_SIZE);
         tileRect.on('click', function() {
             const gameState = window.getGameState();
             if (!gameState.isReady || !gameState.isTurn) return;
@@ -244,14 +244,16 @@ function highlightShipSnapCells(cells, isValid) {
     feedbackLayer.batchDraw();
 }
 
-function playMissSplash(x, y, showPermanentImage = false) {
+function playMissSplash(pos, gridNum, showPermanentImage = false) {
     console.log("Miss Splash");
+    const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
     const permaImagePath = showPermanentImage ? '../assets/perma-miss.png' : null;
     animateGif(x, y, 9, 100, 'splash', 'gif', permaImagePath);
 }
 
-function playHitExplosion(x, y, showPermanentImage = false) {
+function playHitExplosion(pos, gridNum, showPermanentImage = false) {
     console.log("Hit Explosion");
+    const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
     const permaImagePath = showPermanentImage ? '../assets/perma-hit.png' : null;
     animateGif(x, y, 8, 100, 'boom', 'gif', permaImagePath);
 }

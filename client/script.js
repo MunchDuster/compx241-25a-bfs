@@ -358,18 +358,16 @@ function fireMissile() {
 
         if (turn.type == 'missile') {
             if (success) {
-                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 if (!response.playerResponse.hit){
-                    window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
+                    window.playMissSplash(selectedTile, 2, true);
                     playsfx('splash');
                 } else if (response.playerResponse.hit) {
-                    window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
+                    window.playHitExplosion(selectedTile, 2, true);
                     playsfx('boom');
                 }
             }
         } else if (turn.type == 'recon-missile') {
-            const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
-            window.showMineCount(canvasTilepos.x, canvasTilepos.y, response.playerResponse.mineCount);
+            window.showMineCount(selectedTile, 2, response.playerResponse.mineCount);
         }
 
         selectedTile = null;
