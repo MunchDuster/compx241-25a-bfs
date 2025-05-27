@@ -8,6 +8,9 @@ class Minefield {
         this.mineArray = [BOARD_HEIGHT * BOARD_WIDTH];
         this.mineArray.fill(false);
         this.initializeMines(user1Ships, user2Ships);
+
+        console.log('Initial Minefield Layout:');
+        this.printMineField();
     }
 
     initializeMines(user1Ships, user2Ships) {
@@ -15,6 +18,31 @@ class Minefield {
         this.removeShipTiles(availableTiles, user1Ships);
         this.removeShipTiles(availableTiles, user2Ships);
         this.placeMinesRandomly(availableTiles);
+    }
+
+    // For Debug purposes, remove later in final game
+    printMineField() {
+        process.stdout.write('   ');
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+            process.stdout.write(` ${x} `);
+        }
+        process.stdout.write('\n');
+
+        // Print separator line
+        process.stdout.write('   '); 
+        process.stdout.write('-'.repeat(BOARD_WIDTH * 3));
+        process.stdout.write('\n');
+
+        // Print rows with labels
+        for (let y = 0; y < BOARD_HEIGHT; y++) {
+            process.stdout.write(` ${String.fromCharCode(65 + y)} |`);
+            for (let x = 0; x < BOARD_WIDTH; x++) {
+                const index = (y * 10) + x;
+                process.stdout.write(this.mineArray[index] ? ' M ' : ' · ');
+            }
+            process.stdout.write('\n');
+        }
+        process.stdout.write('\n');
     }
 
     getInitialAvailableTiles() {
