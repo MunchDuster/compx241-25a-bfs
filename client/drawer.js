@@ -1,7 +1,8 @@
 let stage, gridLayer, shipLayer, feedbackLayer, shipPlacementLayer;
 
 const CANVAS_WIDTH = 1320;
-const CANVAS_HEIGHT = 500
+const CANVAS_HEIGHT = 525;
+const CANVAS_TOP_GAP = 25; //gap for x coord labels to go into
 const GRID_SIZE = 10;
 let fontLoaded = false;
 
@@ -36,7 +37,7 @@ function initCanvas(isPlayer1) {
 
     stage.add(gridLayer, shipLayer, feedbackLayer, shipPlacementLayer);
 
-    TILE_SIZE = Math.round(CANVAS_HEIGHT / GRID_SIZE) - OFFSET * 2;
+    TILE_SIZE = Math.round((CANVAS_HEIGHT - CANVAS_TOP_GAP) / GRID_SIZE) - OFFSET * 2;
     drawGameBoard(isPlayer1);
     console.log("Konva Drawer Initialised. Grid is on the " + (isPlayer1 ? "left" : "right"));
 }
@@ -64,9 +65,38 @@ function drawGameBoard(isPlayer1) {
 
 function drawSingleBoard(startX, gridNum) {
     for (let y = 0; y < GRID_SIZE; y++) {
+        
+        const yPos = (TILE_SIZE / 2) + (y * (TILE_SIZE + OFFSET)) + CANVAS_TOP_GAP;
+
+        const yCoordLabels = new Konva.Text({
+            x: startX - (TILE_SIZE / 2),
+            y: yPos,
+            width: TILE_SIZE,
+            height: TILE_SIZE,
+            text: y + 1,
+            fontSize: TILE_SIZE,
+            fontFamily: 'Micro 5',
+            fill: 'black',
+            align: 'center',
+            verticalAlign: 'middle'
+        });
+
         for (let x = 0; x < GRID_SIZE; x++) {
+
             const xPos = startX + (TILE_SIZE / 2) + (x * (TILE_SIZE + OFFSET));
-            const yPos = (TILE_SIZE / 2) + (y * (TILE_SIZE + OFFSET));
+
+            const xCoordLabels = new Konva.Text({
+                x: xPos,
+                y: yPos - TILE_SIZE,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                text: String.fromCharCode(65 + x), //convert x to letter using unicode values //Capital letter is A = 65 to Z = 91, lowercase is a = 97 to z = 123
+                fontSize: TILE_SIZE,
+                fontFamily: 'Micro 5',
+                fill: 'black',
+                align: 'center',
+                verticalAlign: 'middle'
+            });
 
             const tileRect = new Konva.Rect({
                 x: xPos, y: yPos,
@@ -111,6 +141,10 @@ function drawSingleBoard(startX, gridNum) {
             }
 
             gridLayer.add(tileRect);
+            gridLayer.add(yCoordLabels);
+            if(y == 0) {
+                gridLayer.add(xCoordLabels);
+            }
 
             console.log(`Tile (${x}, ${y}, ${gridNum}) at position (${xPos}, ${yPos})`);
         }
