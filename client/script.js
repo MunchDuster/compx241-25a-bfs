@@ -24,6 +24,7 @@ const usernameDisplays = document.querySelectorAll('.username-display:not([id="o
 const oppUsernameDisplay = document.getElementById('opp');
 const fireButton = document.getElementById('fire-button');
 const toggleMissileModeButton = document.getElementById('toggle-missile-mode-button');
+const moveShipButton = document.getElementById('move-ship-button');
 
 /*
  *  ---- Game State Variables ----
@@ -158,6 +159,7 @@ socket.on('turn-start', () => {
     document.getElementById('game-controls').classList.remove('hidden');
     fireButton.disabled = false;
     toggleMissileModeButton.disabled = false;
+    moveShipButton.disabled = false;
 });
 
 // Handle turn wait? 
@@ -168,6 +170,7 @@ socket.on('wait-start', () => {
     document.getElementById('game-controls').classList.remove('hidden');
     fireButton.disabled = true;
     toggleMissileModeButton.disabled = true;
+    moveShipButton.disabled = true;
 });
 
 socket.on('see-turn', (turnInfo) => {
