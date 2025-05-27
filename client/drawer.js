@@ -311,7 +311,7 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, p
     showNextFrame();
 }
 
-function renderShipDamage(pos, gridPos) {
+function renderShipDamage(pos, gridNum) {
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
 
     // Generate a random number from 0 to 3 for the damage sprite
