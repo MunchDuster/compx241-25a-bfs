@@ -244,14 +244,14 @@ function highlightShipSnapCells(cells, isValid) {
     feedbackLayer.batchDraw();
 }
 
-function playMissSplash(pos, gridNum, showPermanentImage = false) {
+function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Miss Splash");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
     const permaImagePath = showPermanentImage ? '../assets/perma-miss.png' : null;
     animateGif(x, y, 9, 100, 'splash', 'gif', permaImagePath);
 }
 
-function playHitExplosion(pos, gridNum, showPermanentImage = false) {
+function playHitExplosion(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Hit Explosion");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
     const permaImagePath = showPermanentImage ? '../assets/perma-hit.png' : null;
@@ -311,7 +311,7 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, p
     showNextFrame();
 }
 
-function renderShipDamage(pos, gridNum) {
+function renderShipDamage(pos, gridNum = 2) {
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
 
     // Generate a random number from 0 to 3 for the damage sprite
@@ -332,7 +332,8 @@ function renderShipDamage(pos, gridNum) {
     damageImg.src = `../assets/damage_${randDamageSprite}.png`;
 }
 
-function showMineCount(x, y, count) {
+function showMineCount(pos, gridNum = 2, count) {
+    const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
     const text = new Konva.Text({
         x: x,
         y: y,
