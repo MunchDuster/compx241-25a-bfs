@@ -336,6 +336,7 @@ function playerTurn() {
 function toggleMissileMode() {
     isMissileMode = !isMissileMode;
     toggleMissileModeButton.innerText = isMissileMode ? 'Switch to Scan' : 'Switch to Missile';
+    fireButton.innerText = isMissileMode ? 'Fire Missile' : 'Fire Recon Missile';
     console.log('Switching to ' + (isMissileMode ? 'Missile' : 'Scan'));
 }
 
@@ -358,10 +359,10 @@ function fireMissile() {
             if (success) {
                 const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 if (!response.playerResponse.hit){
-                    window.playMissSplash(canvasTilepos.x, canvasTilepos.y);
+                    window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
                     playsfx('splash');
                 } else if (response.playerResponse.hit) {
-                    window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
+                    window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
                     playsfx('boom');
                 }
             }

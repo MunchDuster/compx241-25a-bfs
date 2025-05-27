@@ -3,6 +3,7 @@ let stage, gridLayer, shipLayer, feedbackLayer, shipPlacementLayer;
 const CANVAS_WIDTH = 1320;
 const CANVAS_HEIGHT = 500
 const GRID_SIZE = 10;
+let fontLoaded = false;
 
 const OFFSET = 4;
 let TILE_SIZE
@@ -19,6 +20,7 @@ let isUserPlayer1;
  */
 
 function initCanvas(isPlayer1) {
+    preloadFont();
     stage = new Konva.Stage({
         container: 'game-board',
         width: CANVAS_WIDTH,
@@ -37,6 +39,20 @@ function initCanvas(isPlayer1) {
     TILE_SIZE = Math.round(CANVAS_HEIGHT / GRID_SIZE) - OFFSET * 2;
     drawGameBoard(isPlayer1);
     console.log("Konva Drawer Initialised. Grid is on the " + (isPlayer1 ? "left" : "right"));
+}
+
+async function preloadFont() {
+    if (fontLoaded) return;
+    
+    const font = new FontFace('Micro 5', 'url(../assets/fonts/Micro5-Regular.ttf)');
+    try {
+        await font.load();
+        document.fonts.add(font);
+        fontLoaded = true;
+        console.log('Micro 5 font loaded');
+    } catch (error) {
+        console.error('Failed to load Micro 5 font:', error);
+    }
 }
 
 function drawGameBoard(isPlayer1) {
@@ -171,17 +187,19 @@ function highlightShipSnapCells(cells, isValid) {
     feedbackLayer.batchDraw();
 }
 
-function playMissSplash(x, y) {
+function playMissSplash(x, y, showPermanentImage = false) {
     console.log("Miss Splash");
-    animateGif(x, y, 9, 100, 'splash', 'gif');
+    const permaImagePath = showPermanentImage ? '../assets/perma-miss.png' : null;
+    animateGif(x, y, 9, 100, 'splash', 'gif', permaImagePath);
 }
 
-function playHitExplosion(x, y) {
+function playHitExplosion(x, y, showPermanentImage = false) {
     console.log("Hit Explosion");
-    animateGif(x, y, 8, 100, 'boom', 'gif');
+    const permaImagePath = showPermanentImage ? '../assets/perma-hit.png' : null;
+    animateGif(x, y, 8, 100, 'boom', 'gif', permaImagePath);
 }
 
-function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
+function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, permaImagePath) {
     let currentFrame = 0;
     let frame = null;
 
@@ -203,6 +221,10 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
             });
             feedbackLayer.add(frame);
             feedbackLayer.batchDraw();
+
+            if (permaImagePath !== null && frameImg.src === permaImagePath) {
+                return;
+            }
             
             // Check if there are more frames
             if (currentFrame < totalFrames - 1) {
@@ -214,6 +236,10 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png) {
             } else {
                 // Last frame so destroy it and stop animating
                 setTimeout(() => {
+                    if (permaImagePath != null) {
+                        frameImg.src = permaImagePath;
+                        return;
+                    }
                     frame.destroy();
                     feedbackLayer.batchDraw();
                 }, frameDuration);
@@ -261,6 +287,22 @@ function showMineCount(x, y, count) {
 
     feedbackLayer.add(text);
     feedbackLayer.batchDraw();
+
+    // Fade out animation
+    const fadeOut = new Konva.Tween({
+        node: text,
+        duration: 2, // 2 seconds
+        opacity: 0,
+        onFinish: () => {
+            text.destroy();
+            feedbackLayer.batchDraw();
+        }
+    });
+
+    // Start fade after 3 seconds
+    setTimeout(() => {
+        fadeOut.play();
+    }, 2000);
 }
 
 
