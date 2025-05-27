@@ -183,6 +183,8 @@ socket.on('see-turn', (turnInfo) => {
             setTimeout(() => {
                 window.renderShipDamage(result.tile, 1);
             }, 800);
+        } else {
+            window.playMissSplash(result.tile, 1);
         }
     }
 
