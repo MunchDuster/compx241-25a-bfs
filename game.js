@@ -190,27 +190,28 @@ class Game {
                     };
                 }
 
-                if (this.minefield.isMissileHit(x, y)) {
-                    return {
-                        success: true,
-                        result: {hit: true, tile: turn.targetTile}
-                    };
-                }
+                const isMineHit = this.minefield.isMissileHit(x, y);
+                let shipHit = null;
 
                 for (const ship of opponentUser.ships) {
                     if (ship.isHit(x, y)) {
                         ship.hit(x, y);
-                        return {
-                            success: true,
-                            result: {hit: true, tile: turn.targetTile, ship: ship.type},
-                        };
+                        shipHit = ship;
+                        break;
                     }
                 }
 
-                // No hit
+                if (shipHit) {
+                    return {
+                        success: true,
+                        result: {hit: true, tile: turn.targetTile, ship: shipHit.type},
+                    };
+                }
+
+                // No hit or only mine hit
                 return {
                     success: true,
-                    result: {hit: false, tile: turn.targetTile},
+                    result: {hit: isMineHit, tile: turn.targetTile},
                 };
             case TURN_TYPE.Recon:
                 //Check tile input is correct
