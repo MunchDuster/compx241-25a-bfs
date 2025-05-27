@@ -65,7 +65,39 @@ function drawGameBoard(isPlayer1) {
     gridLayer.batchDraw();
 }
 
+function drawGridLabels(startX) {
+    const genericTextStuff = {
+        fontSize: TILE_SIZE,
+        fontFamily: 'Micro 5',
+        fill: 'black',
+        align: 'center',
+        verticalAlign: 'middle',
+        width: TILE_SIZE,
+        height: TILE_SIZE,
+    };
+
+    for (let y = 0; y < GRID_SIZE; y++) {
+        const yPos = (TILE_SIZE / 2) + (y * (TILE_SIZE + OFFSET)) + CANVAS_TOP_GAP;
+        new Konva.Text({
+            x: startX - (TILE_SIZE / 2),
+            y: yPos,
+            text: y + 1,
+            ...genericTextStuff
+        });
+    }
+    for (let x = 0; x < GRID_SIZE; x++) {
+        const xPos = startX + (TILE_SIZE / 2) + (x * (TILE_SIZE + OFFSET));
+        new Konva.Text({
+            x: xPos,
+            y: TILE_SIZE/2,
+            text: String.fromCharCode(65 + x), //convert x to letter using unicode values //Capital letter is A = 65 to Z = 91, lowercase is a = 97 to z = 123
+            ...genericTextStuff
+        });
+    }
+}
+
 function drawSingleBoard(startX, gridNum) {
+    drawGridLabels();
     for (let y = 0; y < GRID_SIZE; y++) {
         
         const yPos = (TILE_SIZE / 2) + (y * (TILE_SIZE + OFFSET)) + CANVAS_TOP_GAP;
