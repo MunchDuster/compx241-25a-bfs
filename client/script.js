@@ -188,7 +188,7 @@ socket.on('see-turn', (turnInfo) => {
     }
 
     if (gameState.isOver) {
-        
+        showMenu('find');
     }
 });
 
@@ -353,6 +353,7 @@ function fireMissile() {
     console.log("Firing");
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
+        const gameOver = response.gameOver;
         console.log(response);
 
         if (turn.type == 'missile') {
@@ -375,5 +376,8 @@ function fireMissile() {
         const tiles = stagesAndLayers.gridLayer.find('Rect');
         tiles.forEach(t => t.fill('#5F85B5'));
         stagesAndLayers.gridLayer.batchDraw();
+        if(gameOver) {
+            showMenu('find');
+        }
     });
 }
