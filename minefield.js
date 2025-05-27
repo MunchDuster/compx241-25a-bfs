@@ -8,15 +8,15 @@ class Minefield {
         this.mineArray = [BOARD_HEIGHT * BOARD_WIDTH];
         this.mineArray.fill(false);
         this.initializeMines(user1Ships, user2Ships);
-
         console.log('Initial Minefield Layout:');
         this.printMineField();
+        // this.debugShowMines();
     }
 
     initializeMines(user1Ships, user2Ships) {
-        const availableTiles = this.getInitialAvailableTiles();
-        this.removeShipTiles(availableTiles, user1Ships);
-        this.removeShipTiles(availableTiles, user2Ships);
+        let availableTiles = this.getInitialAvailableTiles();
+        availableTiles = this.removeShipTiles(availableTiles, user1Ships);
+        availableTiles = this.removeShipTiles(availableTiles, user2Ships);
         this.placeMinesRandomly(availableTiles);
     }
 
@@ -56,14 +56,23 @@ class Minefield {
     }
 
     removeShipTiles(availableTiles, userShips) {
+        if (availableTiles == null) {
+            console.error('available tiles array null!');
+            return;
+        }
         for (let ship of userShips) {
             for (let tile of ship.tiles) {
-                const index = availableTiles.indexOf(tile);
-                if(index != -1) {
-                    availableTiles.splice(index, 1);
+                for (let i = 0; i < availableTiles.length; i++) {
+                    const availableTile = availableTiles[i];
+                    if (availableTile.x != tile.x || availableTile.y != tile.y) {
+                        continue;
+                    }
+                    availableTiles.splice(i, 1);
+                    break;
                 }
             }
         }
+        return availableTiles;
     }
 
     randomInt(min, max) {
@@ -77,6 +86,17 @@ class Minefield {
             this.placeMine(tile);
             availableTiles.splice(index, 1);
         }
+    }
+    debugShowMines() {
+        const GRID_SIZE = 10;
+        let str = 'MINEFIELD: \n';
+        for (let y = 0; y < GRID_SIZE; y++) {
+            for (let x = 0; x < GRID_SIZE; x++) {
+                str += this.mineArray[x + y * 10] === true ? '#' : '~';
+            }
+            str += '\n';
+        }
+        console.log(str);
     }
 
     placeMine({x, y}){
