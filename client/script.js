@@ -139,7 +139,7 @@ socket.on('game-ended', (message) => {
     // Reset game state and show start menu
     oppUsername = null;
     gameRoom = null;
-    showMenu('start');
+    showMenu('find');
 });
 
 // Handle disconnection from server
