@@ -16,6 +16,8 @@ const GRID_X_OFFSET_P2 = PLAYER_GRID_WIDTH;
 
 let isUserPlayer1;
 
+window.addEventListener('load', preloadFont);
+
 /*
  * ---- Draw Functions ----
  */
