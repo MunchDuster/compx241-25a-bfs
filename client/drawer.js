@@ -60,8 +60,8 @@ async function preloadFont() {
 
 function drawGameBoard(isPlayer1) {
     gridLayer.destroyChildren();
-    drawSingleBoard(GRID_X_OFFSET_P1, isPlayer1 ? "1" : "2");
-    drawSingleBoard(GRID_X_OFFSET_P2, isPlayer1 ? "2" : "1");
+    drawSingleBoard(GRID_X_OFFSET_P1, isPlayer1 ? 1 : 2);
+    drawSingleBoard(GRID_X_OFFSET_P2, isPlayer1 ? 2 : 1);
     gridLayer.batchDraw();
 }
 
