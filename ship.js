@@ -57,7 +57,7 @@ class Ship {
     }
 
     isSunk() {
-        return this.hitArray.every(hit => hit === 1);
+        return this.hitArray.every(hit => hit === true);
     }
 
     updateTilePositions() {
@@ -164,8 +164,12 @@ class Ship {
         return this.tiles.some(tile => tile.x == x & tile.y == y);
     }
     hit(x, y) {
-        const index = y * 10 + x;
-        this.hitArray[index] = true;
+        const hitIndex = this.tiles.findIndex(tile => tile.x === x && tile.y === y);
+        
+        if (hitIndex === true) {
+            console.log('warning: hitting same tile on ship multiple times!');
+        }
+        this.hitArray[hitIndex] = true;
     }
     isOutOfBounds() {
         return this.wouldBeOutOfBounds(this.tiles);

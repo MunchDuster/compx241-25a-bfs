@@ -135,6 +135,12 @@ class Game {
 
         return user1ShipsSunk || user2ShipsSunk;
     }
+    getUser1ShipsSunk() {
+        return this.user1.ships.filter(ship => ship.isSunk()).length;
+    }
+    getUser2ShipsSunk() {
+        return this.user2.ships.filter(ship => ship.isSunk()).length;
+    }
     setUserBoatPlacements(user, placements) {
         const ships = placements.map(placement => new Ship(placement));
         const userX = user.socketId == this.user1.socketId ? this.user1 : this.user2;

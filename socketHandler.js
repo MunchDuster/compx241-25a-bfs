@@ -91,6 +91,9 @@ function SocketHandler(socket, io) {
             console.log('turn ' + turn.type + ' failed, reason: ', result);
             return;
         }
+        
+        console.log('user1 has ' + game.getUser1ShipsSunk() + ' boats sunk');
+        console.log('user1 has ' + game.getUser2ShipsSunk() + ' boats sunk');
 
         // const gameOver = game.checkGameOver();
 
