@@ -178,11 +178,10 @@ socket.on('see-turn', (turnInfo) => {
     console.log('see-turn', turnInfo);
     if (type === 'missile') {
         if (result.hit && result.ship) {
-            const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
-            window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
+            window.playHitExplosion(result.tile, 1, false);
             playsfx('boom');
             setTimeout(() => {
-                window.renderShipDamage(canvasTilepos.x, canvasTilepos.y);
+                window.renderShipDamage(result.tile, 1);
             }, 800);
         }
     }
