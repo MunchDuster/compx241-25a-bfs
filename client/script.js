@@ -25,6 +25,7 @@ const oppUsernameDisplay = document.getElementById('opp');
 const fireButton = document.getElementById('fire-button');
 const toggleMissileModeButton = document.getElementById('toggle-missile-mode-button');
 const moveShipButton = document.getElementById('move-ship-button');
+const playerTurnText = document.getElementById('player-turn-text');
 
 /*
  *  ---- Game State Variables ----
@@ -139,7 +140,7 @@ socket.on('game-ended', (message) => {
     // Reset game state and show start menu
     oppUsername = null;
     gameRoom = null;
-    showMenu('find');
+    showMenu('start');
 });
 
 // Handle disconnection from server
@@ -160,6 +161,7 @@ socket.on('turn-start', () => {
     fireButton.disabled = false;
     toggleMissileModeButton.disabled = false;
     moveShipButton.disabled = false;
+    playerTurnText.hidden = false;
 });
 
 // Handle turn wait? 
@@ -171,6 +173,7 @@ socket.on('wait-start', () => {
     fireButton.disabled = true;
     toggleMissileModeButton.disabled = true;
     moveShipButton.disabled = true;
+    playerTurnText.hidden = true;
 });
 
 socket.on('see-turn', (turnInfo) => {
@@ -178,18 +181,17 @@ socket.on('see-turn', (turnInfo) => {
     console.log('see-turn', turnInfo);
     if (type === 'missile') {
         if (result.hit && result.ship) {
-            window.playHitExplosion(result.tile, 1, false);
+            const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
+            window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
             playsfx('boom');
             setTimeout(() => {
-                window.renderShipDamage(result.tile, 1);
+                window.renderShipDamage(canvasTilepos.x, canvasTilepos.y);
             }, 800);
-        } else {
-            window.playMissSplash(result.tile, 1);
         }
     }
 
     if (gameState.isOver) {
-        showMenu('find');
+        
     }
 });
 
@@ -354,29 +356,27 @@ function fireMissile() {
     console.log("Firing");
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
-        const gameOver = response.gameOver;
         console.log(response);
 
         if (turn.type == 'missile') {
             if (success) {
+                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 if (!response.playerResponse.hit){
-                    window.playMissSplash(selectedTile, 2, true);
+                    window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
                     playsfx('splash');
                 } else if (response.playerResponse.hit) {
-                    window.playHitExplosion(selectedTile, 2, true);
+                    window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
                     playsfx('boom');
                 }
             }
         } else if (turn.type == 'recon-missile') {
-            window.showMineCount(selectedTile, 2, response.playerResponse.mineCount);
+            const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
+            window.showMineCount(canvasTilepos.x, canvasTilepos.y, response.playerResponse.mineCount);
         }
 
         selectedTile = null;
         const tiles = stagesAndLayers.gridLayer.find('Rect');
         tiles.forEach(t => t.fill('#5F85B5'));
         stagesAndLayers.gridLayer.batchDraw();
-        if(gameOver) {
-            showMenu('find');
-        }
     });
 }
