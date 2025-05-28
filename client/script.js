@@ -181,17 +181,21 @@ socket.on('see-turn', (turnInfo) => {
     console.log('see-turn', turnInfo);
     if (type === 'missile') {
         if (result.hit && result.ship) {
-            const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
-            window.playHitExplosion(canvasTilepos.x, canvasTilepos.y);
+            // const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
+            // window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, canvasTilepos.gridNumber);
+            
+            window.playHitExplosion(result.tile, 1, false);
             playsfx('boom');
             setTimeout(() => {
-                window.renderShipDamage(canvasTilepos.x, canvasTilepos.y);
+                // window.renderShipDamage(canvasTilepos.x, canvasTilepos.y, canvasTilepos.gridNumber,);
+                
+                window.renderShipDamage(result.tile, 1);
             }, 800);
         }
     }
 
     if (gameState.isOver) {
-        
+        showMenu('find');
     }
 });
 
@@ -357,26 +361,35 @@ function fireMissile() {
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
         console.log(response);
-
+        const gameOver = response.gameOver;
         if (turn.type == 'missile') {
             if (success) {
                 const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
                 if (!response.playerResponse.hit){
-                    window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
+                    // window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
+                    
+                    window.playMissSplash(selectedTile, 2, true);
                     playsfx('splash');
                 } else if (response.playerResponse.hit) {
-                    window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
+                    // window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
+
+                    window.playHitExplosion(selectedTile, 2, true);
                     playsfx('boom');
                 }
             }
         } else if (turn.type == 'recon-missile') {
-            const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
-            window.showMineCount(canvasTilepos.x, canvasTilepos.y, response.playerResponse.mineCount);
+            // const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
+            // window.showMineCount(canvasTilepos.x, canvasTilepos.y, response.playerResponse.mineCount);
+            
+            window.showMineCount(selectedTile, 2, response.playerResponse.mineCount);
         }
 
         selectedTile = null;
         const tiles = stagesAndLayers.gridLayer.find('Rect');
         tiles.forEach(t => t.fill('#5F85B5'));
         stagesAndLayers.gridLayer.batchDraw();
+        if(gameOver) {
+            showMenu('find');
+        }
     });
 }
