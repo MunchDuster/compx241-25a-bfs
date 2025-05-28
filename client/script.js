@@ -161,7 +161,7 @@ socket.on('turn-start', () => {
     fireButton.disabled = false;
     toggleMissileModeButton.disabled = false;
     moveShipButton.disabled = false;
-    playerTurnText.hidden = false;
+    playerTurnText.innerHTML = "Your Turn!";
 });
 
 // Handle turn wait? 
@@ -173,7 +173,7 @@ socket.on('wait-start', () => {
     fireButton.disabled = true;
     toggleMissileModeButton.disabled = true;
     moveShipButton.disabled = true;
-    playerTurnText.hidden = true;
+    playerTurnText.innerHTML = "Opponents Turn!";
 });
 
 socket.on('see-turn', (turnInfo) => {
