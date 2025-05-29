@@ -402,10 +402,10 @@ function fireMissile() {
         const tiles = stagesAndLayers.gridLayer.find('Rect');
         tiles.forEach(t => t.fill('#5F85B5'));
         stagesAndLayers.gridLayer.batchDraw();
-        if(!gameOver) {
-            alert("Game Over");
-            alert("Hey, another alert.")
-            rejoin();
-        }
+        // if(!gameOver) {
+        //     alert("Game Over");
+        //     alert("Hey, another alert.")
+        //     rejoin();
+        // }
     });
 }
