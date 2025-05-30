@@ -281,13 +281,9 @@ function setSelectedTile(x, y) {
     console.log("Selected tile:", selectedTile);
 }
 
-function setSelectedShip(shipType, centerTile, rotation) {
-    selectedShip = {
-        shipType: shipType, 
-        centerTile: {x: centerTile.x, y: centerTile.y}, 
-        rotation: rotation
-    };
-    console.log("Selected ship: ", selectedShip.shipType, " at ", selectedShip.centerTile, " rotated ", selectedShip.rotation);
+function setSelectedShip(ship) {
+    selectedShip = ship;
+    console.log("Selected ship: ", selectedShip.type, " at: ", selectedShip.centerTile, " rotated: ", selectedShip.rotation, " size: ", selectedShip.size);
 }
 
 window.setSelectedTile = setSelectedTile;
@@ -426,4 +422,30 @@ function fireMissile() {
 
 function moveShip() {
     isMoveShipMode = true;
+    let gridStartX;
+    if(isPlayer1) {
+        gridStartX = getDrawerValues().GRID_X_OFFSET_P1;
+    } else {
+        gridStartX = getDrawerValues().GRID_X_OFFSET_P2;
+    }
+
+    if(selectedShip == null) return
+    const tiles = stagesAndLayers.gridLayer.find('Rect');
+
+    tiles.forEach(t => {
+
+        const {x, y} = getGridPosFromCanvasPos(t.x(), t.y(), gridStartX);
+
+        console.log(x == selectedShip.centerTile.x );
+        console.log(y == selectedShip.centreTile.y + Math.ceil(selectedShip / 2));
+        
+        if(selectedShip.rotation == 0) {
+            if(x == selectedShip.centerTile.x ) { //&& (y == selectedShip.centreTile.y + Math.ceil(selectedShip / 2) || y == selectedShip.centreTile.y - Math.ceil(selectedShip / 2))) { 
+                t.fill('rgba(0,255,0,0.4)');
+            } else { t.fill('#5F85B5'); }
+        }
+
+        
+
+    });
 }
