@@ -196,11 +196,22 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 offsetY: ship.height / 2,
                 shipRef: ship,
             });
+                        
+            shipImage.on('mouseup', function() {
+                const gameState = window.getGameState();
+                if (!gameState.isMoveShipMode) {
+                    console.log("can't move ", this.shipType)
+                    return;
+                }
+                window.setSelectedShip(this.shipType, ship.centerTile);
+            });
+
             shipImage.shipRef = ship;
             ship.konvaImg = shipImage;
             shipPlacementLayer.add(shipImage);
             shipPlacementLayer.batchDraw();
 
+           
             loadedShips++;
             if (loadedShips === ships.length && onShipsLoaded) {
                 onShipsLoaded();

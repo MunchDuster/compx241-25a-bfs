@@ -44,6 +44,7 @@ let unplacedShipsArray = [];
 let currentPlacedShipsArray = [];
 
 let isMissileMode = true;
+let isMoveShipMode = false;
 
 let sfx = null;
 
@@ -214,7 +215,8 @@ function getGameState() {
         selectedShip: selectedShip,
         selectedTile: selectedTile,
         unplacedShips: unplacedShipsArray,
-        currentPlacedShips: currentPlacedShipsArray
+        currentPlacedShips: currentPlacedShipsArray,
+        isMoveShipMode: isMoveShipMode,
     };
 }
 
@@ -264,7 +266,18 @@ function setSelectedTile(x, y) {
     selectedTile = {x: x, y: y};
     console.log("Selected tile:", selectedTile);
 }
+
+function setSelectedShip(shipType, centerTile, rotation) {
+    selectedShip = {
+        shipType: shipType, 
+        centerTile: {x: centerTile.x, y: centerTile.y}, 
+        rotation: rotation
+    };
+    console.log("Selected ship: ", selectedShip.shipType, " at ", selectedShip.centerTile, " rotated ", selectedShip.rotation);
+}
+
 window.setSelectedTile = setSelectedTile;
+window.setSelectedShip = setSelectedShip;
 
 // Sound must player after an interaction like a click, browser will not play it otherwise
 function playAudio() {
@@ -342,6 +355,7 @@ function playerTurn() {
 
 function toggleMissileMode() {
     isMissileMode = !isMissileMode;
+    isMoveShipMode = false;
     toggleMissileModeButton.innerText = isMissileMode ? 'Switch to Scan' : 'Switch to Missile';
     fireButton.innerText = isMissileMode ? 'Fire Missile' : 'Fire Recon Missile';
     console.log('Switching to ' + (isMissileMode ? 'Missile' : 'Scan'));
@@ -392,4 +406,8 @@ function fireMissile() {
             showMenu('find');
         }
     });
+}
+
+function moveShip() {
+    isMoveShipMode = true;
 }
