@@ -199,11 +199,10 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                         
             shipImage.on('mouseup', function() {
                 const gameState = window.getGameState();
-                if (!gameState.isMoveShipMode) {
-                    console.log("can't move ", ship.type)
-                    return;
-                }
+                if (!gameState.isMoveShipMode) return;
                 window.setSelectedShip(ship);
+                moveShip();
+                console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
             });
 
             shipImage.shipRef = ship;

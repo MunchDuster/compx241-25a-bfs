@@ -420,8 +420,13 @@ function fireMissile() {
     });
 }
 
+function canMoveShip() {
+    isMoveShipMode = !isMoveShipMode;
+    moveShipButton.style.background = moveShipButton.style.background == '#f0f0f0' ? 'green' : '#f0f0f0';
+}
+
 function moveShip() {
-    isMoveShipMode = true;
+    console.log("Move ship");
     let gridStartX;
     if(isPlayer1) {
         gridStartX = getDrawerValues().GRID_X_OFFSET_P1;
@@ -436,16 +441,24 @@ function moveShip() {
 
         const {x, y} = getGridPosFromCanvasPos(t.x(), t.y(), gridStartX);
 
-        console.log(x == selectedShip.centerTile.x );
-        console.log(y == selectedShip.centreTile.y + Math.ceil(selectedShip / 2));
-        
-        if(selectedShip.rotation == 0) {
-            if(x == selectedShip.centerTile.x ) { //&& (y == selectedShip.centreTile.y + Math.ceil(selectedShip / 2) || y == selectedShip.centreTile.y - Math.ceil(selectedShip / 2))) { 
-                t.fill('rgba(0,255,0,0.4)');
-            } else { t.fill('#5F85B5'); }
+        const OFFSET = Math.ceil(selectedShip.size / 2);
+        const EVENOFFSET = selectedShip.size % 2 == 0 ? 1 : 0;
+
+        switch (selectedShip.rotation) {
+            case 0:
+            case 2:
+                if(x == selectedShip.centerTile.x && (y == selectedShip.centerTile.y + OFFSET|| y == selectedShip.centerTile.y - OFFSET - EVENOFFSET )) { 
+                    t.fill('rgba(0,255,0,0.4)');
+                } else { t.fill('#5F85B5'); }
+                break;
+            case 1:
+            case 3:
+                if( y == selectedShip.centerTile.y && (x == selectedShip.centerTile.x + OFFSET + EVENOFFSET|| x == selectedShip.centerTile.x - OFFSET)) { 
+                    t.fill('rgba(0,255,0,0.4)');
+                } else { t.fill('#5F85B5'); }
+                break; 
         }
-
-        
-
     });
 }
+
+window.moveShip() = moveShip();
