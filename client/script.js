@@ -141,7 +141,8 @@ socket.on('game-ended', (message) => {
     // Reset game state and show start menu
     oppUsername = null;
     gameRoom = null;
-    showMenu('start');
+    // showMenu('start');
+    rejoin();
 });
 
 // Handle disconnection from server
@@ -195,9 +196,11 @@ socket.on('see-turn', (turnInfo) => {
         }
     }
 
-    if (gameState.isOver) {
-        showMenu('find');
-    }
+    // if (!gameState.isOver) {
+    //     alert("Game Over");
+    //     alert("Hey, another alert.")
+    //     rejoin();
+    // }
 });
 
 /*
@@ -227,9 +230,20 @@ function find() {
     // Prompt user to input username
     // username = prompt('enter user name: ');
     username = document.getElementById("uname").value;
-
+    
     //Emit find event to server with username
     socket.emit('find', username, (response) => {
+        if (!response.success) return;
+        // Show the find menu and update username displays
+        showMenu('find');
+        console.log(usernameDisplays)
+        usernameDisplays.forEach(div => div.innerText = username);
+    });
+}
+
+// Handle user rejoining lobby after game end
+function rejoin() {
+    socket.emit('rejoin-lobby', username, (response) => {
         if (!response.success) return;
         // Show the find menu and update username displays
         showMenu('find');
@@ -402,9 +416,11 @@ function fireMissile() {
         const tiles = stagesAndLayers.gridLayer.find('Rect');
         tiles.forEach(t => t.fill('#5F85B5'));
         stagesAndLayers.gridLayer.batchDraw();
-        if(gameOver) {
-            showMenu('find');
-        }
+        // if(!gameOver) {
+        //     alert("Game Over");
+        //     alert("Hey, another alert.")
+        //     rejoin();
+        // }
     });
 }
 

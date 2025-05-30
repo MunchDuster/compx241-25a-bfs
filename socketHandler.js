@@ -53,7 +53,8 @@ function SocketHandler(socket, io) {
 
     // Handle user searching for a game
     socket.on('find', lobby.joinLobby);
-
+    // Handle user searching for a game
+    socket.on('rejoin-lobby', lobby.rejoinLobby);
     // Handle game request from one user to another
     socket.on('request-game', lobby.requestGame);
 
@@ -104,6 +105,8 @@ function SocketHandler(socket, io) {
         }
         io.to(opponent.socketId).emit('see-turn', seeTurn);
         if (gameOver) {
+            io.to(user.socketId).emit('game-ended', "winner");
+            io.to(opponent.socketId).emit('game-ended', "winner");
             game.delete();
             user.game = null;
             opponent.game = null;
@@ -168,13 +171,14 @@ function SocketHandler(socket, io) {
         }
         else if (user.isFinding) {
             socket.leave('finding');
+            io.to('finding').emit('find-results', User.getAllFinding());
         }
         
         user.delete();
 
-        if(user.isFinding) {
-            io.to('finding').emit('find-results', User.getAllFinding());
-        }
+        // if(user.isFinding) {
+        //     io.to('finding').emit('find-results', User.getAllFinding());
+        // }
     });
 
     function logError(errorMsg) {

@@ -12,12 +12,19 @@ function LobbyHandler(user, logError, onJoinedLobby, onGameRequested, onJoinGame
             return;
         }
 
+        // // Check for duplicate usernames
+        // if (User.getIdByName(newUsername) != null) {
+        //     logError('Username already taken. Please choose another.');
+        //     callback({success: false});
+        //     return;
+        // }
         // Check for duplicate usernames
-        if (User.getIdByName(newUsername) != null) {
+        if(User.getAllFinding().includes(newUsername)) {
             logError('Username already taken. Please choose another.');
             callback({success: false});
             return;
         }
+        
 
         // Update user state to indicate they are searching for a game
         user.name = newUsername;
@@ -28,6 +35,16 @@ function LobbyHandler(user, logError, onJoinedLobby, onGameRequested, onJoinGame
         // Add user to relevant rooms
         onJoinedLobby()
     };
+    this.rejoinLobby = (username, callback) => {
+        // Update user state to indicate they are searching for a game
+        user.name = username;
+        user.isFinding = true;
+        console.log(`${user.toString()} is finding.`);
+        callback({success: true});
+
+        // Add user to relevant rooms
+        onJoinedLobby()
+    }
     this.requestGame = (requesteeUsername) => {
         console.log(`${user.name} requesting game with ${requesteeUsername}`);
 
