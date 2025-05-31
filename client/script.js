@@ -118,6 +118,7 @@ socket.on('requested-game', (requesterUsername) => {
 // Set up game state when joining a game
 socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     showMenu('game'); // Switch to game menu
+    switchMusic();
     isPlayer1 = isFirstPlayer;
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
@@ -187,7 +188,7 @@ socket.on('see-turn', (turnInfo) => {
             // window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, canvasTilepos.gridNumber);
             
             window.playHitExplosion(result.tile, 1, false);
-            playsfx('boom');
+            playAudio('boom');
             setTimeout(() => {
                 // window.renderShipDamage(canvasTilepos.x, canvasTilepos.y, canvasTilepos.gridNumber,);
                 
@@ -293,53 +294,6 @@ function setSelectedShip(shipType, centerTile, rotation) {
 window.setSelectedTile = setSelectedTile;
 window.setSelectedShip = setSelectedShip;
 
-// Sound must player after an interaction like a click, browser will not play it otherwise
-function playAudio() {
-    console.log('playing audio')
-    
-    // hide the tip
-    const tip = document.querySelector('.whyCantIHearTheSong');
-    tip.parentElement.removeChild(tip);
-
-    const sound = document.getElementById('songer');
-
-    const audioContext = new AudioContext();
-    const track = audioContext.createMediaElementSource(sound);
-
-    const gainNode = audioContext.createGain();
-
-    const volumeSlider = document.getElementById('volumeSlider');
-    const setGain = () => {
-        const volume = volumeSlider.value;
-        console.log('setting volume ' + volume);
-        gainNode.gain.value = volume;
-    }
-    volumeSlider.addEventListener('mousemove', setGain);
-    setGain();
-
-    track.connect(gainNode).connect(audioContext.destination);
-    sound.play();
-
-    window.removeEventListener('click', playAudio);
-}
-window.addEventListener('click', playAudio);
-
-function playsfx(sfxName) {
-    if (!sfx) {
-        sfx = new AudioContext();
-    }
-
-    const audio = new Audio(`../assets/audio/${sfxName}.mp3`);
-    const track = sfx.createMediaElementSource(audio);
-
-    const gainNode = sfx.createGain();
-    const volumeSlider = document.getElementById('volumeSlider');
-    gainNode.gain.value = volumeSlider ? volumeSlider.value : 0.2;
-
-    track.connect(gainNode).connect(sfx.destination);
-    audio.play();
-}
-
 /*
  *  ---- In Game Functions ----
  */
@@ -397,12 +351,12 @@ function fireMissile() {
                     // window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
                     
                     window.playMissSplash(selectedTile, 2, true);
-                    playsfx('splash');
+                    playAudio('splash');
                 } else if (response.playerResponse.hit) {
                     // window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
 
                     window.playHitExplosion(selectedTile, 2, true);
-                    playsfx('boom');
+                    playAudio('boom');
                 }
             }
         } else if (turn.type == 'recon-missile') {
