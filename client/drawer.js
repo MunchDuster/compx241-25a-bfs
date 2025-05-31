@@ -258,14 +258,14 @@ function highlightShipSnapCells(cells, isValid) {
 function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Miss Splash");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
-    const permaImagePath = showPermanentImage ? '../assets/perma-miss.png' : null;
+    const permaImagePath = showPermanentImage ? '../assets/images/perma-miss.png' : null;
     animateGif(x, y, 9, 100, 'splash', 'gif', permaImagePath);
 }
 
 function playHitExplosion(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Hit Explosion");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
-    const permaImagePath = showPermanentImage ? '../assets/perma-hit.png' : null;
+    const permaImagePath = showPermanentImage ? '../assets/images/perma-hit.png' : null;
     animateGif(x, y, 8, 100, 'boom', 'gif', permaImagePath);
 }
 
@@ -316,7 +316,7 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, p
             }
         };
         
-        frameImg.src = `../assets/${gifname}/${currentFrame}.${filetype}`;
+        frameImg.src = `../assets/animations/${gifname}/${currentFrame}.${filetype}`;
     }
 
     showNextFrame();
@@ -340,7 +340,7 @@ function renderShipDamage(pos, gridNum = 2) {
         shipLayer.add(damageImage);
         shipLayer.batchDraw();
     };
-    damageImg.src = `../assets/damage_${randDamageSprite}.png`;
+    damageImg.src = `../assets/images/damage/damage_${randDamageSprite}.png`;
 }
 
 function showMineCount(pos, gridNum = 2, count) {

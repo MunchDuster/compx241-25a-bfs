@@ -7,11 +7,11 @@ let drawerValues = null;
 let stagesAndLayers = null;
 
 const SHIP_DEFINITIONS = [
-    { type: "carrier",    size: 5, imgPath: "../assets/carrier.png"},
-    { type: "battleship", size: 4, imgPath: "../assets/battleship.png"},
-    { type: "cruiser",    size: 3, imgPath: "../assets/cruiser.png"},
-    { type: "submarine",  size: 3, imgPath: "../assets/submarine.png"},
-    { type: "destroyer",  size: 2, imgPath: "../assets/destroyer.png"}
+    { type: "carrier",    size: 5, imgPath: "../assets/images/ships/carrier.png"},
+    { type: "battleship", size: 4, imgPath: "../assets/images/ships/battleship.png"},
+    { type: "cruiser",    size: 3, imgPath: "../assets/images/ships/cruiser.png"},
+    { type: "submarine",  size: 3, imgPath: "../assets/images/ships/submarine.png"},
+    { type: "destroyer",  size: 2, imgPath: "../assets/images/ships/destroyer.png"}
 ];
 
 

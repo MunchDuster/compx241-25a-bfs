@@ -329,7 +329,7 @@ function playsfx(sfxName) {
         sfx = new AudioContext();
     }
 
-    const audio = new Audio(`../assets/${sfxName}.mp3`);
+    const audio = new Audio(`../assets/audio/${sfxName}.mp3`);
     const track = sfx.createMediaElementSource(audio);
 
     const gainNode = sfx.createGain();
