@@ -454,11 +454,11 @@ function showMoveShipButton(ship, gridnum = 1) {
 
     const offset = getArrowOffset(length, isEven, ship.rotation);
     const arrows = isVertical ? [
-        { x: 0, y: -offset.up, rotation: 0, direction: 0 },     
-        { x: 0, y: offset.down, rotation: 180, direction: 2 }   
+        { x: 0, y: -offset.up, rotation: 0,},     
+        { x: 0, y: offset.down, rotation: 180,}   
     ] : [
-        { x: -offset.left, y: 0, rotation: 270, direction: 3 }, 
-        { x: offset.right, y: 0, rotation: 90, direction: 1 }   
+        { x: -offset.left, y: 0, rotation: 270,}, 
+        { x: offset.right, y: 0, rotation: 90,}   
     ];
 
     arrows.forEach(arrowData => {
@@ -480,6 +480,7 @@ function showMoveShipButton(ship, gridnum = 1) {
                 width: TILE_SIZE,
                 height: TILE_SIZE,
                 opacity: 0.8,
+                
             });
 
             arrowShape.on('mouseover', function() {
