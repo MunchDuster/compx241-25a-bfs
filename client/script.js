@@ -309,6 +309,7 @@ function setSelectedShip(ship) {
 
 function setSelectedDirection(arrow) {
     selectedDirection = arrow;
+    console.log(arrow);
 }
 
 window.setSelectedTile = setSelectedTile;
@@ -422,34 +423,43 @@ function canMoveShip() {
 }
 
 function moveShip() {
-    let {x, y} = {x: 0, y: 0};
-    const gridNum = isPlayer1 ? 1 : 2;
+    let {x, y} = {x: {pos: 0, grid: 0}, y: {pos: 0, grid: 0}};
+    const GRIDSPACING =  getCanvasPosFromGridPos(1, 1, 1).y - getCanvasPosFromGridPos(1, 0, 1).y; //get the spacing between the positions of two adjacent squares
 
     switch (selectedDirection) {
         case 0: //up
-            y = -1; 
-            x = 0;
+            y = {pos: -GRIDSPACING, grid: -1}; 
+            console.log("up");
             break;
         case 90: //right
-            x = 1;
-            y = 0; 
+            x = {pos: GRIDSPACING, grid: 1};
+            console.log("right");
             break;
         case 180: //down
-            y = 1; 
-            x = 0;
+            y = {pos: GRIDSPACING, grid: 1}; 
+            console.log("down");
             break;
         case 270: //left
-            x = -1; 
-            y = 0;
+            x = {pos: -GRIDSPACING, grid: -1}; 
+            console.log("left");
             break;
     }
 
-    selectedShip.x = getCanvasPosFromGridPos(selectedShip.centerTile.x + x, selectedShip.centerTile.y + y, gridNum).x;
-    selectedShip.y = getCanvasPosFromGridPos(selectedShip.centerTile.x + x, selectedShip.centerTile.y + y, gridNum).y;
-    selectedShip.centerTile.x += x;
-    selectedShip.centerTile.y += y;
-    selectedShip.isPlaced = false;
-    selectedDirection = null;
+    console.log("Old Position: Image: ", selectedShip.konvaImg.x(), selectedShip.konvaImg.y());
+
+    //change backend stuff for ship
+    selectedShip.x += x.pos;
+    selectedShip.y += y.pos;
+    selectedShip.centerTile.x += x.grid;
+    selectedShip.centerTile.y += y.grid;
+    
+    //change ship image pos for frontEnd
+    let tempX = selectedShip.konvaImg.x() + x.pos;
+    let tempY = selectedShip.konvaImg.y() + y.pos;
+    selectedShip.konvaImg.x(tempX);
+    selectedShip.konvaImg.y(tempY);
+
+    console.log("New Position: Image: ", selectedShip.konvaImg.x(), selectedShip.konvaImg.y());
 }
 
 window.moveShip = moveShip;
