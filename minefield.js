@@ -58,9 +58,10 @@ class Minefield {
     removeShipTiles(availableTiles, userShips) {
         for (let ship of userShips) {
             for (let tile of ship.tiles) {
-                const index = availableTiles.indexOf(tile);
-                if(index != -1) {
-                    availableTiles.splice(index, 1);
+                for (let i = 0; i < availableTiles.length; i++) {
+                    const availableTile = availableTiles[i];
+                    if (availableTile.x != tile.x || availableTile.y != tile.y) continue;
+                    availableTiles.splice(i, 1);
                 }
             }
         }

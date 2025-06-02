@@ -187,7 +187,7 @@ socket.on('wait-start', () => {
     fireButton.disabled = true;
     toggleMissileModeButton.disabled = true;
     moveShipButton.disabled = true;
-    playerTurnText.innerHTML = "Opponents Turn!";
+    playerTurnText.innerHTML = oppUsernameDisplay.innerText + "'s Turn!";
 });
 
 socket.on('see-turn', (turnInfo) => {
