@@ -358,7 +358,7 @@ function fireMissile() {
         } else if (turn.type == 'recon-missile') {
             // const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
             // window.showMineCount(canvasTilepos.x, canvasTilepos.y, response.playerResponse.mineCount);
-            
+            window.highlightReconArea(selectedTile, 2);
             window.showMineCount(selectedTile, 2, response.playerResponse.mineCount);
         }
 

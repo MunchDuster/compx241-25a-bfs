@@ -242,8 +242,8 @@ function highlightShipSnapCells(cells, isValid) {
         const rect = new Konva.Rect({
             x: pos.x,
             y: pos.y,
-            width: drawerValues.TILE_SIZE,
-            height: drawerValues.TILE_SIZE,
+            width: TILE_SIZE,
+            height: TILE_SIZE,
             fill: color,
             stroke: 'black',
             strokeWidth: 1,
@@ -252,6 +252,54 @@ function highlightShipSnapCells(cells, isValid) {
         feedbackLayer.add(rect);
     });
     feedbackLayer.batchDraw();
+}
+
+function highlightReconArea(centerPos, gridNum = 2) {
+    const highlightColour = 'rgba(8, 122, 0, 0.5)';
+    const highlightStroke = 'rgb(35, 94, 25)';
+
+    for(let x = -1; x <= 1; x++) {
+        for(let y = -1; y <= 1; y++) {
+            const gridPos = {x: centerPos.x + x, y: centerPos.y + y};
+
+            if (gridPos.x < 0 || gridPos.x >= GRID_SIZE || 
+                gridPos.y < 0 || gridPos.y >= GRID_SIZE) {
+                continue;
+            }
+
+            const pos = window.getCanvasPosFromGridPos(gridPos.x, gridPos.y, gridNum);
+
+            const rect = new Konva.Rect({
+                x: pos.x,
+                y: pos.y,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                fill: highlightColour,
+                stroke: highlightStroke,
+                strokeWidth: 1,
+                opacity: 1
+            });
+            feedbackLayer.add(rect);
+        }
+    }
+    feedbackLayer.batchDraw();
+
+    const highlights = feedbackLayer.find('Rect');
+    highlights.forEach(highlight => {
+        const fadeOut = new Konva.Tween({
+            node: highlight,
+            duration: 2,
+            opacity: 0,
+            onFinish: () => {
+                highlight.destroy();
+                feedbackLayer.batchDraw();
+            }
+        });
+
+        setTimeout(() => {
+            fadeOut.play();
+        }, 2000);
+    });
 }
 
 function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
@@ -354,7 +402,8 @@ function showMineCount(pos, gridNum = 2, count) {
         fontFamily: 'Micro 5',
         fill: getMineCountColor(count),
         align: 'center',
-        verticalAlign: 'middle'
+        verticalAlign: 'middle',
+        stroke: 'rgb(35, 94, 25)',
     });
 
     feedbackLayer.add(text);
@@ -463,6 +512,7 @@ window.playMissSplash = playMissSplash;
 window.playHitExplosion = playHitExplosion;
 window.renderShipDamage = renderShipDamage;
 window.showMineCount = showMineCount;
+window.highlightReconArea = highlightReconArea;
 
 // Helper Functions
 window.getDrawerValues = getDrawerValues;
