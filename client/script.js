@@ -435,4 +435,4 @@ function moveShip() {
     });
 }
 
-window.moveShip() = moveShip();
+window.moveShip = moveShip;
