@@ -138,12 +138,15 @@ socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
 
 // Handle game ending 
 socket.on('game-ended', (message) => {
-    alert(message);
+    // alert(message);
     // Reset game state and show start menu
+
+    document.getElementById('game-controls').classList.add('hidden');
+    document.getElementById('game-over-controls').classList.remove('hidden');
+    document.getElementById('game-over-message').innerHTML = message;
     oppUsername = null;
     gameRoom = null;
-    // showMenu('start');
-    rejoin();
+
 });
 
 // Handle disconnection from server
