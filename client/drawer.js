@@ -349,6 +349,54 @@ function highlightReconArea(centerPos, gridNum = 2) {
     });
 }
 
+function highlightMineBlastArea(centerPos, gridNum = 1) {
+    const blastColor = 'rgba(255, 69, 0, 0.5)';
+    const blastStroke = '#FF4500';
+
+    for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+            const gridPos = {x: centerPos.x + x, y: centerPos.y + y};
+
+            if (gridPos.x < 0 || gridPos.x >= GRID_SIZE || 
+                gridPos.y < 0 || gridPos.y >= GRID_SIZE) {
+                continue;
+            }
+            
+            const pos = window.getCanvasPosFromGridPos(gridPos.x, gridPos.y, gridNum);
+
+            const rect = new Konva.Rect({
+                x: pos.x,
+                y: pos.y,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                fill: blastColor,
+                stroke: blastStroke,
+                strokeWidth: 1,
+                opacity: 1
+            });
+            feedbackLayer.add(rect);
+        }
+    }
+    feedbackLayer.batchDraw();
+
+    const highlights = feedbackLayer.find('Rect');
+    highlights.forEach(highlight => {
+        const fadeOut = new Konva.Tween({
+            node: highlight,
+            duration: 1,
+            opacity: 0,
+            onFinish: () => {
+                highlight.destroy();
+                feedbackLayer.batchDraw();
+            }
+        });
+
+        setTimeout(() => {
+            fadeOut.play();
+        }, 200);
+    });
+}
+
 function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Miss Splash");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
