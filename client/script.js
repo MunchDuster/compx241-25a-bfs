@@ -294,6 +294,7 @@ function setSelectedTile(x, y) {
 
 function setSelectedShip(ship) {
     selectedShip = ship;
+    window.showMoveShipButton(selectedShip, 1);
     console.log("Selected ship: ", selectedShip.type, " at: ", selectedShip.centerTile, " rotated: ", selectedShip.rotation, " size: ", selectedShip.size);
 }
 
