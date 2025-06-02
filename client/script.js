@@ -309,6 +309,8 @@ function confirmPlacements () {
     socket.emit('set-placements', placements);
     isReady = true;
 
+    window.lockShips();
+
     document.getElementById('ready-button').disabled = true;
     document.getElementById('placement-feedback').innerText = 'Wating for opponent...'; 
 }
