@@ -138,12 +138,13 @@ socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
 
 // Handle game ending 
 socket.on('game-ended', (message) => {
-    // alert(message);
-    // Reset game state and show start menu
-
+    //Hide the current menu/controls
+    document.getElementById('ship-placement-controls').classList.add('hidden');
     document.getElementById('game-controls').classList.add('hidden');
+    //Show the game end controls
     document.getElementById('game-over-controls').classList.remove('hidden');
     document.getElementById('game-over-message').innerHTML = message;
+    //Reset Game and Opponent
     oppUsername = null;
     gameRoom = null;
 
