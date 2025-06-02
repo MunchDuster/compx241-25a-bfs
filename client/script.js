@@ -402,7 +402,23 @@ function fireMissile() {
 
 function canMoveShip() {
     isMoveShipMode = !isMoveShipMode;
-    moveShipButton.style.background = moveShipButton.style.background == '#f0f0f0' ? 'green' : '#f0f0f0';
+    isMissileMode = false;
+    
+    if (isMoveShipMode) {
+        moveShipButton.style.background = '#4CAF50'; // gree n as background
+        moveShipButton.style.color = 'white';
+        moveShipButton.style.fontWeight = 'bold';
+        moveShipButton.innerText = 'Moving Ship';
+    } else {
+        moveShipButton.style.background = '#f0f0f0';
+        moveShipButton.style.color = 'black';
+        moveShipButton.style.fontWeight = 'bold';
+        moveShipButton.innerText = 'Move Ship';
+        
+        // Clear arrows
+        feedbackLayer.destroyChildren();
+        feedbackLayer.batchDraw();
+    }
 }
 
 function moveShip() {
