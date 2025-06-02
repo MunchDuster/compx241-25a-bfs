@@ -149,8 +149,8 @@ socket.on('game-ended', (message) => {
     document.getElementById('ship-placement-controls').classList.add('hidden');
     document.getElementById('game-controls').classList.add('hidden');
     //Show the game end controls
-    document.getElementById('game-over-controls').classList.remove('hidden');
     document.getElementById('game-over-message').innerHTML = message;
+    document.getElementById('game-over-controls').classList.remove('hidden');
     //Reset Game and Opponent
     oppUsername = null;
     gameRoom = null;
@@ -193,16 +193,12 @@ socket.on('wait-start', () => {
 socket.on('see-turn', (turnInfo) => {
     const {gameState, type, result} = turnInfo;
     console.log('see-turn', turnInfo);
+
     if (type === 'missile') {
-        if (result.hit && result.ship) {
-            // const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
-            // window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, canvasTilepos.gridNumber);
-            
+        if (result.shipHit && result.ship) {
             window.playHitExplosion(result.tile, 1, false);
             playAudio('boom');
             setTimeout(() => {
-                // window.renderShipDamage(canvasTilepos.x, canvasTilepos.y, canvasTilepos.gridNumber,);
-                
                 window.renderShipDamage(result.tile, 1);
             }, 800);
         }
@@ -263,6 +259,7 @@ function find() {
 
 // Handle user rejoining lobby after game end
 function rejoin() {
+    document.getElementById('game-over-controls').classList.add('hidden');
     socket.emit('rejoin-lobby', username, (response) => {
         if (!response.success) return;
         // Show the find menu and update username displays
@@ -362,42 +359,55 @@ function fireMissile() {
             y: selectedTile.y
         }
     };
+
     console.log("Firing");
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
         console.log(response);
-        const gameOver = response.gameOver;
+        
         if (turn.type == 'missile') {
             if (success) {
-                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
-                if (!response.playerResponse.hit){
-                    // window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
-                    
+                if (response.result.mineHit) {
+                    window.playHitExplosion(selectedTile, 2, true);
+                    playAudio('boom');
+
+                    // Show damge to own ships from mine blast 😔😔
+                    if (response.result.collateralDamage.length > 0) {
+                        window.highlightMineBlastArea(selectedTile);
+                        window.highlightMineBlastArea(selectedTile, 2);
+
+                        response.result.collateralDamage.forEach(damage => {
+                            window.playHitExplosion(damage.tile, 1);
+                            setTimeout(() => {
+                                window.renderShipDamage(damage.tile, 1);
+                            }, 800);
+                        });
+                    }
+                } else if (!response.result.shipHit) {
                     window.playMissSplash(selectedTile, 2, true);
                     playAudio('splash');
-                } else if (response.playerResponse.hit) {
-                    // window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
-
+                } else if (response.result.shipHit) {
                     window.playHitExplosion(selectedTile, 2, true);
                     playAudio('boom');
                 }
+
+                /* if (!response.playerResponse.hit){
+                    window.playMissSplash(selectedTile, 2, true);
+                    playAudio('splash');
+                } else if (response.playerResponse.hit) {
+                    window.playHitExplosion(selectedTile, 2, true);
+                    playAudio('boom');
+                } */
             }
         } else if (turn.type == 'recon-missile') {
-            // const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
-            // window.showMineCount(canvasTilepos.x, canvasTilepos.y, response.playerResponse.mineCount);
             window.highlightReconArea(selectedTile, 2);
-            window.showMineCount(selectedTile, 2, response.playerResponse.mineCount);
+            window.showMineCount(selectedTile, 2, response.result.mineCount);
         }
 
         selectedTile = null;
         const tiles = stagesAndLayers.gridLayer.find('Rect');
         tiles.forEach(t => t.fill('#5F85B5'));
         stagesAndLayers.gridLayer.batchDraw();
-        // if(!gameOver) {
-        //     alert("Game Over");
-        //     alert("Hey, another alert.")
-        //     rejoin();
-        // }
     });
 }
 

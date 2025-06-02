@@ -11,7 +11,13 @@ const SocketHandler = require('./socketHandler');
 // Initialize express and socket.io
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "https://bfs.so-we-must-think.space",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
 
 // check if set to test client script (while frontend isn't frontending yet)
 const TEST_MODE = process.argv.length > 2 && process.argv[2] == 'test';
