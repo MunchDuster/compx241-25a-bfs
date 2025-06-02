@@ -59,7 +59,13 @@ socket.on('connect', function() {
 
 // Handle error messages from server
 socket.on('error', (message) => {
-    alert(message);
+    //Super clunky I know
+    if(message === 'Invalid username. Must be 3-16 letters with no spaces.') {
+        //'Invalid username. Must be 3-16 letters with no spaces.'
+        
+    } else {
+        alert(message);
+    }
 })
 
 // Handle updated list of available players
