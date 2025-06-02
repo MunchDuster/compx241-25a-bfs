@@ -148,8 +148,8 @@ socket.on('game-ended', (message) => {
     document.getElementById('ship-placement-controls').classList.add('hidden');
     document.getElementById('game-controls').classList.add('hidden');
     //Show the game end controls
-    document.getElementById('game-over-controls').classList.remove('hidden');
     document.getElementById('game-over-message').innerHTML = message;
+    document.getElementById('game-over-controls').classList.remove('hidden');
     //Reset Game and Opponent
     oppUsername = null;
     gameRoom = null;
@@ -261,6 +261,7 @@ function find() {
 
 // Handle user rejoining lobby after game end
 function rejoin() {
+    document.getElementById('game-over-controls').classList.add('hidden');
     socket.emit('rejoin-lobby', username, (response) => {
         if (!response.success) return;
         // Show the find menu and update username displays
