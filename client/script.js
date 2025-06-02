@@ -377,7 +377,7 @@ function fireMissile() {
                         response.result.collateralDamage.forEach(tile => {
                             window.playHitExplosion(tile, 1);
                             setTimeout(() => {
-                                window.renderShipDamage(result.tile, 1);
+                                window.renderShipDamage(tile, 1);
                             }, 800);
                         });
                     }
