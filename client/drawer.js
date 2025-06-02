@@ -696,12 +696,13 @@ function getMineCountColor(count) {
 // Draw Functions
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
+window.renderShipDamage = renderShipDamage;
 window.highlightShipSnapCells = highlightShipSnapCells;
+window.highlightReconArea = highlightReconArea;
+window.highlightMineBlastArea = highlightMineBlastArea;
 window.playMissSplash = playMissSplash;
 window.playHitExplosion = playHitExplosion;
-window.renderShipDamage = renderShipDamage;
 window.showMineCount = showMineCount;
-window.highlightReconArea = highlightReconArea;
 window.showMoveShipButton = showMoveShipButton;
 
 // Helper Functions
