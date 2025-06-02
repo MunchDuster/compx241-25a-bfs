@@ -199,6 +199,7 @@ class Game {
                 const isMineHit = this.minefield.isMissileHit(x, y);
                 console.log(`${currentUser.name} hit mine at ${x}, ${y}?: ${isMineHit}`);
                 let shipHit = null;
+                let collateralDamage = [];
 
                 for (const ship of opponentUser.ships) {
                     if (ship.isHit(x, y)) {
@@ -208,18 +209,38 @@ class Game {
                     }
                 }
 
-                if (shipHit) {
-                    console.log(`${currentUser.name} Hit ship ${shipHit.type} at ${x}, ${y}`);
-                    return {
-                        success: true,
-                        result: {hit: true, tile: turn.targetTile, ship: shipHit.type},
-                    };
+                if (isMineHit) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        for (let dy = -1; dy <= 1; dy++) {
+                            const xCheck = x + dx;
+                            const yCheck = y + dy;
+
+                            if (xCheck < 0 || xCheck >= BOARD_SIZE || yCheck < 0 || yCheck >= BOARD_SIZE) {
+                                continue;
+                            }
+
+                            for (const ship of currentUser.ships) {
+                                if (ship.isHit(xCheck, yCheck)) {
+                                    ship.hit(xCheck, yCheck);
+                                    collateralDamage.push({
+                                        type: ship.type,
+                                        tile: {x: xCheck, y: yCheck}
+                                    });
+                                }
+                            }
+                        }
+                    }
                 }
 
-                // No hit or only mine hit
                 return {
                     success: true,
-                    result: {hit: isMineHit, tile: turn.targetTile},
+                    result: {
+                        shiphit: shipHit !== null,
+                        tile: turn.targetTile,
+                        ship: shipHit?.type,
+                        mineHit: isMineHit,
+                        collateralDamage: collateralDamage
+                    },
                 };
             case TURN_TYPE.Recon:
                 //Check tile input is correct
