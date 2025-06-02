@@ -79,13 +79,9 @@ function SocketHandler(socket, io) {
         // Play out the turn received
         const {success, result} = game.playTurn(user, turn);
 
-        // Create a response to send to the player who made the turn
-        // Do not send what the player hit, e.g. type of ship / mines
-        const playerResponse = turn.type == 'missile' ? { hit: result.hit, tile: result.tile,} : result;
-
         const gameOver = game.checkGameOver();
         // Send callback to player who made turn
-        callback({success, playerResponse, gameOver});
+        callback({success, result, gameOver});
         
         if (!success) {
             console.log('turn ' + turn.type + ' failed, reason: ', result);
