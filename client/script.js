@@ -39,6 +39,7 @@ let isTurn = false;
 let isReady = false;
 let selectedShip = null;
 let selectedTile = null;
+let selectedDirection = null;
 
 let unplacedShipsArray = [];
 let currentPlacedShipsArray = [];
@@ -228,6 +229,7 @@ function getGameState() {
         isReady: isReady,
         selectedShip: selectedShip,
         selectedTile: selectedTile,
+        selectedDirection: selectedDirection,
         unplacedShips: unplacedShipsArray,
         currentPlacedShips: currentPlacedShipsArray,
         isMoveShipMode: isMoveShipMode,
@@ -303,6 +305,10 @@ function setSelectedShip(ship) {
     selectedShip = ship;
     window.showMoveShipButton(selectedShip, 1);
     console.log("Selected ship: ", selectedShip.type, " at: ", selectedShip.centerTile, " rotated: ", selectedShip.rotation, " size: ", selectedShip.size);
+}
+
+function setSelectedDirection(arrow) {
+    selectedDirection = arrow;
 }
 
 window.setSelectedTile = setSelectedTile;
@@ -400,39 +406,29 @@ function canMoveShip() {
 }
 
 function moveShip() {
-    console.log("Move ship");
-    let gridStartX;
-    if(isPlayer1) {
-        gridStartX = getDrawerValues().GRID_X_OFFSET_P1;
-    } else {
-        gridStartX = getDrawerValues().GRID_X_OFFSET_P2;
+    let {x, y} = {x: 0, y: 0};
+
+    switch (selectedDirection) {
+        case 0: //up
+            y = - 46; 
+            x = 0;
+            break;
+        case 90: //right
+            x = 46;
+            y = 0; 
+            break;
+        case 180: //down
+            y = 46; 
+            x = 0;
+            break;
+        case 270: //left
+            x = - 46; 
+            y = 0;
+            break;
     }
 
-    if(selectedShip == null) return
-    const tiles = stagesAndLayers.gridLayer.find('Rect');
+    return {x, y};
 
-    tiles.forEach(t => {
-
-        const {x, y} = getGridPosFromCanvasPos(t.x(), t.y(), gridStartX);
-
-        const OFFSET = Math.ceil(selectedShip.size / 2);
-        const EVENOFFSET = selectedShip.size % 2 == 0 ? 1 : 0;
-
-        switch (selectedShip.rotation) {
-            case 0:
-            case 2:
-                if(x == selectedShip.centerTile.x && (y == selectedShip.centerTile.y + OFFSET|| y == selectedShip.centerTile.y - OFFSET - EVENOFFSET )) { 
-                    t.fill('rgba(0,255,0,0.4)');
-                } else { t.fill('#5F85B5'); }
-                break;
-            case 1:
-            case 3:
-                if( y == selectedShip.centerTile.y && (x == selectedShip.centerTile.x + OFFSET + EVENOFFSET|| x == selectedShip.centerTile.x - OFFSET)) { 
-                    t.fill('rgba(0,255,0,0.4)');
-                } else { t.fill('#5F85B5'); }
-                break; 
-        }
-    });
 }
 
 window.moveShip = moveShip;

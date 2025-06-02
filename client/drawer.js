@@ -15,6 +15,7 @@ const GRID_X_OFFSET_P1 = PLACEMENT_AREA_WIDTH;
 const GRID_X_OFFSET_P2 = PLAYER_GRID_WIDTH;
 
 let isUserPlayer1;
+let canMove = false;
 
 window.addEventListener('load', preloadFont);
 
@@ -202,6 +203,7 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 if (!gameState.isMoveShipMode) return;
                 window.setSelectedShip(ship);
                 console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
+                this.move() = window.moveShip();
             });
 
             shipImage.shipRef = ship;
@@ -498,7 +500,9 @@ function showMoveShipButton(ship, gridnum = 1) {
             });
 
             arrowShape.on('click', function() {
+                canMove = true;
                 console.log('arrow clicked 🍕🍕🍕');
+                window.setSelectedDirection(this.rotation);
                 feedbackLayer.destroyChildren();
                 feedbackLayer.batchDraw();
             });
