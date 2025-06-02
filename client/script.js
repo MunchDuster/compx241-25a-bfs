@@ -416,7 +416,7 @@ function canMoveShip() {
     isMissileMode = false;
     
     if (isMoveShipMode) {
-        moveShipButton.style.background = '#4CAF50'; // gree n as background
+        moveShipButton.style.background = '#4CAF50'; // green as background
         moveShipButton.style.color = 'white';
         moveShipButton.style.fontWeight = 'bold';
         moveShipButton.innerText = 'Moving Ship';
@@ -470,6 +470,8 @@ function moveShip() {
     selectedShip.konvaImg.y(tempY);
 
     console.log("New Position: Image: ", selectedShip.konvaImg.x(), selectedShip.konvaImg.y());
+
+    canMoveShip();
 }
 
 window.moveShip = moveShip;
