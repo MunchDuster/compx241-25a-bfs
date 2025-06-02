@@ -62,7 +62,7 @@ socket.on('error', (message) => {
     //Super clunky I know
     if(message === 'Invalid username. Must be 3-16 letters with no spaces.') {
         //'Invalid username. Must be 3-16 letters with no spaces.'
-        clopen();
+        showUsernameAlert();
     } else {
         alert(message);
     }
@@ -235,16 +235,14 @@ function getGameState() {
 }
 
 window.getGameState = getGameState;
-
-function clopen() {
-    
-    let label = document.getElementById('invalid-username-alert');
-    if(label.classList.contains('hidden')) {
-        label.classList.remove('hidden');
-    } else {
-        label.classList.add('hidden');
-    }
+function showUsernameAlert() {
+    document.getElementById('invalid-username-alert').classList.remove('hidden');
 }
+// 
+function closeUsernameAlert() {
+    document.getElementById('invalid-username-alert').classList.add('hidden');
+}
+
 // Handle user clicking "Find Game" button
 function find() {
     // Prompt user to input username
