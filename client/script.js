@@ -195,7 +195,7 @@ socket.on('see-turn', (turnInfo) => {
     console.log('see-turn', turnInfo);
 
     if (type === 'missile') {
-        if (result.hit && result.ship) {
+        if (result.shipHit && result.ship) {
             window.playHitExplosion(result.tile, 1, false);
             playAudio('boom');
             setTimeout(() => {
@@ -399,7 +399,7 @@ function fireMissile() {
             }
         } else if (turn.type == 'recon-missile') {
             window.highlightReconArea(selectedTile, 2);
-            window.showMineCount(selectedTile, 2, response.playerResponse.mineCount);
+            window.showMineCount(selectedTile, 2, response.result.mineCount);
         }
 
         selectedTile = null;

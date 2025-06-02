@@ -235,7 +235,7 @@ class Game {
                 return {
                     success: true,
                     result: {
-                        shiphit: shipHit !== null,
+                        shipHit: shipHit != null,
                         tile: turn.targetTile,
                         ship: shipHit?.type,
                         mineHit: isMineHit,
