@@ -1,8 +1,10 @@
 const audioDirectory = 'assets/audio/';
 const audioType = '.mp3';
+const volumeSlider = document.getElementById('volumeSlider');
 
 let audioContext;
 let gainNode;
+let gainMultiplier = 1; // for track fade in-out
 
 let musicTrack;
 let musicAudio;
@@ -14,15 +16,14 @@ function initializeAudioSystem() {
 }
 
 // volume control
+function updateGain() {
+    const volume = volumeSlider.value * gainMultiplier;
+    console.log('setting volume: ' + volume);
+    gainNode.gain.value = volume;
+}
 function initializeVolumeSlider() {
-    const volumeSlider = document.getElementById('volumeSlider');
-    const setGain = () => {
-        const volume = volumeSlider.value;
-        console.log('setting volume: ' + volume);
-        gainNode.gain.value = volume;
-    };
-    volumeSlider.addEventListener('input', setGain);
-    setGain();
+    volumeSlider.addEventListener('input', updateGain);
+    updateGain();
 }
 function hideTheExplanation() {
     const tip = document.querySelector('.whyCantIHearTheSong');
@@ -36,22 +37,20 @@ async function wait(seconds) {
     return new Promise(resolve => setTimeout(resolve, seconds * 1000));
 }
 async function smoothVolumeChange(target, time) {
-    const startVolume = volumeSlider.value;
+    const startVolume = gainMultiplier;
     const speed = Math.abs(startVolume - target) / time;
     const delta = speed * deltaTimeSeconds;
     if (target > startVolume) {
         for(let v = startVolume; v < target; v += delta) {
-            v = Math.min(target, v);
-            volumeSlider.value = v;
-            volumeSlider.dispatchEvent(new Event('input'));
+            gainMultiplier = Math.min(target, v);
+            updateGain();
             await wait(deltaTimeSeconds);
         }
     }
     else {
         for(let v = startVolume; v > target; v -= delta) {
-            v = Math.max(target, v);
-            volumeSlider.value = v;
-            volumeSlider.dispatchEvent(new Event('input'));
+            gainMultiplier = Math.max(target, v);
+            updateGain();
             await wait(deltaTimeSeconds);
         }
     }
