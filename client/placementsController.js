@@ -357,9 +357,13 @@ function placeShip(konvaShip) {
         ship.isPlaced = false;
         ship.centerTile = { x: -1, y: -1 };
 
-        if (unplacedShips.indexOf(ship) === -1) {
+        if (!unplacedShips.includes(ship)) {
             unplacedShips.push(ship);
-            currentPlacedShips.splice(currentPlacedShips.indexOf(ship), 1);
+        }
+        
+        const placedIndex = currentPlacedShips.indexOf(ship);
+        if (placedIndex !== -1) {
+            currentPlacedShips.splice(placedIndex, 1);
         }
     }
 
