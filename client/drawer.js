@@ -201,7 +201,6 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 const gameState = window.getGameState();
                 if (!gameState.isMoveShipMode) return;
                 window.setSelectedShip(ship);
-                moveShip();
                 console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
             });
 
@@ -426,6 +425,91 @@ function showMineCount(pos, gridNum = 2, count) {
     }, 2000);
 }
 
+function showMoveShipButton(ship, gridnum = 1) {
+    feedbackLayer.destroyChildren();
+    const isVertical = ship.rotation % 2 == 0;
+    const length = ship.size;
+    const isEven = length % 2 === 0;
+    
+    function getArrowOffset(length, isEven, shipRotation) {
+        if (!isEven) {
+            if (shipRotation % 2 == 0) {
+                return { up: Math.ceil(length / 2), down: Math.ceil(length / 2)};
+            } else {
+                return { left: Math.ceil(length / 2), right: Math.ceil(length / 2)};
+            }
+        }
+        const halfLength = length / 2;
+        switch (shipRotation) {
+            case 0:
+                return { up: halfLength + 1, down: halfLength};
+            case 1:
+                return { left: halfLength, right: halfLength + 1};
+            case 2:
+                return { up: halfLength, down: halfLength + 1};
+            case 3:
+                return { left: halfLength + 1, right: halfLength};
+        }
+    }
+
+    const offset = getArrowOffset(length, isEven, ship.rotation);
+    const arrows = isVertical ? [
+        { x: 0, y: -offset.up, rotation: 0, direction: 0 },     
+        { x: 0, y: offset.down, rotation: 180, direction: 2 }   
+    ] : [
+        { x: -offset.left, y: 0, rotation: 270, direction: 3 }, 
+        { x: offset.right, y: 0, rotation: 90, direction: 1 }   
+    ];
+
+    arrows.forEach(arrowData => {
+        const targetX = ship.centerTile.x + arrowData.x;
+        const targetY = ship.centerTile.y + arrowData.y;
+
+        if (targetX < 0 || targetX >= GRID_SIZE || 
+            targetY < 0 || targetY >= GRID_SIZE) {
+            return;
+        }
+
+        const pos = getCanvasPosFromGridPos(targetX, targetY, gridnum);
+        const arrowImg = new Image();
+        arrowImg.onload = function() {
+            const arrowShape = new Konva.Image({
+                x: pos.x,
+                y: pos.y,
+                image: arrowImg,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                opacity: 0.8,
+            });
+
+            arrowShape.on('mouseover', function() {
+                document.body.style.cursor = 'pointer';
+                this.opacity(1);
+                feedbackLayer.batchDraw();
+            });
+
+            arrowShape.on('mouseout', function() {
+                document.body.style.cursor = 'default';
+                this.opacity(0.8);
+                feedbackLayer.batchDraw();
+            });
+
+            arrowShape.on('click', function() {
+                window.socket.emit('play-turn', {
+                    type: 'move',
+                    ship: ship.type,
+                    direction: arrowData.direction
+                });
+                feedbackLayer.destroyChildren();
+                feedbackLayer.batchDraw();
+            });
+
+            feedbackLayer.add(arrowShape);
+            feedbackLayer.batchDraw();
+        };
+        arrowImg.src = '../assets/images/arrow2.png';
+    });
+}
 
 /*
  * ---- Helper Functions ----
@@ -513,6 +597,7 @@ window.playHitExplosion = playHitExplosion;
 window.renderShipDamage = renderShipDamage;
 window.showMineCount = showMineCount;
 window.highlightReconArea = highlightReconArea;
+window.showMoveShipButton = showMoveShipButton;
 
 // Helper Functions
 window.getDrawerValues = getDrawerValues;
