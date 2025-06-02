@@ -7,6 +7,7 @@ const GRID_SIZE = 10;
 let fontLoaded = false;
 
 const OFFSET = 4;
+let currShips = [];
 let TILE_SIZE
 
 const PLACEMENT_AREA_WIDTH = 160;
@@ -177,7 +178,6 @@ function drawSingleBoard(startX, gridNum) {
 function renderShipsPlacementDock(ships, onShipsLoaded) {
     shipPlacementLayer.destroyChildren();
     let loadedShips = 0;
-    let temp = [];
 
     ships.forEach(ship => {
         if (ship.isPlaced) return;
@@ -201,7 +201,7 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
             shipImage.on('mouseup', function() {
                 const gameState = window.getGameState();
                 if (!gameState.isMoveShipMode) return;
-                window.setSelectedShip(ship);
+                window.setSelectedShip(ship); 
                 console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
             });
 
@@ -209,7 +209,7 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
             ship.konvaImg = shipImage;
             shipPlacementLayer.add(shipImage);
             shipPlacementLayer.batchDraw();
-            temp.push(ship);
+            currShips.push(ship);
            
             loadedShips++;
             if (loadedShips === ships.length && onShipsLoaded) {
@@ -223,7 +223,6 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
         };
     });
     console.log("Ships Placement Dock Rendered");
-    currShips = temp;
 }
 
 function highlightShipSnapCells(cells, isValid) {
@@ -435,6 +434,8 @@ function renderShipDamage(pos, gridNum = 2) {
         // Draw on ship layer as it is like part of the ship or smth 
         shipLayer.add(damageImage);
         shipLayer.batchDraw();
+
+        
     };
     damageImg.src = `../assets/images/damage/damage_${randDamageSprite}.png`;
 }
@@ -512,11 +513,24 @@ function showMoveShipButton(ship, gridnum = 1) {
     ];
 
     arrows.forEach(arrowData => {
+
         const targetX = ship.centerTile.x + arrowData.x;
         const targetY = ship.centerTile.y + arrowData.y;
+        let shipCollision = false;
+
+        currShips.forEach(ship => {
+            const CELLS = window.getShipCellsFromCentre(ship, ship.centerTile.x, ship.centerTile.y);
+            CELLS.forEach(cell => {
+                if (targetX == cell.x && targetY == cell.y) {
+                    shipCollision = true;
+                    console.log("Ship Collision!");
+                }
+            });
+        });
 
         if (targetX < 0 || targetX >= GRID_SIZE || 
-            targetY < 0 || targetY >= GRID_SIZE) {
+            targetY < 0 || targetY >= GRID_SIZE ||
+            shipCollision) {
             return;
         }
 
