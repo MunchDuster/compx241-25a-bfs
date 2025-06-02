@@ -70,6 +70,11 @@ body {
     position: relative;
 }
 
+#game-controls button {
+    font-weight: bold;
+    font-size: 16px;
+}
+
 .slidecontainer {
     position: absolute;
     top: 10px;
