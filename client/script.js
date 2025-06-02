@@ -371,7 +371,15 @@ function fireMissile() {
 
                     // Show damge to own ships from mine blast 😔😔
                     if (response.result.collateralDamage.length > 0) {
-                        // 🦟🦟
+                        window.highlightMineBlastArea(selectedTile);
+                        window.highlightMineBlastArea(selectedTile, 2);
+
+                        response.result.collateralDamage.forEach(tile => {
+                            window.playHitExplosion(tile, 1);
+                            setTimeout(() => {
+                                window.renderShipDamage(result.tile, 1);
+                            }, 800);
+                        });
                     }
                 } else if (!response.result.shipHit) {
                     window.playMissSplash(selectedTile, 2, true);
