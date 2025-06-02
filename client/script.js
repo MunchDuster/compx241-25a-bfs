@@ -374,10 +374,10 @@ function fireMissile() {
                         window.highlightMineBlastArea(selectedTile);
                         window.highlightMineBlastArea(selectedTile, 2);
 
-                        response.result.collateralDamage.forEach(tile => {
-                            window.playHitExplosion(tile, 1);
+                        response.result.collateralDamage.forEach(damage => {
+                            window.playHitExplosion(damage.tile, 1);
                             setTimeout(() => {
-                                window.renderShipDamage(tile, 1);
+                                window.renderShipDamage(damage.tile, 1);
                             }, 800);
                         });
                     }
