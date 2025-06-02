@@ -14,7 +14,9 @@ const PLAYER_GRID_WIDTH = (CANVAS_WIDTH) / 2;
 const GRID_X_OFFSET_P1 = PLACEMENT_AREA_WIDTH;
 const GRID_X_OFFSET_P2 = PLAYER_GRID_WIDTH;
 
+let currShips = [];
 let isUserPlayer1;
+let canMove = false;
 
 window.addEventListener('load', preloadFont);
 
@@ -177,6 +179,7 @@ function drawSingleBoard(startX, gridNum) {
 function renderShipsPlacementDock(ships, onShipsLoaded) {
     shipPlacementLayer.destroyChildren();
     let loadedShips = 0;
+    let temp = [];
 
     ships.forEach(ship => {
         if (ship.isPlaced) return;
@@ -201,7 +204,6 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 const gameState = window.getGameState();
                 if (!gameState.isMoveShipMode) return;
                 window.setSelectedShip(ship);
-                moveShip();
                 console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
             });
 
@@ -209,7 +211,7 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
             ship.konvaImg = shipImage;
             shipPlacementLayer.add(shipImage);
             shipPlacementLayer.batchDraw();
-
+            temp.push(ship);
            
             loadedShips++;
             if (loadedShips === ships.length && onShipsLoaded) {
@@ -223,6 +225,51 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
         };
     });
     console.log("Ships Placement Dock Rendered");
+    currShips = temp;
+}
+
+function replaceShips(ships) {
+    shipPlacementLayer.destroyChildren();
+    let temp = [];
+
+    ships.forEach(ship => {
+
+        const shipImg = new Image();
+        shipImg.onload = function () {
+            const shipImage = new Konva.Image({
+                x: ship.x,
+                y: ship.y,
+                image: shipImg,
+                width: ship.width,
+                height: ship.height,
+                rotation: ship.rotation,
+                draggable: true,
+                shipType: ship.type,
+                offsetX: ship.width / 2,
+                offsetY: ship.height / 2,
+                shipRef: ship,
+            });
+                        
+            shipImage.on('mouseup', function() {
+                const gameState = window.getGameState();
+                if (!gameState.isMoveShipMode) return;
+                window.setSelectedShip(ship);
+                console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
+            });
+
+            shipImage.shipRef = ship;
+            ship.konvaImg = shipImage;
+            shipPlacementLayer.add(shipImage);
+            shipPlacementLayer.batchDraw();
+            temp.push(ship);
+        }
+        shipImg.src = ship.imgPath;
+
+        shipImg.onerror = function() {
+            console.error(`Failed to load ship image: ${ship.imgPath}`);
+        };
+    });
+    currShips = temp;
 }
 
 function highlightShipSnapCells(cells, isValid) {
@@ -299,6 +346,54 @@ function highlightReconArea(centerPos, gridNum = 2) {
         setTimeout(() => {
             fadeOut.play();
         }, 2000);
+    });
+}
+
+function highlightMineBlastArea(centerPos, gridNum = 1) {
+    const blastColor = 'rgba(255, 69, 0, 0.5)';
+    const blastStroke = '#FF4500';
+
+    for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+            const gridPos = {x: centerPos.x + x, y: centerPos.y + y};
+
+            if (gridPos.x < 0 || gridPos.x >= GRID_SIZE || 
+                gridPos.y < 0 || gridPos.y >= GRID_SIZE) {
+                continue;
+            }
+            
+            const pos = window.getCanvasPosFromGridPos(gridPos.x, gridPos.y, gridNum);
+
+            const rect = new Konva.Rect({
+                x: pos.x,
+                y: pos.y,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                fill: blastColor,
+                stroke: blastStroke,
+                strokeWidth: 1,
+                opacity: 1
+            });
+            feedbackLayer.add(rect);
+        }
+    }
+    feedbackLayer.batchDraw();
+
+    const highlights = feedbackLayer.find('Rect');
+    highlights.forEach(highlight => {
+        const fadeOut = new Konva.Tween({
+            node: highlight,
+            duration: 1,
+            opacity: 0,
+            onFinish: () => {
+                highlight.destroy();
+                feedbackLayer.batchDraw();
+            }
+        });
+
+        setTimeout(() => {
+            fadeOut.play();
+        }, 200);
     });
 }
 
@@ -426,6 +521,100 @@ function showMineCount(pos, gridNum = 2, count) {
     }, 2000);
 }
 
+function showMoveShipButton(ship, gridnum = 1) {
+    feedbackLayer.destroyChildren();
+    const isVertical = ship.rotation % 2 == 0;
+    const length = ship.size;
+    const isEven = length % 2 === 0;
+    
+    function getArrowOffset(length, isEven, shipRotation) {
+        if (!isEven) {
+            if (shipRotation % 2 == 0) {
+                return { up: Math.ceil(length / 2), down: Math.ceil(length / 2)};
+            } else {
+                return { left: Math.ceil(length / 2), right: Math.ceil(length / 2)};
+            }
+        }
+        const halfLength = length / 2;
+        switch (shipRotation) {
+            case 0:
+                return { up: halfLength + 1, down: halfLength};
+            case 1:
+                return { left: halfLength, right: halfLength + 1};
+            case 2:
+                return { up: halfLength, down: halfLength + 1};
+            case 3:
+                return { left: halfLength + 1, right: halfLength};
+        }
+    }
+
+    const offset = getArrowOffset(length, isEven, ship.rotation);
+    const arrows = isVertical ? [
+        { x: 0, y: -offset.up, rotation: 0, offsetX: 0, offsetY: 0,},     
+        { x: 0, y: offset.down, rotation: 180, offsetX: TILE_SIZE, offsetY: TILE_SIZE,}   
+    ] : [
+        { x: -offset.left, y: 0, rotation: 270, offsetX: TILE_SIZE, offsetY: 0,}, 
+        { x: offset.right, y: 0, rotation: 90, offsetX: 0, offsetY: TILE_SIZE,}   
+    ];
+
+    arrows.forEach(arrowData => {
+        const targetX = ship.centerTile.x + arrowData.x;
+        const targetY = ship.centerTile.y + arrowData.y;
+
+        if (targetX < 0 || targetX >= GRID_SIZE || 
+            targetY < 0 || targetY >= GRID_SIZE) {
+            return;
+        }
+
+        const pos = getCanvasPosFromGridPos(targetX, targetY, gridnum);
+        const arrowImg = new Image();
+        arrowImg.onload = function() {
+            const arrowShape = new Konva.Image({
+                x: pos.x,
+                y: pos.y,
+                image: arrowImg,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                opacity: 0.8,
+                offsetX: arrowData.offsetX,
+                offsetY: arrowData.offsetY,
+                rotation: arrowData.rotation
+            });
+
+            arrowShape.on('mouseover', function() {
+                document.body.style.cursor = 'pointer';
+                this.opacity(1);
+                feedbackLayer.batchDraw();
+            });
+
+            arrowShape.on('mouseout', function() {
+                document.body.style.cursor = 'default';
+                this.opacity(0.8);
+                feedbackLayer.batchDraw();
+            });
+
+            arrowShape.on('click', function() {
+                let gameState = window.getGameState();
+                window.setSelectedDirection(this.rotation);
+                console.log(selectedShip.type);
+                currShips.forEach(ship => {
+                    if (ship == gameState.selectedShip) {
+                        console.log('arrow clicked 🍕🍕🍕 on ', ship.type);
+                        window.moveShip();
+                        ship = gameState.selectedShip;
+                    }
+                });
+                replaceShips(currShips);
+                feedbackLayer.destroyChildren();
+                feedbackLayer.batchDraw();
+            });
+
+            feedbackLayer.add(arrowShape);
+            feedbackLayer.batchDraw();
+        };
+        arrowImg.src = '../assets/images/arrow2.png';
+    });
+}
 
 /*
  * ---- Helper Functions ----
@@ -507,12 +696,14 @@ function getMineCountColor(count) {
 // Draw Functions
 window.initCanvas = initCanvas;
 window.renderShipsPlacementDock = renderShipsPlacementDock;
+window.renderShipDamage = renderShipDamage;
 window.highlightShipSnapCells = highlightShipSnapCells;
+window.highlightReconArea = highlightReconArea;
+window.highlightMineBlastArea = highlightMineBlastArea;
 window.playMissSplash = playMissSplash;
 window.playHitExplosion = playHitExplosion;
-window.renderShipDamage = renderShipDamage;
 window.showMineCount = showMineCount;
-window.highlightReconArea = highlightReconArea;
+window.showMoveShipButton = showMoveShipButton;
 
 // Helper Functions
 window.getDrawerValues = getDrawerValues;

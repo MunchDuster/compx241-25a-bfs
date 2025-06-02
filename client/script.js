@@ -39,6 +39,7 @@ let isTurn = false;
 let isReady = false;
 let selectedShip = null;
 let selectedTile = null;
+let selectedDirection = null;
 
 let unplacedShipsArray = [];
 let currentPlacedShipsArray = [];
@@ -192,16 +193,12 @@ socket.on('wait-start', () => {
 socket.on('see-turn', (turnInfo) => {
     const {gameState, type, result} = turnInfo;
     console.log('see-turn', turnInfo);
+
     if (type === 'missile') {
-        if (result.hit && result.ship) {
-            // const canvasTilepos = getCanvasPosFromGridPos(result.tile.x, result.tile.y, 1);
-            // window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, canvasTilepos.gridNumber);
-            
+        if (result.shipHit && result.ship) {
             window.playHitExplosion(result.tile, 1, false);
             playAudio('boom');
             setTimeout(() => {
-                // window.renderShipDamage(canvasTilepos.x, canvasTilepos.y, canvasTilepos.gridNumber,);
-                
                 window.renderShipDamage(result.tile, 1);
             }, 800);
         }
@@ -228,6 +225,7 @@ function getGameState() {
         isReady: isReady,
         selectedShip: selectedShip,
         selectedTile: selectedTile,
+        selectedDirection: selectedDirection,
         unplacedShips: unplacedShipsArray,
         currentPlacedShips: currentPlacedShipsArray,
         isMoveShipMode: isMoveShipMode,
@@ -302,7 +300,12 @@ function setSelectedTile(x, y) {
 
 function setSelectedShip(ship) {
     selectedShip = ship;
+    window.showMoveShipButton(selectedShip, 1);
     console.log("Selected ship: ", selectedShip.type, " at: ", selectedShip.centerTile, " rotated: ", selectedShip.rotation, " size: ", selectedShip.size);
+}
+
+function setSelectedDirection(arrow) {
+    selectedDirection = arrow;
 }
 
 window.setSelectedTile = setSelectedTile;
@@ -355,84 +358,108 @@ function fireMissile() {
             y: selectedTile.y
         }
     };
+
     console.log("Firing");
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
         console.log(response);
-        const gameOver = response.gameOver;
+        
         if (turn.type == 'missile') {
             if (success) {
-                const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
-                if (!response.playerResponse.hit){
-                    // window.playMissSplash(canvasTilepos.x, canvasTilepos.y, true);
-                    
+                if (response.result.mineHit) {
+                    window.playHitExplosion(selectedTile, 2, true);
+                    playAudio('boom');
+
+                    // Show damge to own ships from mine blast 😔😔
+                    if (response.result.collateralDamage.length > 0) {
+                        window.highlightMineBlastArea(selectedTile);
+                        window.highlightMineBlastArea(selectedTile, 2);
+
+                        response.result.collateralDamage.forEach(damage => {
+                            window.playHitExplosion(damage.tile, 1);
+                            setTimeout(() => {
+                                window.renderShipDamage(damage.tile, 1);
+                            }, 800);
+                        });
+                    }
+                } else if (!response.result.shipHit) {
                     window.playMissSplash(selectedTile, 2, true);
                     playAudio('splash');
-                } else if (response.playerResponse.hit) {
-                    // window.playHitExplosion(canvasTilepos.x, canvasTilepos.y, true);
-
+                } else if (response.result.shipHit) {
                     window.playHitExplosion(selectedTile, 2, true);
                     playAudio('boom');
                 }
+
+                /* if (!response.playerResponse.hit){
+                    window.playMissSplash(selectedTile, 2, true);
+                    playAudio('splash');
+                } else if (response.playerResponse.hit) {
+                    window.playHitExplosion(selectedTile, 2, true);
+                    playAudio('boom');
+                } */
             }
         } else if (turn.type == 'recon-missile') {
-            // const canvasTilepos = getCanvasPosFromGridPos(selectedTile.x, selectedTile.y, 2);
-            // window.showMineCount(canvasTilepos.x, canvasTilepos.y, response.playerResponse.mineCount);
             window.highlightReconArea(selectedTile, 2);
-            window.showMineCount(selectedTile, 2, response.playerResponse.mineCount);
+            window.showMineCount(selectedTile, 2, response.result.mineCount);
         }
 
         selectedTile = null;
         const tiles = stagesAndLayers.gridLayer.find('Rect');
         tiles.forEach(t => t.fill('#5F85B5'));
         stagesAndLayers.gridLayer.batchDraw();
-        // if(!gameOver) {
-        //     alert("Game Over");
-        //     alert("Hey, another alert.")
-        //     rejoin();
-        // }
     });
 }
 
 function canMoveShip() {
     isMoveShipMode = !isMoveShipMode;
-    moveShipButton.style.background = moveShipButton.style.background == '#f0f0f0' ? 'green' : '#f0f0f0';
+    isMissileMode = false;
+    
+    if (isMoveShipMode) {
+        moveShipButton.style.background = '#4CAF50'; // gree n as background
+        moveShipButton.style.color = 'white';
+        moveShipButton.style.fontWeight = 'bold';
+        moveShipButton.innerText = 'Moving Ship';
+    } else {
+        moveShipButton.style.background = '#f0f0f0';
+        moveShipButton.style.color = 'black';
+        moveShipButton.style.fontWeight = 'bold';
+        moveShipButton.innerText = 'Move Ship';
+        
+        // Clear arrows
+        feedbackLayer.destroyChildren();
+        feedbackLayer.batchDraw();
+    }
 }
 
 function moveShip() {
-    console.log("Move ship");
-    let gridStartX;
-    if(isPlayer1) {
-        gridStartX = getDrawerValues().GRID_X_OFFSET_P1;
-    } else {
-        gridStartX = getDrawerValues().GRID_X_OFFSET_P2;
+    let {x, y} = {x: 0, y: 0};
+    const gridNum = isPlayer1 ? 1 : 2;
+
+    switch (selectedDirection) {
+        case 0: //up
+            y = -1; 
+            x = 0;
+            break;
+        case 90: //right
+            x = 1;
+            y = 0; 
+            break;
+        case 180: //down
+            y = 1; 
+            x = 0;
+            break;
+        case 270: //left
+            x = -1; 
+            y = 0;
+            break;
     }
 
-    if(selectedShip == null) return
-    const tiles = stagesAndLayers.gridLayer.find('Rect');
-
-    tiles.forEach(t => {
-
-        const {x, y} = getGridPosFromCanvasPos(t.x(), t.y(), gridStartX);
-
-        const OFFSET = Math.ceil(selectedShip.size / 2);
-        const EVENOFFSET = selectedShip.size % 2 == 0 ? 1 : 0;
-
-        switch (selectedShip.rotation) {
-            case 0:
-            case 2:
-                if(x == selectedShip.centerTile.x && (y == selectedShip.centerTile.y + OFFSET|| y == selectedShip.centerTile.y - OFFSET - EVENOFFSET )) { 
-                    t.fill('rgba(0,255,0,0.4)');
-                } else { t.fill('#5F85B5'); }
-                break;
-            case 1:
-            case 3:
-                if( y == selectedShip.centerTile.y && (x == selectedShip.centerTile.x + OFFSET + EVENOFFSET|| x == selectedShip.centerTile.x - OFFSET)) { 
-                    t.fill('rgba(0,255,0,0.4)');
-                } else { t.fill('#5F85B5'); }
-                break; 
-        }
-    });
+    selectedShip.x = getCanvasPosFromGridPos(selectedShip.centerTile.x + x, selectedShip.centerTile.y + y, gridNum).x;
+    selectedShip.y = getCanvasPosFromGridPos(selectedShip.centerTile.x + x, selectedShip.centerTile.y + y, gridNum).y;
+    selectedShip.centerTile.x += x;
+    selectedShip.centerTile.y += y;
+    selectedShip.isPlaced = false;
+    selectedDirection = null;
 }
 
-window.moveShip() = moveShip();
+window.moveShip = moveShip;
