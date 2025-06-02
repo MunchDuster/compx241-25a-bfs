@@ -14,6 +14,7 @@ const PLAYER_GRID_WIDTH = (CANVAS_WIDTH) / 2;
 const GRID_X_OFFSET_P1 = PLACEMENT_AREA_WIDTH;
 const GRID_X_OFFSET_P2 = PLAYER_GRID_WIDTH;
 
+let currShips = [];
 let isUserPlayer1;
 let canMove = false;
 
@@ -178,6 +179,7 @@ function drawSingleBoard(startX, gridNum) {
 function renderShipsPlacementDock(ships, onShipsLoaded) {
     shipPlacementLayer.destroyChildren();
     let loadedShips = 0;
+    let temp = [];
 
     ships.forEach(ship => {
         if (ship.isPlaced) return;
@@ -203,14 +205,13 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 if (!gameState.isMoveShipMode) return;
                 window.setSelectedShip(ship);
                 console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
-                this.move() = window.moveShip();
             });
 
             shipImage.shipRef = ship;
             ship.konvaImg = shipImage;
             shipPlacementLayer.add(shipImage);
             shipPlacementLayer.batchDraw();
-
+            temp.push(ship);
            
             loadedShips++;
             if (loadedShips === ships.length && onShipsLoaded) {
@@ -224,6 +225,51 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
         };
     });
     console.log("Ships Placement Dock Rendered");
+    currShips = temp;
+}
+
+function replaceShips(ships) {
+    shipPlacementLayer.destroyChildren();
+    let temp = [];
+
+    ships.forEach(ship => {
+
+        const shipImg = new Image();
+        shipImg.onload = function () {
+            const shipImage = new Konva.Image({
+                x: ship.x,
+                y: ship.y,
+                image: shipImg,
+                width: ship.width,
+                height: ship.height,
+                rotation: ship.rotation,
+                draggable: true,
+                shipType: ship.type,
+                offsetX: ship.width / 2,
+                offsetY: ship.height / 2,
+                shipRef: ship,
+            });
+                        
+            shipImage.on('mouseup', function() {
+                const gameState = window.getGameState();
+                if (!gameState.isMoveShipMode) return;
+                window.setSelectedShip(ship);
+                console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
+            });
+
+            shipImage.shipRef = ship;
+            ship.konvaImg = shipImage;
+            shipPlacementLayer.add(shipImage);
+            shipPlacementLayer.batchDraw();
+            temp.push(ship);
+        }
+        shipImg.src = ship.imgPath;
+
+        shipImg.onerror = function() {
+            console.error(`Failed to load ship image: ${ship.imgPath}`);
+        };
+    });
+    currShips = temp;
 }
 
 function highlightShipSnapCells(cells, isValid) {
@@ -500,9 +546,17 @@ function showMoveShipButton(ship, gridnum = 1) {
             });
 
             arrowShape.on('click', function() {
-                canMove = true;
-                console.log('arrow clicked 🍕🍕🍕');
+                let gameState = window.getGameState();
                 window.setSelectedDirection(this.rotation);
+                console.log(selectedShip.type);
+                currShips.forEach(ship => {
+                    if (ship == gameState.selectedShip) {
+                        console.log('arrow clicked 🍕🍕🍕 on ', ship.type);
+                        window.moveShip();
+                        ship = gameState.selectedShip;
+                    }
+                });
+                replaceShips(currShips);
                 feedbackLayer.destroyChildren();
                 feedbackLayer.batchDraw();
             });

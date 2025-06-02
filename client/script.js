@@ -423,28 +423,33 @@ function canMoveShip() {
 
 function moveShip() {
     let {x, y} = {x: 0, y: 0};
+    const gridNum = isPlayer1 ? 1 : 2;
 
     switch (selectedDirection) {
         case 0: //up
-            y = - 46; 
+            y = -1; 
             x = 0;
             break;
         case 90: //right
-            x = 46;
+            x = 1;
             y = 0; 
             break;
         case 180: //down
-            y = 46; 
+            y = 1; 
             x = 0;
             break;
         case 270: //left
-            x = - 46; 
+            x = -1; 
             y = 0;
             break;
     }
 
-    return {x, y};
-
+    selectedShip.x = getCanvasPosFromGridPos(selectedShip.centerTile.x + x, selectedShip.centerTile.y + y, gridNum).x;
+    selectedShip.y = getCanvasPosFromGridPos(selectedShip.centerTile.x + x, selectedShip.centerTile.y + y, gridNum).y;
+    selectedShip.centerTile.x += x;
+    selectedShip.centerTile.y += y;
+    selectedShip.isPlaced = false;
+    selectedDirection = null;
 }
 
 window.moveShip = moveShip;
