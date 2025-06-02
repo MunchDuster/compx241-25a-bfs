@@ -108,8 +108,8 @@ function SocketHandler(socket, io) {
         }
         io.to(opponent.socketId).emit('see-turn', seeTurn);
         if (gameOver) {
-            io.to(user.socketId).emit('game-ended', "winner");
-            io.to(opponent.socketId).emit('game-ended', "winner");
+            io.to(user.socketId).emit('game-ended', "Winner: " + game.winner);
+            io.to(opponent.socketId).emit('game-ended', "Winner: " + game.winner);
             game.delete();
             user.game = null;
             opponent.game = null;
