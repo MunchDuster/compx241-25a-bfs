@@ -235,18 +235,18 @@ function getGameState() {
 }
 
 window.getGameState = getGameState;
+// Function to show invalid username alert to client
 function showUsernameAlert() {
     document.getElementById('invalid-username-alert').classList.remove('hidden');
 }
-// 
+// Function to hide invalid username alert from client
 function closeUsernameAlert() {
     document.getElementById('invalid-username-alert').classList.add('hidden');
 }
 
 // Handle user clicking "Find Game" button
 function find() {
-    // Prompt user to input username
-    // username = prompt('enter user name: ');
+    //Get the username from the client 
     username = document.getElementById("uname").value;
     
     //Emit find event to server with username
