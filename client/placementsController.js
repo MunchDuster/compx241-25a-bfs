@@ -377,4 +377,5 @@ function lockShips() {
     stagesAndLayers.shipLayer.batchDraw();
 }
 
+window.lockShips = lockShips;
 window.initPlacements = initPlacements;
