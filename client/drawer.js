@@ -495,11 +495,7 @@ function showMoveShipButton(ship, gridnum = 1) {
             });
 
             arrowShape.on('click', function() {
-                window.socket.emit('play-turn', {
-                    type: 'move',
-                    ship: ship.type,
-                    direction: arrowData.direction
-                });
+                console.log('arrow clicked 🍕🍕🍕');
                 feedbackLayer.destroyChildren();
                 feedbackLayer.batchDraw();
             });
