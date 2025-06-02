@@ -79,13 +79,24 @@ function setupInputListeners() {
             const konvaShip = ship.konvaImg;
 
             konvaShip.on('dragstart', function () {
-                if (ship.isPlaced) {
+                if (!gameState.isReady) {
+                    draggedShip = this;
+                    this.moveTo(stagesAndLayers.shipPlacementLayer);
+                    this.moveToTop();
+
+                    if (ship.isPlaced) {
+                        ship.isPlaced = false;
+                        const index = currentPlacedShips.indexOf(ship);
+                        if (index > -1) {
+                            currentPlacedShips.splice(index, 1);
+                        }
+                    }
+
+console.log("Dragging ship: ", ship.type); // me when i copy and paste lmao im sure this will work right?
+                } else {
                     this.draggable(false);
-                    return;
                 }
-                draggedShip = this;
-                this.moveToTop();
-                console.log("Dragging ship: ", ship.type);
+                
             });
 
             konvaShip.on('dragmove', function () {
@@ -330,7 +341,9 @@ function placeShip(konvaShip) {
 
                 //konvaShip.draggable(false);
                 konvaShip.moveTo(stagesAndLayers.shipLayer);
-                currentPlacedShips.push(ship);
+                if (!currentPlacedShips.includes(ship)) {
+                    currentPlacedShips.push(ship);
+                }
                 shipPlaced = true;
             }
         }
