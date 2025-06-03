@@ -346,7 +346,7 @@ function highlightMineBlastArea(centerPos, gridNum = 1) {
 
         setTimeout(() => {
             fadeOut.play();
-        }, 200);
+        }, 3000);
     });
 }
 
@@ -482,7 +482,7 @@ function showMineCount(pos, gridNum = 2, count) {
     // Start fade after 3 seconds
     setTimeout(() => {
         fadeOut.play();
-    }, 2000);
+    }, 3000);
 }
 
 function showMoveShipButton(ship, gridnum = 1) {

@@ -471,6 +471,7 @@ function moveShip() {
     console.log("New Position: Image: ", selectedShip.konvaImg.x(), selectedShip.konvaImg.y());
 
     canMoveShip();
+    moveShipButton.disabled = true;
 }
 
 window.moveShip = moveShip;
