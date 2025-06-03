@@ -133,6 +133,7 @@ socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     console.log('joining game ' + gameRoom + ' against ' + oppUsername);
 
     initCanvas(isPlayer1); // Initialize drawing state
+    stagesAndLayers = window.getStageAndLayers();
     currentPlacedShipsArray = [];
     unplacedShipsArray = [];
     initPlacements(isPlayer1); //place ships to be moved by the player
@@ -253,7 +254,40 @@ function find() {
 
 // Handle user rejoining lobby after game end
 function rejoin() {
+    // Reset game state variables
+    isPlayer1 = null;
+    isTurn = false;
+    isReady = false;
+    selectedShip = null;
+    selectedTile = null;
+    selectedDirection = null;
+    unplacedShipsArray = [];
+    currentPlacedShipsArray = [];
+    isMissileMode = true;
+    isMoveShipMode = false;
+
+    // Reset UI elements
     document.getElementById('game-over-controls').classList.add('hidden');
+    document.getElementById('game-controls').classList.add('hidden');
+    document.getElementById('ship-placement-controls').classList.add('hidden');
+    moveShipButton.disabled = false;
+    fireButton.disabled = false;
+    toggleMissileModeButton.disabled = false;
+    playerTurnText.innerHTML = "";
+
+    // DESTROY ALL CHILDREN 💣🧨💥🧒💥👶👨‍👩‍👧‍👦💥👩‍👦💥👪💥👩‍👧‍👦
+    if (stagesAndLayers) {
+        stagesAndLayers.gridLayer.destroyChildren();
+        stagesAndLayers.shipLayer.destroyChildren();
+        stagesAndLayers.feedbackLayer.destroyChildren();
+        stagesAndLayers.shipPlacementLayer.destroyChildren();
+        
+        stagesAndLayers.gridLayer.batchDraw();
+        stagesAndLayers.shipLayer.batchDraw();
+        stagesAndLayers.feedbackLayer.batchDraw();
+        stagesAndLayers.shipPlacementLayer.batchDraw();
+    }
+
     socket.emit('rejoin-lobby', username, (response) => {
         if (!response.success) return;
         // Show the find menu and update username displays
