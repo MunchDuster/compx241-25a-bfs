@@ -27,6 +27,13 @@ const toggleMissileModeButton = document.getElementById('toggle-missile-mode-but
 const moveShipButton = document.getElementById('move-ship-button');
 const playerTurnText = document.getElementById('player-turn-text');
 
+// Disable game buttons initially
+fireButton.disabled = true;
+toggleMissileModeButton.disabled = true;
+moveShipButton.disabled = true;
+document.getElementById('ready-button').disabled = true;
+document.getElementById('return-to-lobby-button').disabled = true;
+
 /*
  *  ---- Game State Variables ----
  */
@@ -72,7 +79,7 @@ socket.on('error', (message) => {
 // Handle updated list of available players
 socket.on('find-results', (usersFinding) => {
     console.log('find results are: ', usersFinding);
-    findListContainer.innerHTML = ''; // Clear exisiting list\
+    findListContainer.innerHTML = ''; // Clear exisiting list
 
     // Create a new list item for each available player
     for (let findUsername of usersFinding) {
@@ -152,6 +159,7 @@ socket.on('game-ended', (message) => {
     //Show the game end controls
     document.getElementById('game-over-message').innerHTML = message;
     document.getElementById('game-over-controls').classList.remove('hidden');
+    document.getElementById('return-to-lobby-button').disabled = false;
     //Reset Game and Opponent
     oppUsername = null;
     gameRoom = null;
@@ -293,19 +301,43 @@ function rejoin() {
 
 // Function to handle menu visibility
 function showMenu(name) {
+    document.getElementById('uname').disabled = true;
+    document.getElementById('find').disabled = true;
+    document.getElementById('settings').disabled = true;
+    document.getElementById('credits').disabled = true;
+    document.getElementById('ready-button').disabled = true;
+    document.getElementById('return-to-lobby-button').disabled = true;
+    fireButton.disabled = true;
+    toggleMissileModeButton.disabled = true;
+    moveShipButton.disabled = true;
+    const requestButtons = document.querySelectorAll('.request-game-button');
+    requestButtons.forEach(button => button.disabled = true);
+
     for(let menu of menus) {
         if (menu.name == name) {
             // Show requested menu if not already shown
-            if (menu.shown) continue;
             menu.shown = true;
             menu.element.classList.remove('hidden');
-            continue;
-        }
 
-        // Hide other menus
-        if (!menu.shown) continue;
-        menu.shown = false;
-        menu.element.classList.add('hidden');
+            if (name == 'start') {
+                document.getElementById('uname').disabled = false;
+                document.getElementById('find').disabled = false;
+                document.getElementById('settings').disabled = false;
+                document.getElementById('credits').disabled = false;
+            } else if (name == 'find') {
+                const requestButtons = document.querySelectorAll('.request-game-button');
+                requestButtons.forEach(button => button.disabled = false);
+            } else if (name == 'game') {
+                if (isTurn) {
+                    fireButton.disabled = false;
+                    toggleMissileModeButton.disabled = false;
+                    moveShipButton.disabled = false;
+                }
+            }
+        } else {
+            menu.shown = false;
+            menu.element.classList.add('hidden');
+        }
     }
 }
 
@@ -574,31 +606,4 @@ window.moveShip = moveShip;
             e.preventDefault();
         }
     });
-
-    //validate button states periodically
-    setInterval(() => {
-        const gameState = window.getGameState();
-        
-        // return to lobby button
-        const returnButton = document.getElementById('return-to-lobby-button');
-        if (returnButton) {
-            returnButton.disabled = !gameState.gameEnded;
-        }
-
-        // request game buttons
-        const requestButtons = document.querySelectorAll('.request-game-button');
-        requestButtons.forEach(button => {
-            button.disabled = !gameState.isFinding;
-        });
-
-        // game control buttons
-        const gameButtons = document.querySelectorAll('#game-controls button');
-        gameButtons.forEach(button => {
-            if (!gameState.isTurn) {
-                button.disabled = true;
-                button.style.cursor = 'not-allowed';
-                button.style.opacity = '0.6';
-            }
-        });
-    }, 100);
 })();
