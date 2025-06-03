@@ -413,7 +413,6 @@ function fireMissile() {
 
 function canMoveShip() {
     isMoveShipMode = !isMoveShipMode;
-    isMissileMode = false;
     
     if (isMoveShipMode) {
         moveShipButton.style.background = '#4CAF50'; // green as background
