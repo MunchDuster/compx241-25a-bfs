@@ -342,11 +342,14 @@ function playerTurn() {
 }
 
 function toggleMissileMode() {
+    if (isMoveShipMode) {
+        isMoveShipMode = false;
+        updateMoveShipButton();
+    }
+    
     isMissileMode = !isMissileMode;
-    isMoveShipMode = false;
     toggleMissileModeButton.innerText = isMissileMode ? 'Switch to Scan' : 'Switch to Missile';
     fireButton.innerText = isMissileMode ? 'Fire Missile' : 'Fire Recon Missile';
-    console.log('Switching to ' + (isMissileMode ? 'Missile' : 'Scan'));
 }
 
 function fireMissile() {
@@ -413,9 +416,12 @@ function fireMissile() {
 
 function canMoveShip() {
     isMoveShipMode = !isMoveShipMode;
-    
+    updateMoveShipButton();
+}
+
+function updateMoveShipButton() {
     if (isMoveShipMode) {
-        moveShipButton.style.background = '#4CAF50'; // green as background
+        moveShipButton.style.background = '#4CAF50';
         moveShipButton.style.color = 'white';
         moveShipButton.style.fontWeight = 'bold';
         moveShipButton.innerText = 'Moving Ship';
