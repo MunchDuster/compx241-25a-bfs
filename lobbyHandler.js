@@ -37,7 +37,10 @@ function LobbyHandler(user, logError, onJoinedLobby, onGameRequested, onJoinGame
     };
     this.rejoinLobby = (username, callback) => {
         // Update user state to indicate they are searching for a game
-        user.name = username;
+        if (user.name != username) {
+            callback({success: false});
+        }
+
         user.isFinding = true;
         console.log(`${user.toString()} is finding.`);
         callback({success: true});

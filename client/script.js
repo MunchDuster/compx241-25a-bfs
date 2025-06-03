@@ -253,7 +253,7 @@ function find() {
 }
 
 // Handle user rejoining lobby after game end
-function rejoin() {
+function rejoin() {    
     // Reset game state variables
     isPlayer1 = null;
     isTurn = false;
@@ -279,7 +279,11 @@ function rejoin() {
     window.destroyStageAndLayers();
 
     socket.emit('rejoin-lobby', username, (response) => {
-        if (!response.success) return;
+        if (!response.success) {
+            showMenu('start');
+            console.log('failed entering finding');
+            return;
+        };
         // Show the find menu and update username displays
         showMenu('find');
         console.log(usernameDisplays)
