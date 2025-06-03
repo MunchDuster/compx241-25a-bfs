@@ -125,6 +125,7 @@ socket.on('requested-game', (requesterUsername) => {
     const joinButton = document.createElement('button');
     joinButton.innerText = 'Join';
     joinButton.classList.add('join-button');
+    joinButton.disabled = !menus.find(m => m.name === 'find')?.shown;
     joinButton.addEventListener('click', () => socket.emit('join', requesterUsername));
     listItem.appendChild(joinButton);
 });
@@ -314,6 +315,8 @@ function showMenu(name) {
     moveShipButton.disabled = true;
     const requestButtons = document.querySelectorAll('.request-game-button');
     requestButtons.forEach(button => button.disabled = true);
+    const joinButtons = document.querySelectorAll('.join-button');
+    joinButtons.forEach(button => button.disabled = true);
 
     for(let menu of menus) {
         if (menu.name == name) {
@@ -329,6 +332,8 @@ function showMenu(name) {
             } else if (name == 'find') {
                 const requestButtons = document.querySelectorAll('.request-game-button');
                 requestButtons.forEach(button => button.disabled = false);
+                const joinButtons = document.querySelectorAll('.join-button');
+                joinButtons.forEach(button => button.disabled = false);
             } else if (name == 'game') {
                 if (isTurn) {
                     fireButton.disabled = false;
