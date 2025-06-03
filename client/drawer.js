@@ -142,7 +142,7 @@ function drawSingleBoard(startX, gridNum) {
         const tileRect = tileRects[i];
         const x = i % GRID_SIZE;
         const y = Math.floor(i / GRID_SIZE);
-        tileRect.on('click', function() {
+        tileRect.on('mousedown touchstart', function() {
             const gameState = window.getGameState();
             if (!gameState.isReady || !gameState.isTurn) return;
 
@@ -157,7 +157,7 @@ function drawSingleBoard(startX, gridNum) {
             gridLayer.batchDraw();
         });
 
-        tileRect.on('mouseover', function() {
+        tileRect.on('mouseover touchstart', function() {
             const gameState = window.getGameState();
             if (!gameState.isReady || !gameState.isTurn) return;
 
@@ -165,7 +165,7 @@ function drawSingleBoard(startX, gridNum) {
             this.stroke('#4CAF50');
         })
 
-        tileRect.on('mouseout', function() {
+        tileRect.on('mouseout touchend', function() {
             const gameState = window.getGameState();
             if (!gameState.isReady || !gameState.isTurn) return;
 
