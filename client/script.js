@@ -174,6 +174,7 @@ socket.on('disconnect', function() {
     username = null;
     oppUsername = null;
     gameRoom = null;
+    window.location.reload();
 });
 
  // Handle turn start 
