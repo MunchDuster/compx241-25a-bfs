@@ -200,7 +200,7 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                         
             shipImage.on('mouseup', function() {
                 const gameState = window.getGameState();
-                if (!gameState.isMoveShipMode) return;
+                if (!gameState.isMoveShipMode || ship.isHit) return;
                 window.setSelectedShip(ship); 
                 console.log("Selected Ship: ", ship.type, " at: ", ship.x, ship.y);
             });
@@ -420,6 +420,15 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, p
 function renderShipDamage(pos, gridNum = 2) {
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
 
+    currShips.forEach(ship => {
+        const CELLS = window.getShipCellsFromCentre(ship, ship.centerTile.x, ship.centerTile.y);
+        CELLS.forEach(cell => {
+            if(cell.x == pos.x && cell.y == pos.y) {
+                ship.isHit = true;
+           }
+        });
+    });
+    
     // Generate a random number from 0 to 3 for the damage sprite
     const randDamageSprite = Math.floor(Math.random() * 4);
     const damageImg = new Image();

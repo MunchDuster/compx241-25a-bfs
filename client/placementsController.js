@@ -60,6 +60,7 @@ function initPlacements(isPlayer1) {
             rotation: 0,
             isPlaced: false,
             konvaImg: null,
+            isHit: false,
         });
 
         console.log("Ship " + def.type + " placement x: ", shipPlacementX, " y: ", tempY);
@@ -92,7 +93,7 @@ function setupInputListeners() {
                         }
                     }
 
-console.log("Dragging ship: ", ship.type); // me when i copy and paste lmao im sure this will work right?
+                    console.log("Dragging ship: ", ship.type); // me when i copy and paste lmao im sure this will work right?
                 } else {
                     this.draggable(false);
                 }
