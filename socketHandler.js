@@ -150,6 +150,12 @@ function SocketHandler(socket, io) {
         console.log(`Disconnecting: ${user ? user.toString() : socket.id}`);
         if (!user || !user.name) return;
 
+        if (user.isFinding) {
+            socket.leave('finding');
+            user.isFinding = false;
+            io.to('finding').emit('find-results', User.getAllFinding());
+        }
+
         if (user.gameId) {
             const game = Game.getById(user.gameId);
             if (!game) {
@@ -167,10 +173,6 @@ function SocketHandler(socket, io) {
             }
 
             game.userDisconnected(user.name, socket.id);
-        }
-        else if (user.isFinding) {
-            socket.leave('finding');
-            io.to('finding').emit('find-results', User.getAllFinding());
         }
         
         user.delete();
