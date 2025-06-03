@@ -425,6 +425,9 @@ function fireMissile() {
         }
     };
 
+    feedbackLayer.destroyChildren();
+    feedbackLayer.batchDraw();
+
     console.log("Firing");
     socket.emit('play-turn', turn, (response) => {
         const success = response.success;
@@ -505,11 +508,6 @@ function updateMoveShipButton() {
         moveShipButton.style.color = '#666666';
     } else {
         moveShipButton.style.opacity = '1';
-    }
-
-    if (!isMoveShipMode) {
-        feedbackLayer.destroyChildren();
-        feedbackLayer.batchDraw();
     }
 }
 
