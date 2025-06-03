@@ -456,7 +456,20 @@ function moveShip() {
 
     let {x, y} = {x: {pos: 0, grid: 0}, y: {pos: 0, grid: 0}};
     const GRIDSPACING =  getCanvasPosFromGridPos(1, 1, 1).y - getCanvasPosFromGridPos(1, 0, 1).y; //get the spacing between the positions of two adjacent squares
-    
+
+    const originalPos = {
+        x: selectedShip.x,
+        y: selectedShip.y,
+        centerTile: {
+            x: selectedShip.centerTile.x,
+            y: selectedShip.centerTile.y
+        },
+        konvaPos: {
+            x: selectedShip.konvaImg.x(),
+            y: selectedShip.konvaImg.y()
+        }
+    };
+
     switch (selectedDirection) {
         case 0: //up
             y = {pos: -GRIDSPACING, grid: -1}; 
@@ -499,13 +512,12 @@ function moveShip() {
     socket.emit('play-turn', turn, (response) => {
         if (!response.success) {
             // Revert movement if server rejected it
-            selectedShip.x -= x.pos;
-            selectedShip.y -= y.pos;
-            selectedShip.centerTile.x -= x.grid;
-            selectedShip.centerTile.y -= y.grid;
-            
-            selectedShip.konvaImg.x(selectedShip.x);
-            selectedShip.konvaImg.y(selectedShip.y);
+            selectedShip.x = originalPos.x;
+            selectedShip.y = originalPos.y;
+            selectedShip.centerTile.x = originalPos.centerTile.x;
+            selectedShip.centerTile.y = originalPos.centerTile.y;
+            selectedShip.konvaImg.x(originalPos.konvaPos.x);
+            selectedShip.konvaImg.y(originalPos.konvaPos.y);
             
             console.log("Move failed:", response.result);
         } else {
