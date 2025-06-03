@@ -415,17 +415,28 @@ function canMoveShip() {
 
 function updateMoveShipButton() {
     if (isMoveShipMode) {
-        moveShipButton.style.background = '#4CAF50';
+        moveShipButton.style.background = '#45a049'; // green 👾👽
         moveShipButton.style.color = 'white';
         moveShipButton.style.fontWeight = 'bold';
+        moveShipButton.style.cursor = 'pointer';
         moveShipButton.innerText = 'Moving Ship';
     } else {
-        moveShipButton.style.background = '#f0f0f0';
+        moveShipButton.style.background = '#d9d9d9';
         moveShipButton.style.color = 'black';
         moveShipButton.style.fontWeight = 'bold';
+        moveShipButton.style.cursor = 'pointer';
         moveShipButton.innerText = 'Move Ship';
-        
-        // Clear arrows
+    }
+
+    // handle disabled ♿ state
+    if (!isTurn || moveShipButton.disabled) {
+        moveShipButton.style.opacity = '0.6';
+        moveShipButton.style.cursor = 'not-allowed';
+        moveShipButton.style.background = '#cccccc';
+        moveShipButton.style.color = '#666666';
+    }
+
+    if (!isMoveShipMode) {
         feedbackLayer.destroyChildren();
         feedbackLayer.batchDraw();
     }
