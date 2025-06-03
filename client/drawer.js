@@ -425,9 +425,10 @@ function addHitMissMarker(x, y, isHit) {
             image: markerImg,
             width: TILE_SIZE,
             height: TILE_SIZE,
+            listening: false,
         });
-        gridLayer.add(marker);
-        gridLayer.batchDraw();
+        feedbackLayer.add(marker);
+        feedbackLayer.batchDraw();
 
         const fadeOut = new Konva.Tween({
             node: marker,
@@ -435,7 +436,7 @@ function addHitMissMarker(x, y, isHit) {
             opacity: 0,
             onFinish: () => {
                 marker.destroy();
-                gridLayer.batchDraw();
+                feedbackLayer.batchDraw();
             }
         });
 
