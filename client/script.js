@@ -491,6 +491,8 @@ function moveShip() {
         }
         canMoveShip();
     });
+
+    moveShipButton.disabled = true;
 }
 
 window.moveShip = moveShip;
