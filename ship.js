@@ -122,11 +122,11 @@ class Ship {
     getMovedCenter(direction) {
         switch (direction) {
             case 0: 
-            return {x: this.centreTile.x, y: this.centreTile.y + 1};
+            return {x: this.centreTile.x, y: this.centreTile.y - 1};
             case 1: 
             return {x: this.centreTile.x + 1, y: this.centreTile.y};
             case 2: 
-            return {x: this.centreTile.x, y: this.centreTile.y - 1};
+            return {x: this.centreTile.x, y: this.centreTile.y + 1};
             case 3: 
             return {x: this.centreTile.x - 1, y: this.centreTile.y};
         }
