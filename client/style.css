@@ -11,6 +11,7 @@ body {
     margin: 0;  
     padding: 0; 
     text-align: center;
+    background-color: #e6e6e6;
 }
 
 .menu-button {
@@ -73,6 +74,11 @@ body {
 #game-controls button {
     font-weight: bold;
     font-size: 16px;
+    background-color: #d9d9d9;
+}
+
+#game-controls button:hover:not(:disabled) {
+    background-color: #cccccc;
 }
 
 .slidecontainer {
