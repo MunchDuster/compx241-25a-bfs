@@ -467,6 +467,7 @@ function fireMissile() {
         } else if (turn.type == 'recon-missile') {
             window.highlightReconArea(selectedTile, 2);
             window.showMineCount(selectedTile, 2, response.result.mineCount);
+            playAudio('scan');
         }
 
         selectedTile = null;
