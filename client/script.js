@@ -276,17 +276,7 @@ function rejoin() {
     playerTurnText.innerHTML = "";
 
     // DESTROY ALL CHILDREN 💣🧨💥🧒💥👶👨‍👩‍👧‍👦💥👩‍👦💥👪💥👩‍👧‍👦
-    if (stagesAndLayers) {
-        stagesAndLayers.gridLayer.destroyChildren();
-        stagesAndLayers.shipLayer.destroyChildren();
-        stagesAndLayers.feedbackLayer.destroyChildren();
-        stagesAndLayers.shipPlacementLayer.destroyChildren();
-        
-        stagesAndLayers.gridLayer.batchDraw();
-        stagesAndLayers.shipLayer.batchDraw();
-        stagesAndLayers.feedbackLayer.batchDraw();
-        stagesAndLayers.shipPlacementLayer.batchDraw();
-    }
+    window.destroyStageAndLayers();
 
     socket.emit('rejoin-lobby', username, (response) => {
         if (!response.success) return;
