@@ -1,5 +1,9 @@
 // Initialize Socket.IO connection to server
-const socket = io();
+const socket = io({
+    reconnectionAttempts: 3,
+    reconnectionDelay: 1000,
+    timeout: 5000
+});
 
 // Define menu states and their corresponding DOM elements
 const menus = [
