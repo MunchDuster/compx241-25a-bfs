@@ -353,19 +353,21 @@ function highlightMineBlastArea(centerPos, gridNum = 1) {
 function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Miss Splash");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
-    animateGif(x, y, 9, 100, 'splash', 'gif');
-    if (showPermanentImage) {
-        addPermanentMarker(x, y, false);
-    }
+    animateGif(x, y, 9, 100, 'splash', 'gif', () => {
+        if (showPermanentImage) {
+            addPermanentMarker(x, y, false);
+        }
+    });
 }
 
 function playHitExplosion(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Hit Explosion");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
-    animateGif(x, y, 8, 100, 'boom', 'gif');
-    if (showPermanentImage) {
-        addPermanentMarker(x, y, true);
-    }
+    animateGif(x, y, 8, 100, 'boom', 'gif', () => {
+        if (showPermanentImage) {
+            addPermanentMarker(x, y, true);
+        }
+    });
 }
 
 function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, onComplete) {
@@ -403,6 +405,7 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, o
                 setTimeout(() => {
                     frame.destroy();
                     feedbackLayer.batchDraw();
+                    if (onComplete) onComplete();
                 }, frameDuration);
             }
         };
