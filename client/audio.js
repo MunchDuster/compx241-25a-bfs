@@ -18,7 +18,7 @@ function initializeAudioSystem() {
 // volume control
 function updateGain() {
     const volume = volumeSlider.value * gainMultiplier;
-    console.log('setting volume: ' + volume);
+    // console.log('setting volume: ' + volume);
     gainNode.gain.value = volume;
 }
 function initializeVolumeSlider() {
