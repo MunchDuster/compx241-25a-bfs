@@ -174,7 +174,7 @@ function SocketHandler(socket, io) {
         }
         
         user.delete();
-
+        io.to('finding').emit('find-results', User.getAllFinding());
         // if(user.isFinding) {
         //     io.to('finding').emit('find-results', User.getAllFinding());
         // }
