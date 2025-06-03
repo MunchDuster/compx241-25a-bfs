@@ -560,3 +560,45 @@ function moveShip() {
 }
 
 window.moveShip = moveShip;
+
+(function() {
+    // prevent right click context menu
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    
+    //prevent keyboard shortcuts for dev tools
+    document.addEventListener('keydown', e => {
+        if (e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+            (e.ctrlKey && e.key === 'U')
+        ) {
+            e.preventDefault();
+        }
+    });
+
+    //validate button states periodically
+    setInterval(() => {
+        const gameState = window.getGameState();
+        
+        // return to lobby button
+        const returnButton = document.getElementById('return-to-lobby-button');
+        if (returnButton) {
+            returnButton.disabled = !gameState.gameEnded;
+        }
+
+        // request game buttons
+        const requestButtons = document.querySelectorAll('.request-game-button');
+        requestButtons.forEach(button => {
+            button.disabled = !gameState.isFinding;
+        });
+
+        // game control buttons
+        const gameButtons = document.querySelectorAll('#game-controls button');
+        gameButtons.forEach(button => {
+            if (!gameState.isTurn) {
+                button.disabled = true;
+                button.style.cursor = 'not-allowed';
+                button.style.opacity = '0.6';
+            }
+        });
+    }, 100);
+})();
