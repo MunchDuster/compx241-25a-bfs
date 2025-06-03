@@ -643,6 +643,29 @@ function getStageAndLayers() {
     };
 }
 
+function destroyStageAndLayers() {
+    if (!stage) return;
+    
+    gridLayer.destroyChildren();
+    shipLayer.destroyChildren();
+    feedbackLayer.destroyChildren();
+    shipPlacementLayer.destroyChildren();
+        
+    gridLayer.batchDraw();
+    shipLayer.batchDraw();
+    feedbackLayer.batchDraw();
+    shipPlacementLayer.batchDraw();
+
+    stage.clear();
+    stage.destroy();
+
+    stage = null;
+    gridLayer = null;
+    shipLayer = null;
+    feedbackLayer = null;
+    shipPlacementLayer = null;
+}
+
 function getMineCountColor(count) {
     switch(count) {
         // i love mine sweeper 💥🧹
@@ -678,5 +701,6 @@ window.showMoveShipButton = showMoveShipButton;
 // Helper Functions
 window.getDrawerValues = getDrawerValues;
 window.getStageAndLayers = getStageAndLayers;
+window.destroyStageAndLayers = destroyStageAndLayers;
 window.getCanvasPosFromGridPos = getCanvasPosFromGridPos;
 window.getGridPosFromCanvasPos = getGridPosFromCanvasPos;
