@@ -154,7 +154,7 @@ socket.on('game-ended', (message) => {
     //Reset Game and Opponent
     oppUsername = null;
     gameRoom = null;
-
+    isReady = false;
 });
 
 // Handle disconnection from server
@@ -203,12 +203,6 @@ socket.on('see-turn', (turnInfo) => {
             }, 800);
         }
     }
-
-    // if (!gameState.isOver) {
-    //     alert("Game Over");
-    //     alert("Hey, another alert.")
-    //     rejoin();
-    // }
 });
 
 /*
