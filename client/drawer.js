@@ -346,7 +346,7 @@ function highlightMineBlastArea(centerPos, gridNum = 1) {
 
         setTimeout(() => {
             fadeOut.play();
-        }, 3000);
+        }, 500);
     });
 }
 
