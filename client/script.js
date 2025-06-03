@@ -184,6 +184,7 @@ socket.on('turn-start', () => {
     fireButton.disabled = false;
     toggleMissileModeButton.disabled = false;
     moveShipButton.disabled = false;
+    updateMoveShipButton();
     playerTurnText.innerHTML = "Your Turn!";
 });
 
@@ -196,6 +197,7 @@ socket.on('wait-start', () => {
     fireButton.disabled = true;
     toggleMissileModeButton.disabled = true;
     moveShipButton.disabled = true;
+    updateMoveShipButton();
     playerTurnText.innerHTML = oppUsernameDisplay.innerText + "'s Turn!";
 });
 
@@ -500,6 +502,8 @@ function updateMoveShipButton() {
         moveShipButton.style.cursor = 'not-allowed';
         moveShipButton.style.background = '#cccccc';
         moveShipButton.style.color = '#666666';
+    } else {
+        moveShipButton.style.opacity = '1';
     }
 
     if (!isMoveShipMode) {
