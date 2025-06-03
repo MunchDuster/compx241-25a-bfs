@@ -527,7 +527,6 @@ function moveShip() {
     });
 
     document.body.style.cursor = 'default';
-    isMoveShipMode = false;
     updateMoveShipButton();
     moveShipButton.disabled = true;
 }
