@@ -353,18 +353,22 @@ function highlightMineBlastArea(centerPos, gridNum = 1) {
 function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Miss Splash");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
-    const permaImagePath = showPermanentImage ? '../assets/images/perma-miss.png' : null;
-    animateGif(x, y, 9, 100, 'splash', 'gif', permaImagePath);
+    animateGif(x, y, 9, 100, 'splash', 'gif');
+    if (showPermanentImage) {
+        addPermanentMarker(x, y, false);
+    }
 }
 
 function playHitExplosion(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Hit Explosion");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
-    const permaImagePath = showPermanentImage ? '../assets/images/perma-hit.png' : null;
-    animateGif(x, y, 8, 100, 'boom', 'gif', permaImagePath);
+    animateGif(x, y, 8, 100, 'boom', 'gif');
+    if (showPermanentImage) {
+        addPermanentMarker(x, y, true);
+    }
 }
 
-function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, permaImagePath) {
+function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, onComplete) {
     let currentFrame = 0;
     let frame = null;
 
@@ -386,10 +390,6 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, p
             });
             feedbackLayer.add(frame);
             feedbackLayer.batchDraw();
-
-            if (permaImagePath !== null && frameImg.src === permaImagePath) {
-                return;
-            }
             
             // Check if there are more frames
             if (currentFrame < totalFrames - 1) {
@@ -401,10 +401,6 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, p
             } else {
                 // Last frame so destroy it and stop animating
                 setTimeout(() => {
-                    if (permaImagePath != null) {
-                        frameImg.src = permaImagePath;
-                        return;
-                    }
                     frame.destroy();
                     feedbackLayer.batchDraw();
                 }, frameDuration);
@@ -415,6 +411,22 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, p
     }
 
     showNextFrame();
+}
+
+function addPermanentMarker(x, y, isHit) {
+    const markerImg = new Image();
+    markerImg.onload = function() {
+        const marker = new Konva.Image({
+            x: x,
+            y: y,
+            image: markerImg,
+            width: TILE_SIZE,
+            height: TILE_SIZE,
+        });
+        gridLayer.add(marker);
+        gridLayer.batchDraw();
+    };
+    markerImg.src = isHit ? '../assets/images/perma-hit.png' : '../assets/images/perma-miss.png';
 }
 
 function renderShipDamage(pos, gridNum = 2) {
