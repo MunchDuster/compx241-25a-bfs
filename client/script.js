@@ -336,6 +336,11 @@ function playerTurn() {
 }
 
 function toggleMissileMode() {
+    if (!isTurn) {
+        console.log("Not your turn!");
+        return;
+    }
+
     if (isMoveShipMode) {
         isMoveShipMode = false;
         updateMoveShipButton();
@@ -345,6 +350,7 @@ function toggleMissileMode() {
     toggleMissileModeButton.innerText = isMissileMode ? 'Switch to Scan' : 'Switch to Missile';
     fireButton.innerText = isMissileMode ? 'Fire Missile' : 'Fire Recon Missile';
 }
+
 
 function fireMissile() {
     if (!isTurn || !selectedTile) return; // return for now
@@ -443,9 +449,14 @@ function updateMoveShipButton() {
 }
 
 function moveShip() {
+    if (!isTurn) {
+        console.log("Not your turn!");
+        return;
+    }
+
     let {x, y} = {x: {pos: 0, grid: 0}, y: {pos: 0, grid: 0}};
     const GRIDSPACING =  getCanvasPosFromGridPos(1, 1, 1).y - getCanvasPosFromGridPos(1, 0, 1).y; //get the spacing between the positions of two adjacent squares
-
+    
     switch (selectedDirection) {
         case 0: //up
             y = {pos: -GRIDSPACING, grid: -1}; 
@@ -503,6 +514,9 @@ function moveShip() {
         canMoveShip();
     });
 
+    document.body.style.cursor = 'default';
+    isMoveShipMode = false;
+    updateMoveShipButton();
     moveShipButton.disabled = true;
 }
 
