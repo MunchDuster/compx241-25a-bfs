@@ -469,9 +469,28 @@ function moveShip() {
     selectedShip.konvaImg.y(tempY);
 
     console.log("New Position: Image: ", selectedShip.konvaImg.x(), selectedShip.konvaImg.y());
-
-    canMoveShip();
-    moveShipButton.disabled = true;
+    const turn = {
+        type: 'move',
+        ship: selectedShip.type,
+        direction: selectedDirection/90,
+    };
+    socket.emit('play-turn', turn, (response) => {
+        if (!response.success) {
+            // Revert movement if server rejected it
+            selectedShip.x -= x.pos;
+            selectedShip.y -= y.pos;
+            selectedShip.centerTile.x -= x.grid;
+            selectedShip.centerTile.y -= y.grid;
+            
+            selectedShip.konvaImg.x(selectedShip.x);
+            selectedShip.konvaImg.y(selectedShip.y);
+            
+            console.log("Move failed:", response.result);
+        } else {
+            console.log("Move successful");
+        }
+        canMoveShip();
+    });
 }
 
 window.moveShip = moveShip;
