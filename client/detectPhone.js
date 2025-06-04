@@ -16,12 +16,3 @@ function detectMob() {
     });
 }
 console.log('is mobile ', detectMob());
-
-// scale menu UI up
-if (detectMob()) {
-    // document.querySelector('.slidecontainer').style.transform = 'scale(2.4) translate(50%, 425%)';
-    // document.querySelector('h1').style.transform = 'scale(2) translate(12.5%, 25%)';
-    // document.getElementById('start-menu').style.transform = 'scale(3) translate(13%, 35%)';
-    document.querySelector('body').style.transform = 'scale(3) translate(0, 35%)';
-    // document.querySelector('body').style.overflow = 'hidden';
-}

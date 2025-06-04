@@ -12,6 +12,7 @@ body {
     padding: 0; 
     text-align: center;
     background-color: #e6e6e6;
+    font-family: 'Ubuntu';
 }
 
 .menu-button {
@@ -88,7 +89,7 @@ body {
 }
 
 .whyCantIHearTheSong {
-    color: #ccc;
+    color: #696969;
     font-size: smaller;
 }
 
@@ -115,4 +116,110 @@ body {
 .game-logo {
     max-width: 700px;
     height: auto;
+}
+.tab {
+    display: inline-block;
+    width: 4rem;
+}
+#credits-menu {
+    text-align: left;
+    width: 400px;
+    margin: auto;
+    background-color: #c2c2c2;
+    padding: 10px;
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+/* Mobile Styles stuff */
+/* Update mobile styles */
+@media screen and (max-width: 768px) {
+    body {
+        transform: none !important; /* Remove the scale(3) that was causing issues */
+        padding: 10px;
+        margin: 0;
+        width: 100vw;
+        overflow-x: hidden;
+    }
+
+    .logo-container {
+        margin: 10px 0;
+        width: 100%;
+    }
+
+    .game-logo {
+        max-width: 90vw; /* Make logo responsive */
+        height: auto;
+        margin: 0 auto;
+    }
+
+    .game-board-wrapper {
+        width: 100%;
+        padding: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    #game-board {
+        width: 100%;
+        height: auto;
+        transform-origin: top left;
+        margin: 0;
+    }
+
+    .menu-button {
+        width: 90%;
+        height: 50px;
+        font-size: 18px;
+        margin: 8px auto;
+        padding: 10px;
+        display: block;
+    }
+
+    #find-menu {
+        width: 95%;
+        margin: 0 auto;
+    }
+
+    .find-result {
+        padding: 8px;
+        margin: 6px;
+        font-size: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .slidecontainer {
+        position: relative;
+        width: 90%;
+        margin: 10px auto;
+        left: auto;
+        top: auto;
+    }
+
+    input[type="range"] {
+        width: 100%;
+    }
+
+    #game-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin: 10px 0;
+    }
+
+    #game-controls button {
+        width: 90%;
+        font-size: 18px;
+        padding: 12px;
+        margin: 4px 0;
+    }
+}
+
+/* Prevent zooming on iOS */
+@viewport {
+    width: device-width;
+    zoom: 1.0;
 }

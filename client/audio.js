@@ -1,6 +1,14 @@
 const audioDirectory = 'assets/audio/';
 const audioType = '.mp3';
 const volumeSlider = document.getElementById('volumeSlider');
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+if (isMobile) {
+    volumeSlider.value = "1.0";
+} else {
+    volumeSlider.value = "0.1";
+}
+
 
 let audioContext;
 let gainNode;
@@ -57,14 +65,15 @@ async function smoothVolumeChange(target, time) {
 }
 
 // uses a basic fade-out and fade-in to make the change less jarring
-async function changeToInGameMusic() {
-    console.log('changing music');
+async function setMusic(menuName) {
+    let trackName = menuName == 'game' ? 'game-theme' : 'intro';
     const originalVolume = volumeSlider.value;
     await smoothVolumeChange(0, 2);
-    musicTrack.mediaElement.src = audioDirectory + 'game-theme' + audioType;
+    musicTrack.mediaElement.src = audioDirectory + trackName + audioType;
     musicAudio.play();
     await smoothVolumeChange(originalVolume, 2);
 }
+
 function playAudio(audioName, looping=false) {
     console.log('playing audio: ' + audioName);
     const audioPath = audioDirectory + audioName + audioType;
@@ -100,4 +109,4 @@ window.addEventListener('click', onUserInteracted);
 
 // -- EXPORTs --
 window.playAudio = playAudio;
-window.switchMusic = changeToInGameMusic;
+window.switchMusic = setMusic;

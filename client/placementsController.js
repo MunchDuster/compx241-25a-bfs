@@ -78,8 +78,18 @@ function setupInputListeners() {
     unplacedShips.forEach(ship => {
         if (ship.konvaImg) {
             const konvaShip = ship.konvaImg;
+            
+            konvaShip.on('tap click', function(e) {
+                gameState = window.getGameState();
+                if (!gameState.isReady && ship.isPlaced) {
+                    handleRotation(this, true);
+                    e.cancelBubble = true;
+                    window.highlightShipSnapCells([], false);
+                }
+            });
 
             konvaShip.on('dragstart', function () {
+                gameState = window.getGameState();
                 if (!gameState.isReady) {
                     draggedShip = this;
                     this.moveTo(stagesAndLayers.shipPlacementLayer);
@@ -92,12 +102,10 @@ function setupInputListeners() {
                             currentPlacedShips.splice(index, 1);
                         }
                     }
-
-                    console.log("Dragging ship: ", ship.type); // me when i copy and paste lmao im sure this will work right?
+                    console.log("Dragging ship: ", ship.type);
                 } else {
                     this.draggable(false);
                 }
-                
             });
 
             konvaShip.on('dragmove', function () {
@@ -137,9 +145,8 @@ function setupInputListeners() {
             if (shipData && !shipData.isPlaced) {
                 handleRotation(draggedShip, e.evt.deltaY < 0);
             }
-        }
-    });
-    window.addEventListener('keydown', handlePlacementRotationKey);
+        }});
+        window.addEventListener('keydown', handlePlacementRotationKey);
     });
 
     console.log("Input listeners set up for unplaced ships");
@@ -157,7 +164,9 @@ function handlePlacementRotationKey(e) {
 
 function handleRotation(konvaShip, isClockwise = true) {
     const shipData = konvaShip.shipRef;
-    if (!shipData || shipData.isPlaced) return;
+    if (!shipData) return;
+
+    const originalRotation = shipData.rotation;
 
     if (isClockwise) {
         shipData.rotation = (shipData.rotation + 1) % 4;
@@ -166,6 +175,16 @@ function handleRotation(konvaShip, isClockwise = true) {
     }
 
     konvaShip.rotation(shipData.rotation * 90);
+
+    if (shipData.isPlaced) {
+        const cells = getShipCellsFromCentre(shipData, shipData.centerTile.x, shipData.centerTile.y);
+        if (!isPlacementValid(shipData, cells)) {
+            // Revert rotation if invalid
+            shipData.rotation = originalRotation;
+            konvaShip.rotation(originalRotation * 90);
+            return;
+        }
+    }
 
     updateSnapToTile(konvaShip);
     konvaShip.getLayer().batchDraw();

@@ -137,7 +137,6 @@ socket.on('requested-game', (requesterUsername) => {
 // Set up game state when joining a game
 socket.on('joined', (otherUsername, joinedGameRoom, isFirstPlayer) => {
     showMenu('game'); // Switch to game menu
-    switchMusic();
     isPlayer1 = isFirstPlayer;
     oppUsernameDisplay.innerText = otherUsername;
     oppUsername = otherUsername;
@@ -243,6 +242,16 @@ function getGameState() {
     };
 }
 
+function credits() {
+    const menu = document.getElementById('credits-menu');
+    if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+    }
+    else {
+        menu.classList.add('hidden');
+    }
+}
+
 window.getGameState = getGameState;
 // Function to show invalid username alert to client
 function showUsernameAlert() {
@@ -328,6 +337,7 @@ function showMenu(name) {
             // Show requested menu if not already shown
             menu.shown = true;
             menu.element.classList.remove('hidden');
+            switchMusic(menu.name);
 
             if (name == 'start') {
                 document.getElementById('uname').disabled = false;

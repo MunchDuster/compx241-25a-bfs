@@ -142,7 +142,7 @@ function drawSingleBoard(startX, gridNum) {
         const tileRect = tileRects[i];
         const x = i % GRID_SIZE;
         const y = Math.floor(i / GRID_SIZE);
-        tileRect.on('click', function() {
+        tileRect.on('mousedown touchstart', function() {
             const gameState = window.getGameState();
             if (!gameState.isReady || !gameState.isTurn) return;
 
@@ -157,7 +157,7 @@ function drawSingleBoard(startX, gridNum) {
             gridLayer.batchDraw();
         });
 
-        tileRect.on('mouseover', function() {
+        tileRect.on('mouseover touchstart', function() {
             const gameState = window.getGameState();
             if (!gameState.isReady || !gameState.isTurn) return;
 
@@ -165,7 +165,7 @@ function drawSingleBoard(startX, gridNum) {
             this.stroke('#4CAF50');
         })
 
-        tileRect.on('mouseout', function() {
+        tileRect.on('mouseout touchend', function() {
             const gameState = window.getGameState();
             if (!gameState.isReady || !gameState.isTurn) return;
 
@@ -346,7 +346,7 @@ function highlightMineBlastArea(centerPos, gridNum = 1) {
 
         setTimeout(() => {
             fadeOut.play();
-        }, 3000);
+        }, 500);
     });
 }
 
@@ -355,7 +355,7 @@ function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
     animateGif(x, y, 9, 100, 'splash', 'gif', () => {
         if (showPermanentImage) {
-            addPermanentMarker(x, y, false);
+            addHitMissMarker(x, y, false);
         }
     });
 }
@@ -365,7 +365,7 @@ function playHitExplosion(pos, gridNum = 2, showPermanentImage = false) {
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
     animateGif(x, y, 8, 100, 'boom', 'gif', () => {
         if (showPermanentImage) {
-            addPermanentMarker(x, y, true);
+            addHitMissMarker(x, y, true);
         }
     });
 }
@@ -416,7 +416,7 @@ function animateGif(x, y, totalFrames, frameDuration, gifname, filetype = png, o
     showNextFrame();
 }
 
-function addPermanentMarker(x, y, isHit) {
+function addHitMissMarker(x, y, isHit) {
     const markerImg = new Image();
     markerImg.onload = function() {
         const marker = new Konva.Image({
@@ -425,9 +425,24 @@ function addPermanentMarker(x, y, isHit) {
             image: markerImg,
             width: TILE_SIZE,
             height: TILE_SIZE,
+            listening: false,
         });
-        gridLayer.add(marker);
-        gridLayer.batchDraw();
+        feedbackLayer.add(marker);
+        feedbackLayer.batchDraw();
+
+        const fadeOut = new Konva.Tween({
+            node: marker,
+            duration: 2,
+            opacity: 0,
+            onFinish: () => {
+                marker.destroy();
+                feedbackLayer.batchDraw();
+            }
+        });
+
+        setTimeout(() => {
+            fadeOut.play();
+        }, 10420);
     };
     markerImg.src = isHit ? '../assets/images/perma-hit.png' : '../assets/images/perma-miss.png';
 }
@@ -458,8 +473,6 @@ function renderShipDamage(pos, gridNum = 2) {
         // Draw on ship layer as it is like part of the ship or smth 
         shipLayer.add(damageImage);
         shipLayer.batchDraw();
-
-        
     };
     damageImg.src = `../assets/images/damage/damage_${randDamageSprite}.png`;
 }
@@ -483,10 +496,9 @@ function showMineCount(pos, gridNum = 2, count) {
     feedbackLayer.add(text);
     feedbackLayer.batchDraw();
 
-    // Fade out animation
     const fadeOut = new Konva.Tween({
         node: text,
-        duration: 2, // 2 seconds
+        duration: 4,
         opacity: 0,
         onFinish: () => {
             text.destroy();
@@ -494,10 +506,9 @@ function showMineCount(pos, gridNum = 2, count) {
         }
     });
 
-    // Start fade after 3 seconds
     setTimeout(() => {
         fadeOut.play();
-    }, 3000);
+    }, 10420);
 }
 
 function showMoveShipButton(ship, gridnum = 1) {
@@ -573,7 +584,7 @@ function showMoveShipButton(ship, gridnum = 1) {
                 rotation: arrowData.rotation
             });
 
-            arrowShape.on('mouseover', function() {
+            arrowShape.on('mousedown touchstart', function() {
                 document.body.style.cursor = 'pointer';
                 this.opacity(1);
                 feedbackLayer.batchDraw();
@@ -585,7 +596,7 @@ function showMoveShipButton(ship, gridnum = 1) {
                 feedbackLayer.batchDraw();
             });
 
-            arrowShape.on('click', function() {
+            arrowShape.on('mouseup touchend', function() {
                 console.log('arrow clicked 🍕🍕🍕 on ', ship.type);
                 window.setSelectedDirection(this.rotation());
                 window.moveShip();
