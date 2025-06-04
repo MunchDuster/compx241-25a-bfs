@@ -16,8 +16,7 @@
         </div>
         <!-- Start Menu View -->
         <div id="start-menu">
-            <div id='invalid-username-alert' class = "hidden">Invalid username. Must be 3-16 letters with no spaces. <button id="close-alert" onclick=closeUsernameAlert()>Close</button>  </div>
-            <br>
+            
             <label for="uname">Username:</label>
             <input type="text" id="uname" name="uname">
             <br>
@@ -26,8 +25,13 @@
             <button id="settings" class="menu-button" onclick="settings()">Settings</button>
             <br>
             <button id="credits" class="menu-button" onclick="credits()">Credits</button>
+            <br>
+            <div id='invalid-username-alert' class = "hidden">
+                Invalid username. Must be 3-16 letters with no spaces. 
+                <button id="close-alert" onclick=closeUsernameAlert()>Close</button>  
+            </div>
         </div>
-        <!-- //<div> Game over! <div id="game-over-message"></div></div> -->
+        
         <!-- Find Game Menu: Displays when searching for opponents -->
         <div id="find-menu" class="hidden">
             <div>Your username is <div class="username-display"></div></div>
