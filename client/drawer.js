@@ -227,7 +227,7 @@ function renderShipsPlacementDock(ships, onShipsLoaded) {
                 shipRef: ship,
             });
                         
-            shipImage.on('mouseup', function() {
+            shipImage.on('mouseup touchstart', function() {
                 const gameState = window.getGameState();
                 if (!gameState.isMoveShipMode || ship.isHit) return;
                 window.setSelectedShip(ship); 
