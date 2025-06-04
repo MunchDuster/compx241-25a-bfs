@@ -25,11 +25,32 @@ window.addEventListener('load', preloadFont);
 
 function initCanvas(isPlayer1) {
     preloadFont();
+
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+    // Get container dimensions
+    const container = document.getElementById('game-board-container');
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    // Calculate scale to fit container while maintaining aspect ratio
+    const scaleX = containerWidth / CANVAS_WIDTH;
+    const scaleY = containerHeight / CANVAS_HEIGHT;
+    const scale = Math.min(scaleX, scaleY);
+
     stage = new Konva.Stage({
         container: 'game-board',
         width: CANVAS_WIDTH,
         height: CANVAS_HEIGHT
     });
+
+    if (isMobile) {
+        stage.scale({ x: scale, y: scale });
+        
+        // Center the stage in container
+        const offsetX = (containerWidth - CANVAS_WIDTH * scale) / 2;
+        stage.x(offsetX);
+    }
 
     isUserPlayer1 = isPlayer1;
 
@@ -617,6 +638,16 @@ function showMoveShipButton(ship, gridnum = 1) {
  */
 
 function getGridPosFromCanvasPos(canvasX, canvasY, gridStartX) {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    
+    if (isMobile) {
+        // Adjust for stage scaling and position
+        const scale = stage.scaleX();
+        const stageX = stage.x();
+        canvasX = (canvasX - stageX) / scale;
+        canvasY = canvasY / scale;
+    }
+
     const gridStartY = CANVAS_TOP_GAP;
     const relativeX = canvasX - gridStartX;
     const relativeY = canvasY - gridStartY;

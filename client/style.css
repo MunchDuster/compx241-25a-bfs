@@ -135,8 +135,9 @@ body {
 /* Update mobile styles */
 @media screen and (max-width: 768px) {
     body {
-        transform: none !important; /* Remove the scale(3) that was causing issues */
+        transform: none !important;
         padding: 10px;
+        padding-right: 10px;
         margin: 0;
         width: 100vw;
         overflow-x: hidden;
@@ -148,7 +149,7 @@ body {
     }
 
     .game-logo {
-        max-width: 90vw; /* Make logo responsive */
+        max-width: 90vw;
         height: auto;
         margin: 0 auto;
     }
@@ -156,15 +157,25 @@ body {
     .game-board-wrapper {
         width: 100%;
         padding: 0;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #game-board-container {
+        width: 100vw;
+        height: auto;
+        aspect-ratio: 1320/525;
+        position: relative;
+        overflow: hidden;
     }
 
     #game-board {
-        width: 100%;
-        height: auto;
-        transform-origin: top left;
-        margin: 0;
+        width: 100% !important;
+        height: 100% !important;
+        transform-origin: center;
+        background-color: #4279aa;
     }
 
     .menu-button {
