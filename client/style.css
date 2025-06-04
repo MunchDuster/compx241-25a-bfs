@@ -164,11 +164,28 @@ body {
     }
 
     #game-board-container {
-        width: 100vw;
+        width: 100%;
         height: auto;
         aspect-ratio: 1320/525;
         position: relative;
         overflow: hidden;
+        margin: 0 auto;
+    }
+
+    @media (orientation: landscape) {
+        #game-board-container {
+            height: 90vh;
+            width: auto;
+            aspect-ratio: 1320/525;
+        }
+    }
+
+    @media (orientation: portrait) {
+        #game-board-container {
+            width: 95vw;
+            height: auto;
+            aspect-ratio: 1320/525;
+        }
     }
 
     #game-board {

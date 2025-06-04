@@ -26,31 +26,11 @@ window.addEventListener('load', preloadFont);
 function initCanvas(isPlayer1) {
     preloadFont();
 
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-    // Get container dimensions
-    const container = document.getElementById('game-board-container');
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-
-    // Calculate scale to fit container while maintaining aspect ratio
-    const scaleX = containerWidth / CANVAS_WIDTH;
-    const scaleY = containerHeight / CANVAS_HEIGHT;
-    const scale = Math.min(scaleX, scaleY);
-
     stage = new Konva.Stage({
         container: 'game-board',
         width: CANVAS_WIDTH,
         height: CANVAS_HEIGHT
     });
-
-    if (isMobile) {
-        stage.scale({ x: scale, y: scale });
-        
-        // Center the stage in container
-        const offsetX = (containerWidth - CANVAS_WIDTH * scale) / 2;
-        stage.x(offsetX);
-    }
 
     isUserPlayer1 = isPlayer1;
 
@@ -63,6 +43,7 @@ function initCanvas(isPlayer1) {
 
     TILE_SIZE = Math.round((CANVAS_HEIGHT - CANVAS_TOP_GAP) / GRID_SIZE) - OFFSET * 2;
     drawGameBoard(isPlayer1);
+    handleResize();
     console.log("Konva Drawer Initialised. Grid is on the " + (isPlayer1 ? "left" : "right"));
 }
 
@@ -79,6 +60,33 @@ async function preloadFont() {
         console.error('Failed to load Micro 5 font:', error);
     }
 }
+
+function handleResize() {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobile || !stage) return;
+
+    // Get container dimensions
+    const container = document.getElementById('game-board-container');
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    // Calculate scale to fit container while maintaining aspect ratio
+    const scaleX = containerWidth / CANVAS_WIDTH;
+    const scaleY = containerHeight / CANVAS_HEIGHT;
+    const scale = Math.min(scaleX, scaleY);
+
+    stage.scale({ x: scale, y: scale });
+    
+    const offsetX = (containerWidth - CANVAS_WIDTH * scale) / 2;
+    stage.x(offsetX);
+    
+    stage.batchDraw();
+}
+
+window.addEventListener('orientationchange', () => {
+    setTimeout(handleResize, 100); // Small delay to allow new dimensions to settle
+});
+window.addEventListener('resize', handleResize);
 
 function drawGameBoard(isPlayer1) {
     gridLayer.destroyChildren();
