@@ -490,7 +490,7 @@ function addHitMissMarker(x, y, isHit) {
 
         setTimeout(() => {
             fadeOut.play();
-        }, 10420);
+        }, 69420);
     };
     markerImg.src = isHit ? '../assets/images/perma-hit.png' : '../assets/images/perma-miss.png';
 }
