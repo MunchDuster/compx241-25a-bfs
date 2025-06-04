@@ -344,10 +344,12 @@ function showMenu(name) {
                 document.getElementById('find').disabled = false;
                 document.getElementById('settings').disabled = false;
                 document.getElementById('credits').disabled = false;
+                document.getElementById('credits-menu').classList.add('hidden');
             } else if (name == 'find') {
                 const requestButtons = document.querySelectorAll('.request-game-button');
                 requestButtons.forEach(button => button.disabled = false);
                 const joinButtons = document.querySelectorAll('.join-button');
+                document.getElementById('credits-menu').classList.add('hidden');
                 joinButtons.forEach(button => button.disabled = false);
             } else if (name == 'game') {
                 if (isTurn) {
@@ -355,6 +357,7 @@ function showMenu(name) {
                     toggleMissileModeButton.disabled = false;
                     moveShipButton.disabled = false;
                 }
+                document.getElementById('credits-menu').classList.add('hidden');
             }
         } else {
             menu.shown = false;
