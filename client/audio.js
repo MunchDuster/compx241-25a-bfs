@@ -1,6 +1,14 @@
 const audioDirectory = 'assets/audio/';
 const audioType = '.mp3';
 const volumeSlider = document.getElementById('volumeSlider');
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+if (isMobile) {
+    volumeSlider.value = "1.0";
+} else {
+    volumeSlider.value = "0.1";
+}
+
 
 let audioContext;
 let gainNode;
