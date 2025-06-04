@@ -167,7 +167,12 @@ function handleRotation(konvaShip, isClockwise = true) {
     if (!shipData) return;
 
     const originalRotation = shipData.rotation;
+    const originalCenterTile = {
+        x: shipData.centerTile.x,
+        y: shipData.centerTile.y
+    };
 
+    // Update rotation first
     if (isClockwise) {
         shipData.rotation = (shipData.rotation + 1) % 4;
     } else {
@@ -177,16 +182,42 @@ function handleRotation(konvaShip, isClockwise = true) {
     konvaShip.rotation(shipData.rotation * 90);
 
     if (shipData.isPlaced) {
-        const cells = getShipCellsFromCentre(shipData, shipData.centerTile.x, shipData.centerTile.y);
+        const cells = getShipCellsFromCentre(shipData, originalCenterTile.x, originalCenterTile.y);
         if (!isPlacementValid(shipData, cells)) {
             // Revert rotation if invalid
             shipData.rotation = originalRotation;
             konvaShip.rotation(originalRotation * 90);
             return;
         }
+
+        // Only update position if rotation was valid
+        const centerPos = window.getCanvasPosFromGridPos(
+            originalCenterTile.x,
+            originalCenterTile.y,
+            1
+        );
+
+        let verticalOffset = 0;
+        let horizontalOffset = 0;
+        if (shipData.size % 2 === 0) {
+            const offset = (drawerValues.TILE_SIZE / 2) + 1;
+            switch (shipData.rotation) {
+                case 0: verticalOffset = -offset; break;
+                case 1: horizontalOffset = offset; break;
+                case 2: verticalOffset = offset; break;
+                case 3: horizontalOffset = -offset; break;
+            }
+        }
+
+        konvaShip.position({
+            x: centerPos.x + drawerValues.TILE_SIZE / 2 + horizontalOffset,
+            y: centerPos.y + drawerValues.TILE_SIZE / 2 + verticalOffset
+        });
+    } else if (draggedShip === konvaShip) {
+        // Update snap preview while dragging
+        updateSnapToTile(konvaShip);
     }
 
-    updateSnapToTile(konvaShip);
     konvaShip.getLayer().batchDraw();
 }
 
