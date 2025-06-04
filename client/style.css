@@ -119,49 +119,89 @@ body {
 }
 
 /* Mobile Styles stuff */
+/* Update mobile styles */
 @media screen and (max-width: 768px) {
+    body {
+        transform: none !important; /* Remove the scale(3) that was causing issues */
+        padding: 10px;
+        margin: 0;
+        width: 100vw;
+        overflow-x: hidden;
+    }
+
+    .logo-container {
+        margin: 10px 0;
+        width: 100%;
+    }
+
+    .game-logo {
+        max-width: 90vw; /* Make logo responsive */
+        height: auto;
+        margin: 0 auto;
+    }
+
     .game-board-wrapper {
         width: 100%;
         padding: 0;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
 
     #game-board {
         width: 100%;
         height: auto;
         transform-origin: top left;
+        margin: 0;
     }
 
     .menu-button {
-        width: 80%;
-        height: 60px;
-        font-size: 20px;
+        width: 90%;
+        height: 50px;
+        font-size: 18px;
         margin: 8px auto;
         padding: 10px;
         display: block;
     }
 
-    input[type="text"] {
-        width: 80%;
-        height: 40px;
-        font-size: 18px;
-        margin: 8px auto;
+    #find-menu {
+        width: 95%;
+        margin: 0 auto;
     }
 
     .find-result {
-        padding: 10px;
-        margin: 8px;
-        font-size: 18px;
+        padding: 8px;
+        margin: 6px;
+        font-size: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    #find-menu {
+    .slidecontainer {
+        position: relative;
         width: 90%;
+        margin: 10px auto;
+        left: auto;
+        top: auto;
+    }
+
+    input[type="range"] {
+        width: 100%;
+    }
+
+    #game-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin: 10px 0;
     }
 
     #game-controls button {
-        font-size: 20px;
-        padding: 15px;
-        margin: 8px;
+        width: 90%;
+        font-size: 18px;
+        padding: 12px;
+        margin: 4px 0;
     }
 }
 
