@@ -584,7 +584,7 @@ function showMoveShipButton(ship, gridnum = 1) {
                 rotation: arrowData.rotation
             });
 
-            arrowShape.on('mouseover', function() {
+            arrowShape.on('mousedown touchstart', function() {
                 document.body.style.cursor = 'pointer';
                 this.opacity(1);
                 feedbackLayer.batchDraw();
@@ -596,7 +596,7 @@ function showMoveShipButton(ship, gridnum = 1) {
                 feedbackLayer.batchDraw();
             });
 
-            arrowShape.on('click', function() {
+            arrowShape.on('mouseup touchend', function() {
                 console.log('arrow clicked 🍕🍕🍕 on ', ship.type);
                 window.setSelectedDirection(this.rotation());
                 window.moveShip();
