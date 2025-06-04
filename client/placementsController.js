@@ -78,18 +78,18 @@ function setupInputListeners() {
     unplacedShips.forEach(ship => {
         if (ship.konvaImg) {
             const konvaShip = ship.konvaImg;
-
+            
             konvaShip.on('tap click', function(e) {
+                gameState = window.getGameState();
                 if (!gameState.isReady && ship.isPlaced) {
-                    // Rotate ship on tap/click when placed
                     handleRotation(this, true);
                     e.cancelBubble = true;
-                    // Clear any existing highlights
                     window.highlightShipSnapCells([], false);
                 }
             });
 
             konvaShip.on('dragstart', function () {
+                gameState = window.getGameState();
                 if (!gameState.isReady) {
                     draggedShip = this;
                     this.moveTo(stagesAndLayers.shipPlacementLayer);
