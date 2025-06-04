@@ -2,6 +2,7 @@ const audioDirectory = 'assets/audio/';
 const audioType = '.mp3';
 const volumeSlider = document.getElementById('volumeSlider');
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+let currentMusic = 'start';
 
 if (isMobile) {
     volumeSlider.value = "1.0";
@@ -63,10 +64,14 @@ async function smoothVolumeChange(target, time) {
         }
     }
 }
+function playCurrentMusic() {
+    setMusic(currentMusic);
+}
 
 // uses a basic fade-out and fade-in to make the change less jarring
 async function setMusic(menuName) {
-    let trackName = menuName == 'game' ? 'game-theme' : 'intro';
+    currentMusic = menuName;
+    let trackName = menuName;
     const originalVolume = volumeSlider.value;
     await smoothVolumeChange(0, 2);
     musicTrack.mediaElement.src = audioDirectory + trackName + audioType;
@@ -95,7 +100,7 @@ function onUserInteracted() {
     initializeAudioSystem();
     initializeVolumeSlider();
     hideTheExplanation();
-    const {audio, track} = playAudio('intro', true);
+    const {audio, track} = playAudio(currentMusic, true);
     musicAudio = audio;
     musicTrack = track;
     console.log('music track is set to ' + musicTrack);
@@ -110,3 +115,4 @@ window.addEventListener('click', onUserInteracted);
 // -- EXPORTs --
 window.playAudio = playAudio;
 window.switchMusic = setMusic;
+window.playCurrentMusic = playCurrentMusic
