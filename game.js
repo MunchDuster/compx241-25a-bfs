@@ -146,6 +146,7 @@ class Game {
         const userX = user.socketId == this.user1.socketId ? this.user1 : this.user2;
         userX.ships = ships;
         userX.ready = true;
+        //this.printShipPlacements(userX); // Uncomment to print ship placements to console for debugging
     }
 
     startGame(){
@@ -310,6 +311,48 @@ class Game {
             this.user2.callbacks.turnBegin();
             this.user1.callbacks.waitBegin();
         }
+    }
+
+    printShipPlacements(user) {
+        const ships = user.ships;
+        const board = new Array(BOARD_SIZE * BOARD_SIZE).fill('·');
+        
+        // Fill board with ship markers
+        for (const ship of ships) {
+            for (const tile of ship.tiles) {
+                const index = (tile.y * BOARD_SIZE) + tile.x;
+                let marker;
+                switch(ship.type) {
+                    case SHIP_TYPES.BATTLESHIP: marker = 'B'; break;
+                    case SHIP_TYPES.CARRIER: marker = 'A'; break;
+                    case SHIP_TYPES.CRUISER: marker = 'U'; break;
+                    case SHIP_TYPES.DESTROYER: marker = 'D'; break;
+                    case SHIP_TYPES.SUBMARINE: marker = 'S'; break;
+                }
+                board[index] = marker;
+            }
+        }
+
+        // Print board header
+        console.log(`\n${user.name}'s Ship Placements:`);
+        process.stdout.write('   ');
+        for (let x = 0; x < BOARD_SIZE; x++) {
+            process.stdout.write(` ${x} `);
+        }
+        process.stdout.write('\n   ');
+        process.stdout.write('-'.repeat(BOARD_SIZE * 3));
+        process.stdout.write('\n');
+
+        // Print board with ships
+        for (let y = 0; y < BOARD_SIZE; y++) {
+            process.stdout.write(` ${String.fromCharCode(65 + y)} |`);
+            for (let x = 0; x < BOARD_SIZE; x++) {
+                const index = (y * BOARD_SIZE) + x;
+                process.stdout.write(` ${board[index]} `);
+            }
+            process.stdout.write('\n');
+        }
+        process.stdout.write('\n');
     }
 }
 
