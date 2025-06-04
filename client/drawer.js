@@ -1,4 +1,4 @@
-let stage, gridLayer, shipLayer, feedbackLayer, shipPlacementLayer;
+let stage, gridLayer, shipLayer, feedbackLayer, shipPlacementLayer, markerLayer;
 
 const CANVAS_WIDTH = 1320;
 const CANVAS_HEIGHT = 525;
@@ -38,8 +38,9 @@ function initCanvas(isPlayer1) {
     shipLayer = new Konva.Layer();
     feedbackLayer = new Konva.Layer();
     shipPlacementLayer = new Konva.Layer();
+    markerLayer = new Konva.Layer();
 
-    stage.add(gridLayer, shipLayer, feedbackLayer, shipPlacementLayer);
+    stage.add(gridLayer, shipLayer, feedbackLayer, shipPlacementLayer, markerLayer);
 
     TILE_SIZE = Math.round((CANVAS_HEIGHT - CANVAS_TOP_GAP) / GRID_SIZE) - OFFSET * 2;
     drawGameBoard(isPlayer1);
@@ -382,6 +383,15 @@ function highlightMineBlastArea(centerPos, gridNum = 1) {
 function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Miss Splash");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
+
+    const existingMarkers = markerLayer.find('Image').filter(marker => 
+        marker.x() === x && marker.y() === y
+    );
+    existingMarkers.forEach(marker => {
+        marker.destroy();
+    });
+    markerLayer.batchDraw();
+
     animateGif(x, y, 9, 100, 'splash', 'gif', () => {
         if (showPermanentImage) {
             addHitMissMarker(x, y, false);
@@ -392,6 +402,15 @@ function playMissSplash(pos, gridNum = 2, showPermanentImage = false) {
 function playHitExplosion(pos, gridNum = 2, showPermanentImage = false) {
     console.log("Hit Explosion");
     const {x, y} = getCanvasPosFromGridPos(pos.x, pos.y, gridNum);
+
+    const existingMarkers = markerLayer.find('Image').filter(marker => 
+        marker.x() === x && marker.y() === y
+    );
+    existingMarkers.forEach(marker => {
+        marker.destroy();
+    });
+    markerLayer.batchDraw();
+
     animateGif(x, y, 8, 100, 'boom', 'gif', () => {
         if (showPermanentImage) {
             addHitMissMarker(x, y, true);
@@ -456,8 +475,8 @@ function addHitMissMarker(x, y, isHit) {
             height: TILE_SIZE,
             listening: false,
         });
-        feedbackLayer.add(marker);
-        feedbackLayer.batchDraw();
+        markerLayer.add(marker);
+        markerLayer.batchDraw();
 
         const fadeOut = new Konva.Tween({
             node: marker,
@@ -465,7 +484,7 @@ function addHitMissMarker(x, y, isHit) {
             opacity: 0,
             onFinish: () => {
                 marker.destroy();
-                feedbackLayer.batchDraw();
+                markerLayer.batchDraw();
             }
         });
 
