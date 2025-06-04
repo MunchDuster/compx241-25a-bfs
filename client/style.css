@@ -117,6 +117,19 @@ body {
     max-width: 700px;
     height: auto;
 }
+.tab {
+    display: inline-block;
+    width: 4rem;
+}
+#credits-menu {
+    text-align: left;
+    width: 400px;
+    margin: auto;
+    background-color: #c2c2c2;
+    padding: 10px;
+    border: 2px solid grey;
+    border-radius: 5px;
+}
 
 /* Mobile Styles stuff */
 /* Update mobile styles */

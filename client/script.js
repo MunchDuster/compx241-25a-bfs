@@ -242,6 +242,16 @@ function getGameState() {
     };
 }
 
+function credits() {
+    const menu = document.getElementById('credits-menu');
+    if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+    }
+    else {
+        menu.classList.add('hidden');
+    }
+}
+
 window.getGameState = getGameState;
 // Function to show invalid username alert to client
 function showUsernameAlert() {
