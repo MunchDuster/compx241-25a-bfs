@@ -265,7 +265,7 @@ function closeUsernameAlert() {
 // Handle user clicking "Find Game" button
 function find() {
     //Get the username from the client 
-    username = document.getElementById("uname").value;
+    username = document.getElementById("username").value;
     
     //Emit find event to server with username
     socket.emit('find', username, (response) => {
@@ -318,7 +318,7 @@ function rejoin() {
 
 // Function to handle menu visibility
 function showMenu(name) {
-    document.getElementById('uname').disabled = true;
+    document.getElementById('username').disabled = true;
     document.getElementById('find').disabled = true;
     document.getElementById('settings').disabled = true;
     document.getElementById('credits').disabled = true;
